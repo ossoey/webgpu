@@ -1,0 +1,196 @@
+<!--
+   Copyright (c) 2013-2023 Ossoey/experiments. 
+   All rights reserved.
+-->
+<!-- About Us page for Ossoey segmentation website -->
+
+<!-- Authored by ebanga@ossoey.com/ebanga@hotmail.com -->
+
+<!DOCTYPE html> 
+<html>
+    <head>
+        <title>Webgpu</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>       
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.8/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/pdfmake.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/vfs_fonts.js"></script>
+        
+        <style>
+            :root {
+
+            --padding-right-left:20vw;   
+            --header-padding:5px var(--padding-right-left);
+            --padding-right-left-querymedia:2vw;  
+            --header-padding-querymedia:5px var(--padding-right-left-querymedia);
+            --header-margin: 0 2vh;
+
+            --main-head-color: #505050de;
+            --main-body--color: #ffffff;
+            --main-font-family: Arial, Helvetica, sans-serif;
+            --main-font-color: black;
+            --main-line-color: rgba(0, 217, 255, 0.787);
+            --main-padding:5px 10vw;
+
+            --table-head-color:rgba(54, 37, 4, 0.787);
+            --table-body-color1:rgba(0, 217, 255, 0.787);
+            --table-alternate-color2:rgb(255, 209, 73);
+            --table-font-family: Arial, Helvetica, sans-serif;
+            --table-font-color:rgba(54, 37, 4, 0.787);
+            
+            --h1-font-size: 24px;
+            --h2-font-size: 20px;
+            } 
+
+            *{
+                margin: 0; 
+                padding: 0;
+                box-sizing: border-box;  
+            }
+
+            #header-id{
+                padding:var( --header-padding);
+            }
+
+            #logo-menu-id{
+                display: flex;
+                justify-content: space-between;
+            }
+
+            #menu-button-id{
+                cursor: pointer;
+            }
+
+            .menu-subbutton {
+                width: 20px;
+                height: 2px;
+                background-color:var( --main-line-color); 
+                margin: 2px;
+            }
+
+            nav{
+                display: flex;
+                justify-content: end;
+            }
+
+            #menu-id{
+                position: absolute;
+                top: 20px;
+                right:var(--padding-right-left);
+                display: none;
+            }
+
+            .nav-item{
+                cursor: pointer;
+                border: 2px var(--table-body-color1) solid;
+                margin: 3px 0;
+            }
+
+
+
+
+
+            #main-id{
+                display: flex;
+                justify-content: center;
+            }
+
+
+            #home-id{
+                padding:var( --header-padding);
+             
+            }
+
+            .home-menu-item{
+                cursor: pointer;
+                margin: 3px 0;
+                border: 2px var(--table-body-color1) solid;
+            }
+
+
+            #footer-id{
+                padding:var( --header-padding);
+            }
+
+           @media (max-width:900px) {
+                #header-id{
+                    padding:var(    --header-padding-querymedia );
+                }
+
+                #menu-id{
+ 
+                    right:var(--padding-right-left-querymedia);
+ 
+                }
+
+                #home-id{
+                    padding:var(    --header-padding-querymedia );
+                }
+
+                #footer-id{
+                    padding:var(  --header-padding-querymedia );
+                }
+
+           }         
+
+        </style>
+
+    </head>
+    <body>
+
+        <div id="header-id"> 
+
+            <div id="logo-menu-id">
+                <div id="logo-frame-id">
+                    <div id="logo-id"> <h1>Webgpu</h1></div>
+                    <div id="module-id"> <h2>Module</h2></div>
+                </div> 
+                <div id="menu-button-id">
+                    <div class="menu-subbutton"></div>
+                    <div class="menu-subbutton"></div>
+                    <div class="menu-subbutton"></div>
+                </div>
+            </div>
+            <nav>
+                <div id="menu-id">
+                    <div class="nav-item">Vector addition</div>
+                    <div class="nav-item">Dot product</div>
+                    <div class="nav-item">Magnitude</div>
+                    <div class="nav-item">Distance</div>  
+                </div>
+            </nav>
+        </div>
+
+        <div id="main-id">
+
+            <div id="home-id">
+                    <div class="home-menu-item">Vector addition</div>
+                    <div class="home-menu-item">Dot product</div>
+                    <div class="home-menu-item">Magnitude</div>
+                    <div class="home-menu-item">Distance</div>  
+            </div>
+
+        </div>
+        
+        <div id="footer-id">
+            <h3> webgpu.Ossoey.com &#169;Copyright 2023 </h3>
+        </div>  
+
+        <script >
+            const menu_button = document.getElementById('menu-button-id');
+            const menu_id = document.getElementById('menu-id');
+
+            menu_button.addEventListener('click', () => {
+            if (menu_id.style.display === 'block') {
+                menu_id.style.display = 'none'; // Hide the element
+            } else {
+                
+                menu_id.style.display = 'block'; // Display the element
+            }
+            });
+
+        </script>
+
+    </body>
+
+</html>
