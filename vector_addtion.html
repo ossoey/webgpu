@@ -106,6 +106,63 @@
             }
 
 
+
+
+
+
+            .fielsetclass {
+                border: none;
+                margin-bottom: 20px;
+                border-top: 2px var(--table-body-color1) solid;
+            }
+
+             legend {
+                margin: 5px 0;
+              
+            }
+
+            .containerinputframe{
+                display: grid;
+                grid-template-columns: repeat(3, 1fr); /* Three equal-sized columns */
+                grid-gap: 3px; /* Adjust the gap between items */
+              
+            }
+
+            .inputtext{
+                padding: 4px 6px;
+                margin: 0 8px;
+            }
+
+            .inputlabel{
+              
+                margin: 0 8px;
+            }
+
+            .containsubmitbutton{
+                display: grid;
+                grid-template-columns: repeat(3, 1fr); /* Three equal-sized columns */
+                grid-gap: 3px; /* Adjust the gap between items */
+              
+            }
+
+            .submitbutton{
+                border: 2px var(--table-alternate-color2) solid;
+                background-color: var(--main-head-color);
+                cursor: pointer;
+                padding: 5px 7px;
+            }
+
+            .table-striped tbody tr:nth-child(even) {
+                background-color:var(--table-body-color1);
+            }
+            .table-striped tbody tr:nth-child(odd) {
+                background-color:var(--table-alternate-color2);
+            }
+
+
+   
+
+
             #footer-id{
                 padding:var( --header-padding);
             }
@@ -129,6 +186,10 @@
                     padding:var(  --header-padding-querymedia );
                 }
 
+                .containerinputframe{
+                    display: block;
+                }
+
            }         
 
         </style>
@@ -141,7 +202,7 @@
             <div id="logo-menu-id">
                 <div id="logo-frame-id">
                     <div id="logo-id"> <h1>Webgpu</h1></div>
-                    <div id="module-id"> <h2>Module</h2></div>
+                    <div id="module-id"> <h2>Vector Addition</h2></div>
                 </div> 
                 <div id="menu-button-id">
                     <div class="menu-subbutton"></div>
@@ -151,22 +212,71 @@
             </div>
             <nav>
                 <div id="menu-id">
-                    <div class="nav-item"id="homepage-id"> <a href="vector_addtion.html">Vector addition</a></div>
+                    <div class="nav-item">Vector addition</div>
                     <div class="nav-item">Dot product</div>
                     <div class="nav-item">Magnitude</div>
                     <div class="nav-item">Distance</div>  
+                    <div class="nav-item" id="homepage-id"> <a href="index.html">Home</a></div>  
                 </div>
             </nav>
         </div>
 
         <div id="main-id">
 
-            <div id="home-id">
-                    <div class="home-menu-item" id="homepage-id"> <a href="vector_addtion.html">Vector addition</a></div>
-                    <div class="home-menu-item">Dot product</div>
-                    <div class="home-menu-item">Magnitude</div>
-                    <div class="home-menu-item">Distance</div>  
-            </div>
+            <form id="vector-addition-id">
+                
+                <fieldset id="fieldsetinput-id" class="fielsetclass">
+                    <legend><h4> Input &nbsp;</h4></legend>
+                    <div class="containerinputframe" >
+                        <div class="inputframe">
+                            <div class="inputlabel">Vector1</div>
+                            <input type="text" name="" id="vector1" class="inputtext">   
+                        </div>
+        
+                        <div class="inputframe">
+                            <div class="inputlabel">Vector2</div>
+                            <input type="text" name="" id="vector2" class="inputtext">   
+                        </div>    
+                    </div>
+                </fieldset>
+
+                <fieldset id="fieldsetsubmit-id" class="fielsetclass">
+                    <legend> <h4> Submit  &nbsp;</h4></legend>
+                    <div  class="containsubmitbutton">
+                        <button class="submitbutton" id="run">Run</button>
+        
+                        <button class="submitbutton" id="clear">Clear</button>    
+                    </div>
+                </fieldset>
+
+                <fieldset id="fieldsetresult-id" class="fielsetclass">
+                    <legend><h4> Output  &nbsp; </h4></legend>
+                    <div  id="tableframe-id">
+                        <table  class="table-striped">
+                          <thead>
+                            <tr>
+                              <th>Column 1</th>
+                              <th>Column 2</th>
+                              <th>Column 3</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Row 1, Column 1</td>
+                              <td>Row 1, Column 2</td>
+                              <td>Row 1, Column 3</td>
+                            </tr>
+                            <tr>
+                              <td>Row 2, Column 1</td>
+                              <td>Row 2, Column 2</td>
+                              <td>Row 2, Column 3</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+
+            </form>
 
         </div>
         
