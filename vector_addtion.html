@@ -237,6 +237,8 @@
                             <div class="inputlabel">Vector2</div>
                             <input type="text" name="" id="vector2" class="inputtext">   
                         </div>    
+
+                        <div> <canvas> </canvas></div>
                     </div>
                 </fieldset>
 
@@ -276,6 +278,8 @@
                     </div>
                 </fieldset>
 
+
+               
             </form>
 
         </div>
@@ -284,18 +288,202 @@
             <h3> webgpu.Ossoey.com &#169;Copyright 2023 </h3>
         </div>  
 
-        <script >
-            const menu_button = document.getElementById('menu-button-id');
-            const menu_id = document.getElementById('menu-id');
+        <script  type="module" >
+            // const menu_button = document.getElementById('menu-button-id');
+            // const menu_id = document.getElementById('menu-id');
 
-            menu_button.addEventListener('click', () => {
-            if (menu_id.style.display === 'block') {
-                menu_id.style.display = 'none'; // Hide the element
-            } else {
+            // menu_button.addEventListener('click', () => {
+            // if (menu_id.style.display === 'block') {
+            //     menu_id.style.display = 'none'; // Hide the element
+            // } else {
                 
-                menu_id.style.display = 'block'; // Display the element
-            }
-            });
+            //     menu_id.style.display = 'block'; // Display the element
+            // }
+            // });
+
+            // const run = document.getElementById('run');
+
+            // run.addEventListener('click', () => {
+     
+             /* 
+               Bienvenu dans La station WebGPU.  
+               
+               Intro: 
+
+               Bienvenue dans cette nouvelle série YouTube, 
+               
+               dédiée à la présentation de WebGPU !
+               
+               Je suis ravi de vous accueillir ici 
+                     pour vous plonger notement dans le monde passionnant de la technologie WebGPU.
+                     
+               Au cours de cette série,
+                     Nous allons ensemble explorer Les avantages,  les fonctionnalités et les cas d'utilisation de WebGPU le nouvel API graphique basée sur le Web.
+                      
+                Que vous soyez un développeur Web expérimenté 
+                    ou simplement curieux d'en savoir plus sur les capacités graphiques avancées du Web,
+                        cette série est faite pour vous. 
+                     
+                 Nous allons passer en revue les concepts clés, 
+                        les principes de base et les bonnes pratiques pour tirer le meilleur parti de WebGPU.
+
+                Nous aborderons des sujets tels que la programmation parallèle sur le GPU, 
+                        les shaders, 
+                            la gestion des ressources graphiques, 
+                                les techniques de rendu avancées et bien plus encore. À la fin de cette série, 
+                                    vous serez équipés des connaissances nécessaires pour créer des applications Web puissantes et visuellement captivantes.
+
+                N'oubliez donc pas de vous abonner à la chaîne 
+                    et d'activer les notifications 
+                        afin de ne manquer aucun épisode de cette série excitante. 
+                            Préparez-vous à plonger dans le monde de WebGPU et à découvrir 
+                                les possibilités illimitées qu'il offre pour la création d'applications graphiques performantes sur le Web.
+
+                Merci de vous joindre à nous et commençons cette aventure passionnante ensemble !
+
+             */
+  
+
+
+            // });
+
+
+             // wgsl language
+             // type
+
+    
+             async function main() {
+  const adapter = await navigator.gpu?.requestAdapter();
+  const device = await adapter?.requestDevice();
+  if (!device) {
+    fail('need a browser that supports WebGPU');
+    return;
+  }
+
+  // Get a WebGPU context from the canvas and configure it
+  const canvas = document.querySelector('canvas');
+  const context = canvas.getContext('webgpu');
+  const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+  context.configure({
+    device,
+    format: presentationFormat,
+      });
+
+
+  let pointCount =  12*30;   
+  let size = 0.7;
+
+  const module = device.createShaderModule({
+    label: 'our hardcoded red triangle shaders',
+    code: `
+      
+         const pointscount = ${pointCount};
+         const base = 12;
+
+
+        fn reTriangle(vertexindex:u32, center:vec2f,size:f32, subSize:f32 )->vec2f{
+            
+            var arr: array<vec2f,pointscount>;
+              
+              const lessthan = pointscount/base;
+              var sz = size;
+              for (var i = 0; i < lessthan; i++) {
+                      arr[0+12*i] = vec2f(center[0]-subSize*sz,center[1]+  subSize*sz);
+                      arr[1+12*i] = vec2f(center[0],center[1]+ 1.0*sz); 
+                      arr[2+12*i] = vec2f(center[0]+ subSize*sz,center[1] + subSize*sz);
+  
+                      arr[3+12*i] = vec2f(center[0]+ subSize*sz, center[1] + subSize*sz);
+                      arr[4+12*i] = vec2f(center[0] + 1.0*sz, center[1]);
+                      arr[5+12*i] = vec2f(center[0]+ subSize*sz, center[1]-subSize*sz);
+  
+                      arr[6+12*i] = vec2f( center[0]-subSize*sz, center[1]-subSize*sz);
+                      arr[7+12*i] = vec2f(center[0], center[1]-1.0*sz);
+                      arr[8+12*i] = vec2f( center[0]+subSize*sz, center[1]-subSize*sz);
+  
+                      arr[9+12*i] = vec2f(center[0]-subSize*sz,  center[1]+subSize*sz);
+                      arr[10+12*i] = vec2f( center[0]-1.0*sz,  center[1]);
+                      arr[11+12*i] = vec2f( center[0]-subSize*sz,  center[1]-subSize*sz) ;
+  
+                      sz = sz*subSize;
+              }
+  
+
+            return arr[vertexindex];
+        }
+
+   
+
+      @vertex fn vs(
+        @builtin(vertex_index) vertexIndex : u32
+      ) -> @builtin(position) vec4f {
+        
+
+        return vec4f(reTriangle(vertexIndex, vec2f(0,0),${size },0.95) , 0.0, 1.0);
+
+      }
+
+      @fragment fn fs() -> @location(0) vec4f {
+        return vec4f(1, 0, 0, 1);
+      }
+    `,
+  });
+
+  const pipeline = device.createRenderPipeline({
+    label: 'our hardcoded red triangle pipeline',
+    layout: 'auto',
+    vertex: {
+      module,
+      entryPoint: 'vs',
+    },
+    fragment: {
+      module,
+      entryPoint: 'fs',
+      targets: [{ format: presentationFormat }],
+    },
+  });
+
+  const renderPassDescriptor = {
+    label: 'our basic canvas renderPass',
+    colorAttachments: [
+      {
+        // view: <- to be filled out when we render
+        clearValue: [0.3, 0.3, 0.3, 1],
+        loadOp: 'clear',
+        storeOp: 'store',
+      },
+    ],
+  };
+
+  function render() {
+    // Get the current texture from the canvas context and
+    // set it as the texture to render to.
+    renderPassDescriptor.colorAttachments[0].view =
+        context.getCurrentTexture().createView();
+
+    // make a command encoder to start encoding commands
+    const encoder = device.createCommandEncoder({ label: 'our encoder' });
+
+    // make a render pass encoder to encode render specific commands
+    const pass = encoder.beginRenderPass(renderPassDescriptor);
+    pass.setPipeline(pipeline);
+    pass.draw(pointCount);  // call our vertex shader 3 times.
+    pass.end();
+
+    const commandBuffer = encoder.finish();
+    device.queue.submit([commandBuffer]);
+  }
+
+  render();
+}
+
+function fail(msg) {
+  // eslint-disable-next-line no-alert
+  alert(msg);
+}
+
+main();
+
+
 
         </script>
 
