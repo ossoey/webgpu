@@ -302,121 +302,574 @@
 
              // wgsl language
              // type
-      
-            async function ini(){
-                if(!navigator.gpu){
-                    alert(`Webgpu is not supported`);
-                    return;
-                }
+  
 
-                const adapter = await navigator.gpu.requestAdapter();
-                if (!adapter){
-                    alert('Not able to request Adapter');
-                    return;
-                }
 
-                const device = await adapter.requestDevice();
+        async function mainTriangleHardCoded(){
 
-                device.lost.then((info)=>{
-                    console.error(`Device was lost ${info.message}`);
-                    if (info.reason !==`destroyed`){
-                        ini();
-                    }
-                })
-
-                main(device);
+            //Configuration d'objet(Materiel) de traitement et d'affichage
+            const adapter = await navigator.gpu.requestAdapter();
+            if(!adapter){
+                alert(`This navigator doesn't support webgpu`);
+                return;
             }
-           
-            function main(device) {
 
-                const canvas = document.querySelector(`canvas`);
-                const context = canvas.getContext(`webgpu`);
-                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-                context.configure({device,
-                    format :canvasFormat
+            const device = await adapter.requestDevice();
+            if(!device){
+                alert(`Not able to request device`);
+                return
+            }
+
+            const canvas = document.querySelector(`canvas`);
+            const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+            const context = canvas.getContext(`webgpu`);
+            context.configure({
+                device, 
+                format:canvasFormat
+            });
+
+            // Configuration de shader et de pipeline
+
+            const shaderModule = device.createShaderModule({
+                label: `Shader for Hardecode Triangle`,
+                code: `
+                    @vertex fn vs(@builtin(vertex_index) vertexIndex : u32)-> @builtin(position) vec4f{
+                        var pos= array(
+                            vec2f(0,-0.5),
+                            vec2f(-0.5,0),
+                            vec2f(0.5,0)
+                        );
+                        return vec4f(pos[vertexIndex],0,1);
+                    }
+
+                    @fragment fn fs()->@location(0) vec4f{
+                        return vec4f(0,1,0,1);
+                    }
+                `
+            });
+
+            const pipeline = device.createRenderPipeline({
+                label: `Pipeline For hardcode triangle `,
+                layout: `auto`,
+                vertex: {
+                    entryPoint: `vs`,
+                    module: shaderModule,
+                },
+
+                fragment: {
+                    entryPoint: `fs`,
+                    module: shaderModule,
+                    targets: [{format : canvasFormat}]
+                }
+
+            });
+
+            const renderPassDescriptor = {
+                label: `renderPass descriptor triangle Hardcoded`,
+            
+                
+                colorAttachments:[{
+                    view: context.getCurrentTexture().createView(),
+                    clearValue: [0.3, 0.3, 0.3, 1],
+                    loadOp: 'clear',
+                    storeOp: 'store',
+
+
+                    
+                }]  
+            }
+
+            function render(){
+                const cmdEncoder = device.createCommandEncoder({
+                    label: `cmdEncoder HardCoded Triangle`
                 });
+
+                const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
+                                        
+                pass.setPipeline(pipeline);
+                pass.draw(3);
+                pass.end();
+
+                device.queue.submit([cmdEncoder.finish()]);
+
+            }
+
+            render();
+
+
+        }
+
+        async function interChangedColor(){
+            //Configuration d'objet(Materiel) de traitement et d'affichage
+             const adapter = await navigator.gpu.requestAdapter();
+            if(!adapter){
+                alert(`This navigator doesn't support webgpu`);
+                return;
+            }
+
+            const device = await adapter.requestDevice();
+            if(!device){
+                alert(`Not able to request device`);
+                return
+            }
+
+            const canvas = document.querySelector(`canvas`);
+            const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+            const context = canvas.getContext(`webgpu`);
+            context.configure({
+                device, 
+                format:canvasFormat
+            });
+
+            // Configuration de shader et de pipeline
+
+            const shaderModule = device.createShaderModule({
+                label: `Shader for Hardecode Triangle`,
+                code: `
+
+                    struct OutputElement{
+                        @builtin(position) position :vec4f,
+                        @location(0) color : vec4f,
+                        @location(1) @interpolate(flat) vertexIndex : u32
+                    };
+
+                    @vertex fn vs(@builtin(vertex_index) vertexIndex : u32)-> OutputElement{
+                       
+                        var pos = array(
+                            vec2f(0,0.5),
+                            vec2f(-0.5,0),
+                            vec2f(0.5,0)
+                        );
+
+                        var color = array (
+                            vec4f(1.,0,0,1),
+                            vec4f(0,1,0,1),
+                            vec4f(0,0,1,1)
+                        );
+
+                        var output : OutputElement; 
+                        output.position=  vec4f(pos[vertexIndex],0,1) ;
+                        output.color = color[vertexIndex];
+                        return output;
+                    }
+
+                    @fragment fn fs(input: OutputElement)->@location(0) vec4f{
+                        return input.color;
+                    }
+                `
+            });
+
+            const pipeline = device.createRenderPipeline({
+                label: `Pipeline For hardcode triangle `,
+                layout: `auto`,
+                vertex: {
+                    entryPoint: `vs`,
+                    module: shaderModule,
+                },
+
+                fragment: {
+                    entryPoint: `fs`,
+                    module: shaderModule,
+                    targets: [{format : canvasFormat}]
+                }
+
+            });
+
+            const renderPassDescriptor = {
+                label: `renderPass descriptor triangle Hardcoded`,
+            
+                
+                colorAttachments:[{
+                    view: context.getCurrentTexture().createView(),
+                    clearValue: [0.3, 0.3, 0.3, 1],
+                    loadOp: 'clear',
+                    storeOp: 'store',
+                    
+                }]  
+            }
+
+            function render(){
+                const cmdEncoder = device.createCommandEncoder({
+                    label: `cmdEncoder HardCoded Triangle`
+                });
+
+                const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
+                                        
+                pass.setPipeline(pipeline);
+                pass.draw(3);
+                pass.end();
+
+                device.queue.submit([cmdEncoder.finish()]);
+
+            }
+
+            render();
+
+        }
+
+
+        async function interChangedPosition(){
+            //Configuration d'objet(Materiel) de traitement et d'affichage
+             const adapter = await navigator.gpu.requestAdapter();
+            if(!adapter){
+                alert(`This navigator doesn't support webgpu`);
+                return;
+            }
+
+            const device = await adapter.requestDevice();
+            if(!device){
+                alert(`Not able to request device`);
+                return
+            }
+
+            const canvas = document.querySelector(`canvas`);
+            const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+            const context = canvas.getContext(`webgpu`);
+            context.configure({
+                device, 
+                format:canvasFormat
+            });
+
+            // Configuration de shader et de pipeline
+
+            const shaderModule = device.createShaderModule({
+                label: `Shader for Hardecode Triangle`,
+                code: `
+
+                    struct OutputElement{
+                        @builtin(position) position :vec4f,
+                        @location(0) color : vec4f,
+                        @location(1) @interpolate(flat) vertexIndex : u32
+                    };
+
+                    struct Rect{
+                        color: vec4f, 
+                        isFilled: bool
+                    };
+
+                    // offset move spot, tex is texture
+                    fn rect(offset_x:f32,offset_y:f32 ,width_x:f32,width_y:f32,text_x:f32,text_y:f32,colorFore:vec4f)->Rect{
+                
+                        var output: Rect;
+                        if((text_x>0+offset_x)&& (text_x<width_x+offset_x))&&
+                        ((text_y>0+offset_y)&& (text_y<width_y+offset_y)){
+                            output.isFilled = true;  
+                            output.color = colorFore;
+                        } else{
+                            output.isFilled = false;  
+                        }
+                        
+                        return output;
+                    }
+
+                    @vertex fn vs(@builtin(vertex_index) vertexIndex : u32)-> OutputElement{
+                       
+                        var pos = array(
+                            vec2f(0,1),
+                            vec2f(-1,-0.75),
+                            vec2f(1,-0.75)
+                        );
+
+                        var color = array (
+                            vec4f(1.,0,0,1),
+                            vec4f(0,1,0,1),
+                            vec4f(0,0,1,1)
+                        );
+
+                        var output : OutputElement; 
+                        output.position=  vec4f(pos[vertexIndex],0,1) ;
+                        output.color = color[vertexIndex];
+                        return output;
+                    }
+
+
+        
+                    @fragment fn fs(input: OutputElement)->@location(0) vec4f{
+                        var pos = input.position;
+                        var result = vec4f(1,0,1,0);
+
+                        var  spot = rect(150,50,3,3,pos.x,pos.y,vec4f(1,1,1,0));
+                        if (spot.isFilled == true) {
+                            result = spot.color;
+                        }  
+
+                                    
+                        return  result;
+                    }
+                `
+            });
+
+            const pipeline = device.createRenderPipeline({
+                label: `Pipeline For hardcode triangle `,
+                layout: `auto`,
+                vertex: {
+                    entryPoint: `vs`,
+                    module: shaderModule,
+                },
+
+                fragment: {
+                    entryPoint: `fs`,
+                    module: shaderModule,
+                    targets: [{format : canvasFormat}]
+                }
+
+            });
+
+            const renderPassDescriptor = {
+                label: `renderPass descriptor triangle Hardcoded`,
+            
+                
+                colorAttachments:[{
+                    view: context.getCurrentTexture().createView(),
+                    clearValue: [0.3, 0.3, 0.3, 1],
+                    loadOp: 'clear',
+                    storeOp: 'store',
+
+
+                    
+                }]  
+            }
+
+            function render(){
+                const cmdEncoder = device.createCommandEncoder({
+                    label: `cmdEncoder HardCoded Triangle`
+                });
+
+                const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
+                                        
+                pass.setPipeline(pipeline);
+                pass.draw(3);
+                pass.end();
+
+                device.queue.submit([cmdEncoder.finish()]);
+
+            }
+
+            render();
+
+        }
+
+
+        
+        async function interChangedSpot(){
+            //Configuration d'objet(Materiel) de traitement et d'affichage
+             const adapter = await navigator.gpu.requestAdapter();
+            if(!adapter){
+                alert(`This navigator doesn't support webgpu`);
+                return;
+            }
+
+            const device = await adapter.requestDevice();
+            if(!device){
+                alert(`Not able to request device`);
+                return
+            }
+
+            const canvas = document.querySelector(`canvas`);
+            const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+            const context = canvas.getContext(`webgpu`);
+            context.configure({
+                device, 
+                format:canvasFormat
+            });
+
+            // Configuration de shader et de pipeline
+
+            const shaderModule = device.createShaderModule({
+                label: `Shader for Hardecode Triangle`,
+                code: `
+
+                    struct OutputElement{
+                        @builtin(position) position :vec4f,
+                        @location(0) color : vec4f,
+                        @location(1) @interpolate(flat) vertexIndex : u32
+                    };
+
+                    struct Rect{
+                        color: vec4f, 
+                        isFilled: bool
+                    };
+
+                    struct RecCoords {
+                        offset_x:f32,offset_y:f32 ,width_x:f32,width_y:f32,text_x:f32,text_y:f32
+                    }
+
+                    // offset move spot, tex is texture
+                    fn rect(offset_x:f32,offset_y:f32 ,width_x:f32,width_y:f32,text_x:f32,text_y:f32,colorFore:vec4f)->Rect{
+                
+                        var output: Rect;
+                        if((text_x>0+offset_x)&& (text_x<width_x+offset_x))&&
+                        ((text_y>0+offset_y)&& (text_y<width_y+offset_y)){
+                            output.isFilled = true;  
+                            output.color = colorFore;
+                        } else{
+                            output.isFilled = false;  
+                        }
+                        
+                        return output;
+                    }
+
+
+
+                    fn foo(p : ptr<function, i32>) -> i32 {
+                    let x = *p;
+                    *p += 1;
+                    return x;
+                    }
+
+
+                    var<private> modf: f32 = 0.0;
+
+                    fn block( ){
 
                 
-                const shaderModule = device.createShaderModule({
-                    label: `Hardcoded Triangle, ShaderModule`,
-                    code:`
-                        @vertex fn vs(@builtin(vertex_index) vertexIndex: u32)->@builtin(position) vec4f{
-                            var pos = array(
-                                vec2f(0.0, 0.5),
-                                vec2f(-0.5, 0.0),
-                                vec2f(0.5,0.0)
-                            );
+                
+                    }
 
-                            return vec4f(pos[vertexIndex],0,1);
+                    @vertex fn vs(@builtin(vertex_index) vertexIndex : u32)-> OutputElement{
+                       
+                        var pos = array(
+                            vec2f(0,1),
+                            vec2f(-1,-0.75),
+                            vec2f(1,-0.75)
+                        );
 
+                        var color = array (
+                            vec4f(1.,0,0,1),
+                            vec4f(0,1,0,1),
+                            vec4f(0,0,1,1)
+                        );
+
+                        var output : OutputElement; 
+                        output.position=  vec4f(pos[vertexIndex],0,1) ;
+                        output.color = color[vertexIndex];
+                        return output;
+                    }
+
+
+        
+                    @fragment fn fs(input: OutputElement)->@location(0) vec4f{
+                        var pos = input.position;
+                        var result = vec4f(1,0,1,0);
+                        
+                        var rp : RecCoords;
+                        //offset_x:f32,offset_y:f32 ,width_x:f32,width_y:f32,text_x:f32,text_y 
+                        rp.offset_x = 100;
+                        rp.offset_y = 50;
+                        rp.width_x = 1;
+                        rp.width_y = 10;
+                        var move_offset_x:f32;
+                        
+                      
+                        var  spot = rect(rp.offset_x,rp.offset_y,rp.width_x ,rp.width_y,pos.x,pos.y,vec4f(1,1,1,0));
+                        if (spot.isFilled == true) {
+                            result = spot.color;
+                        }  
+
+                       
+                        for (var i = 0; i<20; i=i+1 ) 
+                        {
+                            spot = rect(rp.offset_x+ move_offset_x ,rp.offset_y,rp.width_x ,rp.width_y,pos.x,pos.y,vec4f(1,1,1,0));
+
+                            if (spot.isFilled == true) {
+                                result = spot.color;
+                            
+                            }  
+
+                            move_offset_x = move_offset_x+ rp.width_x;
+                        
                         }
+                        
 
-                        @fragment fn fs()->@location(0) vec4f {
 
-                            return vec4f(0.0, 0.0,1.0,1.0);
-                        }
+                     
+         
+                   
+                                    
+                        return  result;
+                    }
+                `
+            });
 
-                    `
+            const pipeline = device.createRenderPipeline({
+                label: `Pipeline For hardcode triangle `,
+                layout: `auto`,
+                vertex: {
+                    entryPoint: `vs`,
+                    module: shaderModule,
+                },
+
+                fragment: {
+                    entryPoint: `fs`,
+                    module: shaderModule,
+                    targets: [{format : canvasFormat}]
+                }
+
+            });
+
+            const renderPassDescriptor = {
+                label: `renderPass descriptor triangle Hardcoded`,
+            
+                
+                colorAttachments:[{
+                    view: context.getCurrentTexture().createView(),
+                    clearValue: [0.3, 0.3, 0.3, 1],
+                    loadOp: 'clear',
+                    storeOp: 'store',
+
+
+                    
+                }]  
+            }
+
+            function render(){
+                const cmdEncoder = device.createCommandEncoder({
+                    label: `cmdEncoder HardCoded Triangle`
                 });
 
-                const pipeline = device.createRenderPipeline({
-                    label: `Hardcoded Triangle , Pipeline`, 
-                    layout: `auto`, 
-                    vertex: {
-                        module:shaderModule, 
-                        entryPoint: `vs`, 
-                    },
+                const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
+                                        
+                pass.setPipeline(pipeline);
+                pass.draw(3);
+                pass.end();
 
-                    fragment: {
-                        module: shaderModule,
-                        entryPoint: `fs`, 
-                        targets :[{format:canvasFormat}]
-                    }
-                });
-
-
-                const renderPassDescriptor = {
-                    label: `Hardcoded triangle, renderPassDescriptor`, 
-                    colorAttachments: [{
-                        clearValue : [0.0, 0.0, 0.0, 1.],
-                        loadOp : `clear`, 
-                        storeOp: `store`, 
-                    }]
-                };
-
-
-                function render(){
-                    renderPassDescriptor.colorAttachments[0].view =
-                    context.getCurrentTexture().createView();
-
-                    const cmdEncoder = device.createCommandEncoder({label: `HardCoded Triangle, CmdEncoder`});
-                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
-                    pass.setPipeline(pipeline);
-                    pass.draw(3);
-                    pass.end();
-                    const commandBuffer = cmdEncoder.finish();
-                    device.queue.submit([commandBuffer]);
-
-               }
-
-       
-                const observer = new ResizeObserver((entries)=>{
-                    for(const entry of entries){
-                        const canvas = entry.target;
-                        const width  = entry.contentBoxSize[0].inlineSize;
-                        const height = entry.contentBoxSize[0].blockSize;
-                        canvas.width = Math.min(width, device.limits.maxTextureDimension2D);
-                        canvas.height = Math.min(height, device.limits.maxTextureDimension2D);
-                        render();
-                    }
-                })
-                //render();
-                observer.observe(canvas);
-
+                device.queue.submit([cmdEncoder.finish()]);
 
             }
 
-            ini();
+            render();
+
+        }
+
+
+
+        async function computer(){
+
+            const adapter = await navigator.gpu.requestAdapter();
+            if(!adapter){
+                alert(`This navigator doesn't support webgpu`);
+                return;
+            }
+
+            const device = await adapter.requestDevice();
+            if(!device){
+                alert(`Not able to request device`);
+                return
+            }
+
+        }
+
+        async function main(){
+           // mainTriangleHardCoded();
+           // interChangedColor();
+           // interChangedPosition();
+            
+            interChangedSpot()
+            // computer();
+        }
+
+        await main();
+
 
         </script>
 
