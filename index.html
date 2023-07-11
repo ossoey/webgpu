@@ -154,6 +154,7 @@
                     <div class="nav-item"id="homepage-id"> <a href="vector_addtion.html">Vector addition</a></div>
                     <div class="nav-item"id="triangle1-id"> <a href="triangle1.html">Triangle 1</a></div>
                     <div class="nav-item"id="Compute-id"> <a href="compute.html">Compute</a></div>
+                    <div class="nav-item"id="mozzilatest-id"> <a href="mozzilatest.html">mozzilatest</a></div>
                     <div class="nav-item">Dot product</div>
                     <div class="nav-item">Magnitude</div>
                     <div class="nav-item">Distance</div>  
@@ -168,6 +169,9 @@
                     <div class="home-menu-item" id="homepage-id"> <a href="vector_addtion.html">Vector addition</a></div>
                     <div class="home-menu-item" id="triangle1-id"> <a href="triangle1.html">Triangle 1</a></div>
                     <div class="home-menu-item" id="Compute-id"> <a href="compute.html">Compute</a></div>
+                    <div class="home-menu-item" id="Compute-id"> <a href="mozzilatest.html">mozzilatest</a></div>
+
+
 
                     <div class="home-menu-item">Dot product</div>
                     <div class="home-menu-item">Magnitude</div>
@@ -193,6 +197,22 @@
             }
             });
            
+
+        async function init() {
+            if (!navigator.gpu) {
+                throw Error("WebGPU not supported.");
+            }
+
+            const adapter = await navigator.gpu.requestAdapter();
+            if (!adapter) {
+                throw Error("Couldn't request WebGPU adapter.");
+            }
+
+            const device = await adapter.requestDevice();
+
+        }
+
+        ini();
             
 
         </script>
