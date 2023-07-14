@@ -202,7 +202,7 @@
             <div id="logo-menu-id">
                 <div id="logo-frame-id">
                     <div id="logo-id"> <h1>Webgpu</h1></div>
-                    <div id="module-id"> <h2>Triangle 2</h2></div>
+                    <div id="module-id"> <h2>Triangle 3</h2></div>
                 </div> 
                 <div id="menu-button-id">
                     <div class="menu-subbutton"></div>
@@ -301,320 +301,316 @@
 
              // wgsl language
              // type
-      
-            
-            async function triangleHardedCoded() {
 
+            async function drawTriangleHardCoded(){
+                
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
-                    alert('this browser is not supported webgpu');
+                    alert(`This browser does not support webgpu`);
                     return;
                 }
 
                 const device = await adapter.requestDevice();
                 if(!device){
-                    alert('Not able to request device!');
+                    alert(`Not able to request device`);
+                    return;
                 }
 
                 const canvas = document.querySelector(`canvas`);
                 const context = canvas.getContext(`webgpu`);
                 const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
                 context.configure({
-                    device,
-                    format: canvasFormat
+                    device, 
+                    format:canvasFormat
                 });
 
                 const shaderModule = device.createShaderModule({
-                    label: `HardedCode Triangle, shaderModule`, 
+                    label:`Triangle HardCoded, ShaderModule`, 
                     code: `
-                        @vertex fn vs(@builtin(vertex_index) vertexIndex : u32)-> @builtin(position) vec4f{
+                        @vertex  fn vs(@builtin(vertex_index) vertexIndex :u32)-> @builtin(position) vec4f{
                             var pos = array(
-                                vec2f(0,0.5), 
-                                vec2f(-0.5,0), 
-                                vec2f(0.5,0)
+                                vec2f(0,0.5),
+                                vec2f(-0.5, -0.75),
+                                vec2f(0.5, -0.75)
                             );
 
                             return vec4f(pos[vertexIndex],0,1);
                         }
 
                         @fragment fn fs()->@location(0) vec4f{
-                            return vec4f(0,1,0,1);
+
+                            return vec4f(0,0,1,1);
                         }
                     `
                 });
 
                 const pipeline = device.createRenderPipeline({
-                    label:`HardCoded Triangle, Pipeline`, 
+                    label: `Triangle HardCoded, Pipelline`, 
                     layout: `auto`, 
-                    vertex:{
-                        entryPoint:`vs`,
-                        module: shaderModule
-                    },
-
+                    vertex: {
+                        entryPoint: `vs`, 
+                        module : shaderModule
+                    }, 
                     fragment: {
-                        entryPoint: `fs`, 
-                        module:shaderModule,
-                        targets: [{format: canvasFormat}]
+                        entryPoint :`fs`, 
+                        module: shaderModule, 
+                        targets: [{
+                            format: canvasFormat
+                        }]
                     }
                 });
 
+
                 const renderPassDescriptor = {
-                    label:`HardCoded Triangle, Pipeline`,
-                   
                     colorAttachments:[{
-                        view:context.getCurrentTexture().createView(),
-                        clearValue:[0,0,0,1],
+                        view : context.getCurrentTexture().createView(),
+                        clearValue: [0,0,0,1],
                         loadOp:`clear`, 
-                        storeOp:`store`
+                        storeOp: `store`,
                     }]
                 };
 
                 function render(){
-
                     const cmdEncoder = device.createCommandEncoder({
-                        label: 'HardCoded Triangle, cmdEncoder', 
-
+                        label: `Triangle HardCoded, cmdEncoder`
                     });
 
-                    const pass =  cmdEncoder.beginRenderPass(renderPassDescriptor);
+                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
                     pass.setPipeline(pipeline);
                     pass.draw(3);
                     pass.end();
-
                     device.queue.submit([cmdEncoder.finish()]);
+
 
                 }
 
                 render();
 
             }
-
-            async function interStageIntereranceColors() {
-
+      
+            
+            async function drawColoredTriangle(){
+                
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
-                    alert('this browser is not supported webgpu');
+                    alert(`This browser does not support webgpu`);
                     return;
                 }
 
                 const device = await adapter.requestDevice();
                 if(!device){
-                    alert('Not able to request device!');
+                    alert(`Not able to request device`);
+                    return;
                 }
 
                 const canvas = document.querySelector(`canvas`);
                 const context = canvas.getContext(`webgpu`);
                 const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
                 context.configure({
-                    device,
-                    format: canvasFormat
+                    device, 
+                    format:canvasFormat
                 });
 
                 const shaderModule = device.createShaderModule({
-                    label: `Colored Triangle, shaderModule`, 
+                    label:`Colored Triangle, ShaderModule`, 
                     code: `
 
-                        struct OutValues {
-                            @builtin(position) posi :vec4f,
-                            @location(0) color:vec4f
+                        struct OutValues{
+                            @builtin(position) posi : vec4f, 
+                            @location(0) color: vec4f
                         }
 
-                        @vertex fn vs(@builtin(vertex_index) vertexIndex : u32)-> OutValues{
+                        @vertex  fn vs(@builtin(vertex_index) vertexIndex :u32)-> OutValues{
                             var pos = array(
-                                vec2f(0,0.5), 
-                                vec2f(-0.5,0), 
-                                vec2f(0.5,0)
+                                vec2f(0,0.5),
+                                vec2f(-0.5, -0.75),
+                                vec2f(0.5, -0.75)
                             );
 
-                            var color = array<vec4f,3>(
+                            var color = array(
                                 vec4f(1,0,0,1),
-                                vec4f(0,0,1,1),
-                                vec4f(0,1,0,1)
+                                vec4f(0,1,0,1),
+                                vec4f(0,0,1,1)
                             );
 
-                            var out : OutValues;
+                            var out: OutValues;
 
                             out.posi = vec4f(pos[vertexIndex],0,1);
                             out.color = color[vertexIndex];
 
                             return out;
+
                         }
 
-                        @fragment fn fs(val: OutValues)->@location(0) vec4f{
-                            return val.color;
+                        @fragment fn fs(params:OutValues)->@location(0) vec4f{
+
+                            return params.color;
                         }
                     `
                 });
 
                 const pipeline = device.createRenderPipeline({
-                    label:`HardCoded Triangle, Pipeline`, 
+                    label: `Colored Triangle, Pipelline`, 
                     layout: `auto`, 
-                    vertex:{
-                        entryPoint:`vs`,
-                        module: shaderModule
-                    },
-
+                    vertex: {
+                        entryPoint: `vs`, 
+                        module : shaderModule
+                    }, 
                     fragment: {
-                        entryPoint: `fs`, 
-                        module:shaderModule,
-                        targets: [{format: canvasFormat}]
+                        entryPoint :`fs`, 
+                        module: shaderModule, 
+                        targets: [{
+                            format: canvasFormat
+                        }]
                     }
                 });
 
+
                 const renderPassDescriptor = {
-                    label:`HardCoded Triangle, Pipeline`,
-                   
                     colorAttachments:[{
-                        view:context.getCurrentTexture().createView(),
-                        clearValue:[0,0,0,1],
+                        view : context.getCurrentTexture().createView(),
+                        clearValue: [0,0,0,1],
                         loadOp:`clear`, 
-                        storeOp:`store`
+                        storeOp: `store`,
                     }]
                 };
 
                 function render(){
-
                     const cmdEncoder = device.createCommandEncoder({
-                        label: 'HardCoded Triangle, cmdEncoder', 
-
+                        label: `Colored Triangle, cmdEncoder`
                     });
 
-                    const pass =  cmdEncoder.beginRenderPass(renderPassDescriptor);
+                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
                     pass.setPipeline(pipeline);
                     pass.draw(3);
                     pass.end();
-
                     device.queue.submit([cmdEncoder.finish()]);
+
 
                 }
 
                 render();
+
             }
-
- 
-            async function interStageDrawFromPosition() {
-
+     
+            async function drawInsideTriangleMesh(){
+                
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
-                    alert('this browser is not supported webgpu');
+                    alert(`This browser does not support webgpu`);
                     return;
                 }
 
                 const device = await adapter.requestDevice();
                 if(!device){
-                    alert('Not able to request device!');
+                    alert(`Not able to request device`);
+                    return;
                 }
 
                 const canvas = document.querySelector(`canvas`);
                 const context = canvas.getContext(`webgpu`);
                 const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
                 context.configure({
-                    device,
-                    format: canvasFormat
+                    device, 
+                    format:canvasFormat
                 });
 
                 const shaderModule = device.createShaderModule({
-                    label: `Colored Triangle, shaderModule`, 
+                    label:`Draw indide triangle mesh, ShaderModule`, 
                     code: `
 
-                        struct OutValues {
-                            @builtin(position) posi :vec4f,
-                            @location(0) color:vec4f
+                        struct OutValues{
+                            @builtin(position) posi : vec4f, 
+                            @location(0) color: vec4f
                         }
 
-                        @vertex fn vs(@builtin(vertex_index) vertexIndex : u32)-> OutValues{
+                        @vertex  fn vs(@builtin(vertex_index) vertexIndex :u32)-> OutValues{
                             var pos = array(
-                                vec2f(0,0.5), 
-                                vec2f(-0.5,0), 
-                                vec2f(0.5,0)
+                                vec2f(0,0.5),
+                                vec2f(-0.5, -0.75),
+                                vec2f(0.5, -0.75)
                             );
 
-                            var color = array<vec4f,3>(
+                            var color = array(
                                 vec4f(1,0,0,1),
-                                vec4f(0,0,1,1),
-                                vec4f(0,1,0,1)
+                                vec4f(0,1,0,1),
+                                vec4f(0,0,1,1)
                             );
 
-                            var out : OutValues;
+                            var out: OutValues;
 
                             out.posi = vec4f(pos[vertexIndex],0,1);
                             out.color = color[vertexIndex];
 
                             return out;
+
                         }
 
-                        @fragment fn fs(val: OutValues)->@location(0) vec4f{
-                           
-                            var color = vec4f(0,1,0,1);
+                        @fragment fn fs(params:OutValues)->@location(0) vec4f{
+                            
+                            var color = vec4f(0,0,1,0);
 
-                            if(val.posi.x>0)&&(val.posi.x<100){
-                                color = vec4f(1,0,0,1);
+                            if(params.posi.x>0)&&(params.posi.x<100){
+                                color = vec4f(1,1,1,0);
                             }
-                                
                             return color;
                         }
                     `
                 });
 
                 const pipeline = device.createRenderPipeline({
-                    label:`HardCoded Triangle, Pipeline`, 
+                    label: `Draw inside triangle mesh, Pipelline`, 
                     layout: `auto`, 
-                    vertex:{
-                        entryPoint:`vs`,
-                        module: shaderModule
-                    },
-
+                    vertex: {
+                        entryPoint: `vs`, 
+                        module : shaderModule
+                    }, 
                     fragment: {
-                        entryPoint: `fs`, 
-                        module:shaderModule,
-                        targets: [{format: canvasFormat}]
+                        entryPoint :`fs`, 
+                        module: shaderModule, 
+                        targets: [{
+                            format: canvasFormat
+                        }]
                     }
                 });
 
+
                 const renderPassDescriptor = {
-                    label:`HardCoded Triangle, Pipeline`,
-                
                     colorAttachments:[{
-                        view:context.getCurrentTexture().createView(),
-                        clearValue:[0,0,0,1],
+                        view : context.getCurrentTexture().createView(),
+                        clearValue: [0,0,0,1],
                         loadOp:`clear`, 
-                        storeOp:`store`
+                        storeOp: `store`,
                     }]
                 };
 
                 function render(){
-
                     const cmdEncoder = device.createCommandEncoder({
-                        label: 'HardCoded Triangle, cmdEncoder', 
-
+                        label: `Draw inside triangle mesh, cmdEncoder`
                     });
 
-                    const pass =  cmdEncoder.beginRenderPass(renderPassDescriptor);
+                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
                     pass.setPipeline(pipeline);
                     pass.draw(3);
                     pass.end();
-
                     device.queue.submit([cmdEncoder.finish()]);
+
 
                 }
 
                 render();
-            }
-
-
-            async function computeDuble() {
 
             }
+     
 
-            async function main(){
-               // await triangleHardedCoded();
-                //await interStageIntereranceColors();
 
-               // await computeDuble();
-            }
+            async function main() {
+                //await drawTriangleHardCoded();
+                //await drawColoredTriangle();
+                await drawInsideTriangleMesh();
+            };
 
-            await main();
-
+            main();
 
         </script>
 
