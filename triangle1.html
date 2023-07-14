@@ -710,17 +710,45 @@
                     }
 
 
+                    
+                    struct ParamsSimpleRect{
+                        offset_x:f32,
+                        offset_y:f32 ,
+                        width_x:f32,
+                        width_y:f32,
+                        text_x:f32,
+                        text_y:f32,
+                        color:vec4f, 
+                        isFilled: bool
+                    }; 
+
+                    // offset move spot, tex is texture
+                    fn simple_rect(params:ParamsSimpleRect)->ParamsSimpleRect{
+                
+                        var output: ParamsSimpleRect;
+                        if((params.text_x>0+params.offset_x)&& (params.text_x<params.width_x+params.offset_x))&&
+                        ((params.text_y>0+params.offset_y)&& (params.text_y<params.width_y+params.offset_y)){
+                            output.isFilled = true;  
+                            output.color = params.color;
+                        } else{
+                            output.isFilled = false;  
+                        }
+                        
+                        return output;
+                    }
+
+
 
                     fn foo(p : ptr<function, i32>) -> i32 {
-                    let x = *p;
-                    *p += 1;
-                    return x;
+                        let x = *p;
+                        *p += 1;
+                        return x;
                     }
 
 
                     var<private> modf: f32 = 0.0;
 
-                    fn block( ){
+                    fn block(color:ptr<function, vec4f>,  ){
 
                 
                 
@@ -752,15 +780,18 @@
                         var pos = input.position;
                         var result = vec4f(1,0,1,0);
                         
-                        var rp : RecCoords;
+                        var rp : ParamsSimpleRect;
                         //offset_x:f32,offset_y:f32 ,width_x:f32,width_y:f32,text_x:f32,text_y 
-                        rp.offset_x = 100;
+                        rp.offset_x = 150;
                         rp.offset_y = 50;
-                        rp.width_x = 1;
+                        rp.width_x = 5;
                         rp.width_y = 10;
+                        rp.text_x = pos.x;
+                        rp.text_y = pos.y;
+                        rp.color = vec4f(1,1,0,1);
                         var move_offset_x:f32;
                         
-                      
+                       /*
                         var  spot = rect(rp.offset_x,rp.offset_y,rp.width_x ,rp.width_y,pos.x,pos.y,vec4f(1,1,1,0));
                         if (spot.isFilled == true) {
                             result = spot.color;
@@ -778,10 +809,39 @@
 
                             move_offset_x = move_offset_x+ rp.width_x;
                         
-                        }
+                        } 
+                         */
+                       
+                        var  spot = simple_rect(rp);
+                        if (spot.isFilled == true) {
+                            result = spot.color;
+                        }  
+
+                       
+                        for (var i = 0; i<20; i=i+1 ) 
+                        {
+
+                            rp.offset_x =  move_offset_x ;
+                            rp.offset_y = rp.offset_y;
+                             rp.width_x  = rp.width_x;
+                            // rp.width_y  = rp.width_y;
+                           // rp.width_x = 1;
+                            rp.width_y = 10;
+
+                            rp.text_x   = pos.x;
+                            rp.text_y   = pos.y;
+                            rp.color    = vec4f(1,1,0,1);
+                            
+                            spot = simple_rect(rp);
+
+                            if (spot.isFilled == true) {
+                                result = spot.color;
+                            
+                            }  
+
+                            move_offset_x = move_offset_x+ rp.width_x;
                         
-
-
+                        } 
                      
          
                    
