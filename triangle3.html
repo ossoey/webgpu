@@ -602,12 +602,134 @@
 
             }
      
+            async function drawRectInsideTriangleMesh(){
+                
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`This browser does not support webgpu`);
+                    return;
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device){
+                    alert(`Not able to request device`);
+                    return;
+                }
+
+                const canvas = document.querySelector(`canvas`);
+                const context = canvas.getContext(`webgpu`);
+                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+                context.configure({
+                    device, 
+                    format:canvasFormat
+                });
+
+                const shaderModule = device.createShaderModule({
+                    label:`Draw rect inside triangle mesh, ShaderModule`, 
+                    code: `
+
+                        struct OutValues{
+                            @builtin(position) posi : vec4f, 
+                            @location(0) color: vec4f
+                        }
+
+                        @vertex  fn vs(@builtin(vertex_index) vertexIndex :u32)-> OutValues{
+                            var pos = array(
+                                vec2f(0,0.5),
+                                vec2f(-0.5, -0.75),
+                                vec2f(0.5, -0.75)
+                            );
+
+                            var color = array(
+                                vec4f(1,0,0,1),
+                                vec4f(0,1,0,1),
+                                vec4f(0,0,1,1)
+                            );
+
+                            var out: OutValues;
+
+                            out.posi = vec4f(pos[vertexIndex],0,1);
+                            out.color = color[vertexIndex];
+
+                            return out;
+
+                        }
+
+                        @fragment fn fs(params:OutValues)->@location(0) vec4f{
+                            
+                            var color = vec4f(0,0,1,0);
+
+                            if(params.posi.x>140)&&(params.posi.x<150)
+                            &&(params.posi.y>82)&&(params.posi.y<100){
+                                color = vec4f(1,1,1,0);
+                            }
+
+                            if(params.posi.x>140+15)&&(params.posi.x<150+15)
+                            &&(params.posi.y>88)&&(params.posi.y<100){
+                                color = vec4f(1,1,1,0);
+                            }
+
+                            
+                            if(params.posi.x>140+15+15)&&(params.posi.x<150+15+15)
+                            &&(params.posi.y>88)&&(params.posi.y<100){
+                                color = vec4f(1,1,1,0);
+                            }
+
+                            return color;
+                        }
+                    `
+                });
+
+                const pipeline = device.createRenderPipeline({
+                    label: `Draw rect inside triangle mesh, Pipelline`, 
+                    layout: `auto`, 
+                    vertex: {
+                        entryPoint: `vs`, 
+                        module : shaderModule
+                    }, 
+                    fragment: {
+                        entryPoint :`fs`, 
+                        module: shaderModule, 
+                        targets: [{
+                            format: canvasFormat
+                        }]
+                    }
+                });
+
+
+                const renderPassDescriptor = {
+                    colorAttachments:[{
+                        view : context.getCurrentTexture().createView(),
+                        clearValue: [0,0,0,1],
+                        loadOp:`clear`, 
+                        storeOp: `store`,
+                    }]
+                };
+
+                function render(){
+                    const cmdEncoder = device.createCommandEncoder({
+                        label: `Draw rect inside triangle mesh, cmdEncoder`
+                    });
+
+                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
+                    pass.setPipeline(pipeline);
+                    pass.draw(3);
+                    pass.end();
+                    device.queue.submit([cmdEncoder.finish()]);
+
+
+                }
+
+                render();
+
+            }
 
 
             async function main() {
                 //await drawTriangleHardCoded();
                 //await drawColoredTriangle();
-                await drawInsideTriangleMesh();
+                //await drawInsideTriangleMesh();
+                await drawRectInsideTriangleMesh();
             };
 
             main();
