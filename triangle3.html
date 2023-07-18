@@ -932,6 +932,92 @@
 
             }
 
+            async function computeDouble2(){
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`Browser doesn't support webgpu`);
+                    return;
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device){
+                    alert(`Not able to request device`);
+                    return;
+                }
+
+                const shaderModule = device.createShaderModule({
+                    label: `Compute double, shaderModule`,
+                    code: `
+                        @group(0) @binding(0) var<storage,read_write> data:array<f32>;
+                        @compute @workgroup_size(1) fn compute_double(@builtin(global_invocation_id) id: vec3u){
+                            var i = id.x;
+                            data[i] = data[i]*2.0;
+                        }                   
+                    `
+                });
+
+                const dataInput = new Float32Array([1,3,5]);
+
+                const bufferInput = device.createBuffer({
+                    label: `Compute double, bufferInput`, 
+                    size: dataInput.byteLength, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC| GPUBufferUsage.COPY_DST
+                });
+
+                device.queue.writeBuffer(bufferInput,0, dataInput);
+
+                const bufferOutput = device.createBuffer({
+                    label: `Compute double, bufferOutput`, 
+                    size: dataInput.byteLength,
+                    usage: GPUBufferUsage.MAP_READ|GPUBufferUsage.COPY_DST
+                });
+
+                const pipeline = device.createComputePipeline({
+                    label: `Compute double, pipeline`, 
+                    layout: `auto`, 
+                    compute: {
+                        entryPoint: `compute_double`,
+                        module: shaderModule
+                    }
+                });
+
+                const bindGroup = device.createBindGroup({
+                    label: `Compute double, bindGroup`, 
+                    layout: pipeline.getBindGroupLayout(0),
+                    entries:[
+                        {binding:0, resource: {buffer:bufferInput}}
+                    ]
+                });
+
+                async function compute(){
+                    const cmdEncoder = device.createCommandEncoder({
+                        label: `Compute double, cmdEncoder`
+                    });
+
+                    const pass = cmdEncoder.beginComputePass({
+                        label: ` Compute double, pass`
+                    });
+
+                    pass.setPipeline(pipeline);
+                    pass.setBindGroup(0,bindGroup);
+                    pass.dispatchWorkgroups(dataInput.length);
+                    pass.end();
+                    
+                    cmdEncoder.copyBufferToBuffer(bufferInput,0, bufferOutput, 0, bufferOutput.size);
+
+                    device.queue.submit([cmdEncoder.finish()]);
+             await bufferOutput.mapAsync(GPUMapMode.READ);
+                    const dataOutput = new Float32Array(bufferOutput.getMappedRange().slice());
+                    bufferOutput.unmap();
+                    console.log(dataInput);
+                    console.log(dataOutput);
+                   /**/
+       
+                }
+
+                await compute();
+
+            }
 
             async function main() {
                 // await drawTriangleHardCoded();
@@ -939,7 +1025,8 @@
                 //await drawInsideTriangleMesh();
                 //await drawRectInsideTriangleMesh();
                 //await drawInsideTriangleMeshWithRectObject();
-                await computeDouble();
+                //await computeDouble();
+                await computeDouble2();
             };
 
             main();
