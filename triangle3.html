@@ -1109,6 +1109,287 @@
                 await compute();
             }
 
+            async function computeRandomFloat(){
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`Browser doesn't support webgpu!`);
+                    return;
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device){
+                    alert(`Not able to request device!`);
+                }
+
+                const dataInput = new Float32Array([1,3,5]);
+                const bufferInput = device.createBuffer({
+                    label:`Compute random float, bufferInput`, 
+                    size: dataInput.byteLength, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST
+                });
+
+                device.queue.writeBuffer(bufferInput, 0, dataInput);
+
+                const bufferOutput = device.createBuffer({
+                    label: `Compute random float, bufferOutput`, 
+                    size: dataInput.byteLength, 
+                    usage:GPUBufferUsage.MAP_READ|GPUBufferUsage.COPY_DST
+                });
+ 
+                const shaderModule = device.createShaderModule({
+                    label:`Compute random float, shaderModule`, 
+                    code : `
+
+                        fn lcg(seed:u32, min: f32, max: f32) -> f32 {
+                            var value: u32 = seed; 
+                            value = (value* 1664525 + 101390422) % 429496729;  // LCG algorithm
+                            var normalized: f32 = f32(value) / 4294967296.0;  // Scale the result to a float between 0 and 1
+                            return normalized * (max - min) + min;  // Scale the result to the desired range
+                          /* */  
+                           
+                        }
+
+                        @group(0) @binding(0) var<storage, read_write> data: array<f32>;
+                        
+                        @compute @workgroup_size(1) fn compute_randomfloat(@builtin(global_invocation_id) id : vec3u){
+
+                            var i = id.x;
+                            data[0]= lcg(${Date.now()-1689720647173}, 8.5, 9.5);
+                            data[1]= lcg(${Date.now()-1689720647173}, 8.5, 9.5);
+                            data[2]= lcg(${Date.now()-1689720647173}, 8.5, 9.5);
+                        }
+                    `
+                });
+                 
+                const pipeline = device.createComputePipeline({
+                    label:`Compute random float, pipeline`, 
+                    layout:`auto`, 
+                    compute: {
+                        entryPoint: `compute_randomfloat`,
+                        module: shaderModule,
+                    }
+                });
+
+                const bindGroup = device.createBindGroup({
+                    label:`Compute random float, bindGroup`, 
+                    layout: pipeline.getBindGroupLayout(0),
+                    entries: [
+                        {binding:0, resource:{buffer:bufferInput}}
+                    ]
+                });
+
+
+                async function compute(){
+                    const cmdEncoder = device.createCommandEncoder({
+                        label:`Compute random float, cmdEncoder`
+                    });
+
+                    const pass = cmdEncoder.beginComputePass({
+                        label: `Compute random float, pass`
+                    });
+
+                    pass.setPipeline(pipeline);
+                    pass.setBindGroup(0,bindGroup);
+                    pass.dispatchWorkgroups(dataInput.length);
+                    pass.end();
+                    cmdEncoder.copyBufferToBuffer(bufferInput, 0, bufferOutput, 0, bufferOutput.size);
+
+                    device.queue.submit([cmdEncoder.finish()]);
+                     
+                    await bufferOutput.mapAsync(GPUMapMode.READ) ;
+                    const dataOutput = new Float32Array(bufferOutput.getMappedRange().slice());
+                    bufferOutput.unmap();
+
+                    console.log(dataInput);
+                    console.log(dataOutput);
+                    
+                    
+                }
+
+                await compute();
+            }
+
+            async function drawTrianglesWithUniform(){
+
+
+               const  random =(start, end)=>{
+                      
+                    if((start===undefined)||(end ==undefined)) {
+                        start = 0;
+                        end = 1;
+                    }
+
+                    return start + Math.random()*(end-start);
+                }
+
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`This browser doesn't support webgpu!`);
+                    return;
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device){
+                    alert(`Not able to request device!`);
+                }
+
+                const canvas = document.querySelector(`canvas`);
+                const context = canvas.getContext(`webgpu`);
+                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+                context.configure({
+                    device, 
+                    format: canvasFormat
+                });
+
+                const shaderModule = device.createShaderModule({
+                    label: `Draw Triangles with uniform, shaderModule`, 
+                    code: `
+                    
+                        struct Coords {
+                            color: vec4f, 
+                            scale: vec2f,
+                            offset: vec2f 
+                        }
+                    
+                        @group(0) @binding(0) var <uniform> coords : Coords;
+
+                        @vertex fn vs(@builtin(vertex_index) vertexIndex: u32)-> @builtin(position) vec4f {
+                           var pos = array(
+                                vec2f(0, 0.5), 
+                                vec2f(-0.5, -0.5), 
+                                vec2f(0.5,-0.5)
+                           );
+
+                            return vec4f(pos[vertexIndex]*coords.scale + coords.offset,0,1);
+
+                        }
+
+                        @fragment fn fs()->@location(0) vec4f{
+
+                            return coords.color;
+                        }
+
+                    
+                    ` 
+
+                });
+
+                const pipeline = device.createRenderPipeline({
+                    label: `Draw Triangles with uniform, pipeline`, 
+                    layout: `auto`,
+                    vertex: {
+                        entryPoint: `vs`,
+                        module: shaderModule
+                    },
+
+                    fragment: {
+                        entryPoint:`fs`,
+                        module: shaderModule, 
+                        targets:[{format: canvasFormat}]
+                    }
+                });
+
+
+                const uniformLength = 4+2+2;
+                const uniformSize = 4*4+
+                                    2*4+
+                                    2*4;
+
+                const uniformDataColorOffset = 0;
+                const uniformDataScaleOffset = 4;                      
+                const uniformDataOffsetOffset = 6;
+            
+
+                const ObjectCount = 5030;
+   
+                const trianglesObj = [];
+
+                for(let i = 0;i< ObjectCount;i++){
+
+                    const uniformData = new Float32Array(uniformLength);
+
+                    uniformData.set([random(0.1,1),random(0.1,1),random(0.1,1),1], uniformDataColorOffset);
+
+                    uniformData.set([random(-0.8,0.9),random(-0.9,0.9)],uniformDataOffsetOffset);
+
+                    const uniformBuffer = device.createBuffer({
+                        label: `Draw Triangle with uniform, uniform ${i}`,
+                        size: uniformSize,
+                        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+                    });
+
+                    const bindGroup = device.createBindGroup({
+                        label: `Draw Triangles with uniform, bindGroup ${i}`,
+                        layout: pipeline.getBindGroupLayout(0),
+                        entries:[
+                            {binding:0, resource:{buffer: uniformBuffer}}
+                        ]
+                    });
+
+                    trianglesObj.push({
+                        scale: random(0.2, 0.7),
+                        uniformData,
+                        uniformBuffer,
+                        bindGroup 
+                    });
+
+                }
+ 
+
+                const renderPassDescriptor = {
+                    label: ` Draw Triangles with uniform`, 
+                    colorAttachments:[
+                        {clearValue:[0,0,0,1],
+                         loadOp: `clear`,
+                         storeOp: `store`
+                        }
+
+                    ]
+                };
+
+                function render(){
+                    renderPassDescriptor.colorAttachments[0].view = context.getCurrentTexture().createView();
+                    const cmdEncoder = device.createCommandEncoder({
+                        label:`Draw Triangles with uniform`
+
+                    });
+
+                    const aspect = canvas.width/canvas.height;
+
+                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
+                    pass.setPipeline(pipeline);
+
+
+
+                    for(const {scale,uniformData, uniformBuffer, bindGroup} of trianglesObj){
+
+                        uniformData.set([scale/aspect, scale],uniformDataScaleOffset);
+                        device.queue.writeBuffer(uniformBuffer,0, uniformData);
+                        pass.setBindGroup(0,bindGroup);
+                        pass.draw(3);
+                    }
+
+                    pass.end();
+                    device.queue.submit([cmdEncoder.finish()]);
+
+
+                }
+
+                 const observer = new ResizeObserver(entries => {
+                    for (const entry of entries) {
+                    const canvas = entry.target;
+                    const width = entry.contentBoxSize[0].inlineSize;
+                    const height = entry.contentBoxSize[0].blockSize;
+                    canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                    canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                    // re-render
+                    render();
+                    }
+                });
+                observer.observe(canvas);
+            }
+
+
             async function main() {
                 // await drawTriangleHardCoded();
                 //await drawColoredTriangle();
@@ -1117,7 +1398,9 @@
                 //await drawInsideTriangleMeshWithRectObject();
                 //await computeDouble();
                 //await computeDouble2();
-                await returnSequenceIndices();
+                //await returnSequenceIndices();
+                //await computeRandomFloat();
+                await drawTrianglesWithUniform();
             };
 
             main();
