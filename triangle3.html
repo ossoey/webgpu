@@ -387,7 +387,6 @@
                 render();
 
             }
-      
             
             async function drawColoredTriangle(){
                 
@@ -1126,31 +1125,73 @@
                     code: `
                     
                         @group(0) @binding(0) var<storage, read_write>data: array<f32>;
+                        @group(0) @binding(1) var<storage, read_write>data_yes: array<f32>;
+                        @group(0) @binding(2) var<storage, read_write>ind: array<f32>; 
 
-                        @group(0) @binding(1) var<storage, read>datarandom: array<f32>;
+                      
 
+
+                        fn randomFloat(start: f32, end: f32,i : u32)->f32{
+
+                            var arrLength = arrayLength(&data_yes);
+                            var localIndex = (i+ u32(ind[0]))%arrLength;
+                            var rand =start+ (data_yes[localIndex]/ f32(arrLength-1))*(end-start);
+                            return f32( rand );
+                        }
+
+                        
+                            
                         @compute @workgroup_size(1) fn compute_randomfloat(@builtin(global_invocation_id) id : vec3u){
 
                             var i:u32 = id.x;
-
-                            data[i] = data[i]*2.0;
-                          
+                            var inc : u32;
+                            data[i] =  randomFloat(9, 12,i); // f32(inc);// f32( i+ u32(ind[0]));  //f32(  data[ u32(ind[i]) % arrayLength( &data_yes )]  ); //data[i]  + data_yes[i];
+                           
+                        
                         }
                     
                     `
+
                 });
+
+                const bindGroupLayout = device.createBindGroupLayout({
+                    entries: [
+                        {
+                            binding:0, 
+                            visibility:GPUShaderStage.COMPUTE,
+                            buffer: {type:'storage'}
+                        } , 
+
+                        {
+                            binding: 1, 
+                            visibility: GPUShaderStage.COMPUTE, 
+                            buffer: {type:'storage'}
+                        } ,
+
+                        
+                        {
+                            binding: 2, 
+                            visibility: GPUShaderStage.COMPUTE, 
+                            buffer: {type:'storage'}
+                        }
+                    ]
+                });
+                
+                const pipelineLayout = device.createPipelineLayout({
+                    bindGroupLayouts: [bindGroupLayout]
+                })
 
 
                 const pipeline = device.createComputePipeline({
                     label: `Compute random float, pipeline`, 
-                    layout: `auto`, 
+                    layout: pipelineLayout, 
                     compute: {
                         entryPoint: `compute_randomfloat`,
                         module: shaderModule
                     }
                 });
 
-                const dataInput = new Float32Array([1,3,5]);
+                const dataInput = new Float32Array(7);
 
                 const bufferInput = device.createBuffer({
                     label: `Compute random float, bufferInput`,
@@ -1162,15 +1203,27 @@
 
 
 
-                const dataRandom = new Float32Array([3,0,1,5,4,2]);
+                const dataRandom = new Float32Array([3,0,6,1,5,4,2]);
                 
                 const bufferRandom = device.createBuffer({
                     label: `Compute random float, bufferRandom`,
-                    size: 6*4, 
-                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST
+                    size: dataRandom.byteLength, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST
                 });
 
                 device.queue.writeBuffer(bufferRandom,0 ,dataRandom);
+
+
+
+                const dataIndex =  new Float32Array([3]);
+                
+                const bufferIndex = device.createBuffer({
+                    label: `Compute random float, bufferRandom`,
+                    size: dataIndex.byteLength, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST
+                });
+
+                device.queue.writeBuffer(bufferIndex,0 ,dataIndex);
 
 
                 const bufferOutput = device.createBuffer({
@@ -1182,16 +1235,16 @@
 
                 const bindGroup = device.createBindGroup({
                     label: ` Compute random float, bindGroup`, 
-                    layout: pipeline.getBindGroupLayout(0),
+                    layout: bindGroupLayout,
                     entries:[
                         {binding: 0, resource: {buffer: bufferInput}},
-                        {binding: 1, resource: {buffer: bufferRandom}}
+                        {binding: 1, resource: {buffer: bufferRandom}},
+                        {binding: 2, resource: {buffer: bufferIndex}}
+                        
                     ]
                 });
 
-    
-
-
+   
                 async function compute(){
                     const cmdEncoder = device.createCommandEncoder({
                         label:`Compute random float, cmdEncoder`
@@ -1215,16 +1268,367 @@
 
                     console.log(dataInput);
                     console.log(dataOutput);
-                    console.log(dataRandom);
-
 
                 }
 
                 compute();
                 
             }
+            
+            async function computeRandomFloat2(){
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`Browser doesn't support webg;`);
+                    return;
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device){
+                    alert(`Not able to request device!`);
+                }
+
+                const shaderModule = device.createShaderModule({
+                    label: `Compute random float 2, shaderModule`, 
+                    code: `
+                        @group(0) @binding(0) var<storage, read_write> data: array<f32>;
+                        @group(0) @binding(1) var<storage, read_write> data_process: array<f32>;
+
+                        @compute @workgroup_size(1) fn compute_randomfloat2(@builtin(global_invocation_id) id: vec3u) {
+
+                          var i : u32 = id.x;
+
+                          data[i] = data[i]*2.0;
+
+                        }
+                    
+                    `
+                });
+
+                const bindGroupLayout = device.createBindGroupLayout({
+                    label:`Compute random float 2, bindGroupLayout`, 
+                    entries:[
+                        {binding:0, visibility: GPUShaderStage.COMPUTE, buffer:{type:`storage`}},
+                        {binding:1, visibility: GPUShaderStage.COMPUTE, buffer:{type:`storage`}}
+                    
+                    ]
+                });
+
+                const pipelineLayout = device.createPipelineLayout({
+                    label: `Compute random float 2, pipelineLayout `,
+                    bindGroupLayouts:[bindGroupLayout]
+                });
+
+                const pipeline = device.createComputePipeline({
+                    label:`Compute random float 2, pipeline`, 
+                    layout: pipelineLayout, 
+                    compute: {
+                        entryPoint: `compute_randomfloat2`,
+                        module: shaderModule
+                    }
+                });
+
+                const dataInput = new  Float32Array([1,3,5]);
+
+                const bufferInput = device.createBuffer({
+                    label:`Compute random float 2, bufferInput`, 
+                    size: dataInput.byteLength, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST
+                });
+
+                device.queue.writeBuffer(bufferInput,0, dataInput);
 
 
+
+                const randomDataInput = new  Float32Array([6,1,0,3,5,4,2]);
+
+                const bufferRandomDataInput = device.createBuffer({
+                    label:`Compute random float 2, bufferInput`, 
+                    size: randomDataInput.byteLength, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST
+                });
+
+                device.queue.writeBuffer(bufferRandomDataInput,0, randomDataInput);
+
+
+                const bufferOutput = device.createBuffer({
+                    label:`Compute random float 2 , bufferOutput`,
+                    size: dataInput.byteLength, 
+                    usage: GPUBufferUsage.MAP_READ| GPUBufferUsage.COPY_DST
+                });
+
+                const bindGroup = device.createBindGroup({
+                    label: `Compute random float 2, bindGroup`, 
+                    layout: bindGroupLayout, 
+                    entries:[{binding:0, resource:{buffer:bufferInput}},
+                             {binding:1, resource:{buffer:bufferRandomDataInput}}
+                ]
+                });
+
+                 async function compute(){
+                   
+                    const cmdEncoder = device.createCommandEncoder({
+                        label: `Compute random float 2`
+                    });
+
+                    const pass = cmdEncoder.beginComputePass({
+                        label: `Compute random float 2`
+                    });
+
+                    pass.setPipeline(pipeline);
+                    pass.setBindGroup(0,bindGroup);
+                    pass.dispatchWorkgroups(dataInput.length);
+                    pass.end();
+
+                    cmdEncoder.copyBufferToBuffer(bufferInput,0,bufferOutput,0,bufferOutput.size);
+
+
+                    device.queue.submit([cmdEncoder.finish()]);
+                    await bufferOutput.mapAsync(GPUMapMode.READ);
+                    const dataOutput = new Float32Array(bufferOutput.getMappedRange().slice());
+                    bufferOutput.unmap();
+                    console.log(dataInput);
+                    console.log(dataOutput);
+
+                    
+
+                }
+
+                compute();
+                
+
+            }
+
+            async function computeRandomFloat3(){
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`Browser doesn't support webgpu!`);
+                    return;
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device){
+                    alert(`Not able to request device`);
+                    return;
+                }
+
+              
+
+                const shaderModule = device.createShaderModule({
+                    label: `Compute random float 3, shaderModule `, 
+                    code: `
+                       @group(0) @binding(0) var<storage, read_write> data : array<f32>;
+                       @group(0) @binding(1) var<storage, read_write> data_rand : array<f32>;
+                      
+                       @compute @workgroup_size(1) fn compute_randomfloat3(@builtin(global_invocation_id) id:vec3u){
+                         var i:u32 = id.x;
+                         data[i] = data[i] * 2.0;
+                       }
+                    `
+                });
+
+                const bindGroupLayout = device.createBindGroupLayout({
+                    label: ` Compute random float 3, bindGroupLayout`, 
+                    entries:[
+                        {binding:0, visibility: GPUShaderStage.COMPUTE, buffer:{type:`storage`} },
+                        {binding:1, visibility: GPUShaderStage.COMPUTE, buffer:{type:`storage`} },
+                    ]
+                });
+
+                const pipelineLayout = device.createPipelineLayout({
+                    label: `Compute random float 3, pipelineLayout`, 
+                    bindGroupLayouts:[bindGroupLayout]
+                });
+
+                const pipeline = device.createComputePipeline({
+                    label: ` Compute random float 3, pipeline`, 
+                    layout: pipelineLayout,
+                    compute: {
+                        entryPoint: `compute_randomfloat3`, 
+                        module: shaderModule
+                    }
+                });
+
+
+                const dataInput = new Float32Array([1,2,3,4,5,6,7]);
+
+                const bufferInput = device.createBuffer({
+                    label: `Compute random float 3, bufferInput`, 
+                     size: dataInput.byteLength,
+                     usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST
+                });
+
+                device.queue.writeBuffer(bufferInput, 0, dataInput);
+
+                const randomDataInput = new Float32Array([4,6,2,0,5,1,3]);
+
+                const bufferRandomInput = device.createBuffer({
+                    label: `Compute random float 3, bufferInput`, 
+                     size: randomDataInput.byteLength,
+                     usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST
+                });
+
+                device.queue.writeBuffer(bufferRandomInput, 0, randomDataInput);
+
+                const bufferOutput = device.createBuffer({
+                    label: `Compute random float 3, bufferInput`, 
+                     size: dataInput.byteLength,
+                     usage: GPUBufferUsage.MAP_READ|GPUBufferUsage.COPY_DST
+                });
+
+                const bindGroup = device.createBindGroup({
+                    label: `Compute random float 3, bindGroup`, 
+                    layout: bindGroupLayout,
+                    entries: [
+                        {binding:0, resource: {buffer: bufferInput}},
+                        {binding:1, resource: {buffer: bufferRandomInput}}
+                    ]
+                })
+
+                async function compute (){
+                    
+                    const cmdEncoder = device.createCommandEncoder({
+                        label: ` Compute random float 3, cmdEncoder`
+                    });
+
+                    const pass = cmdEncoder.beginComputePass({
+                        label: `Compute random float 3, pass`
+                    });
+
+                    pass.setPipeline(pipeline);
+                    pass.setBindGroup(0,bindGroup);
+                    pass.dispatchWorkgroups(dataInput.length);
+                    pass.end();
+
+                    cmdEncoder.copyBufferToBuffer(bufferInput,0,bufferOutput,0, bufferOutput.size);
+                    await bufferOutput.mapAsync(GPUMapMode.READ);
+                    const dataOutput = new Float32Array(bufferOutput.getMappedRange().slice());
+                    bufferOutput.unmap();
+
+                    console.log(dataInput);
+                    console.log(dataOutput);
+
+                }
+
+                compute();
+            }
+ 
+            async function computeRandomFloat4(){
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`Browser doesn't support webgpu`);
+                    return;
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device){
+                    alert(`Not able to request device`);
+                }
+
+                const shaderModule = device.createShaderModule({
+                    label: `Compute random float 4, shaderModule`,
+                    code: `
+                         @group(0) @binding(0) var <storage, read_write> data: array<f32>;
+                         @group(0) @binding(1) var <storage, read_write> random_data: array<f32>;
+
+                         @compute @workgroup_size(1) fn compute_randomfloat4(@builtin(global_invocation_id) id : vec3u){
+                            var i : u32 = id.x;
+                            data[i] = data [i] * 2.0;
+                         }
+                    
+                    `
+                });
+
+                const bindGroupLayout = device.createBindGroupLayout({
+                    label: `Compute random float 4, bindGroupLayout`,
+                    entries:[
+                        {binding:0, visibility:GPUShaderStage.COMPUTE, buffer:{type:`storage`}},
+                        {binding:1,visibility:GPUShaderStage.COMPUTE, buffer: {type:`storage`}}
+                    ]
+                });
+
+                const pipelineLayout = device.createPipelineLayout({
+                    label: `Compute random float 4, pipelineLayout`, 
+                    bindGroupLayouts: [bindGroupLayout]
+                });
+
+                const pipeline = device.createComputePipeline({
+                    label: `Compute random float 4, pipeline`,
+                    layout: pipelineLayout, 
+                    compute: {
+                        entryPoint: `compute_randomfloat4`,
+                        module: shaderModule
+                    }
+                });
+
+                const dataInput = new Float32Array([1,2,3,4,5,6,7]);
+
+                const bufferInput = device.createBuffer({
+                    label: `Compute random float4, bufferInput`, 
+                    size: dataInput.byteLength,
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST
+                });
+
+                device.queue.writeBuffer(bufferInput, 0, dataInput);
+
+                const dataRandom = new Float32Array([7,3,5,1,2,4,0,6]) ;
+
+                const bufferRandom = device.createBuffer({
+                    label: `Compute random float4, bufferRandom`, 
+                    size: dataRandom.byteLength,
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST
+                });
+
+                device.queue.writeBuffer(bufferRandom,0, dataRandom);
+
+                const bufferOutput = device.createBuffer({
+                    label: `Compute random float4, bufferOutput`, 
+                    size: dataInput.byteLength, 
+                    usage: GPUBufferUsage.MAP_READ| GPUBufferUsage.COPY_DST
+
+                });
+
+                const bindGroup = device.createBindGroup({
+                    label: `Compute random float4, bindGroup`, 
+                    layout: bindGroupLayout, 
+                    entries:[
+                        {binding:0, resource: {buffer:bufferInput}},
+                        {binding:1, resource: {buffer:bufferRandom}}
+                    ]
+                });
+
+                async function compute(){
+                    const cmdEncoder = device.createCommandEncoder({
+                        label: `Compute random float4, cmdEncoder`
+                    });
+
+                    const pass = cmdEncoder.beginComputePass({
+                        label: ` Compute random float4, pass`
+                    });
+
+                    pass.setPipeline(pipeline);
+                    pass.setBindGroup(0,bindGroup);
+                    pass.dispatchWorkgroups(dataInput.length);
+                    pass.end();
+
+                    cmdEncoder.copyBufferToBuffer(bufferInput,0, bufferOutput,0, bufferOutput.size);
+
+                    device.queue.submit([cmdEncoder.finish()]);
+
+
+                    await bufferOutput.mapAsync(GPUMapMode.READ);
+                    const dataOutput = new Float32Array(bufferOutput.getMappedRange().slice());
+                    bufferOutput.unmap();
+
+                    console.log(dataInput);
+                    console.log(dataOutput);
+
+
+                }
+                
+                await compute();
+
+
+            }
 
             async function drawTrianglesWithUniform(){
 
@@ -1305,8 +1709,6 @@
                         targets:[{format: canvasFormat}]
                     }
                 });
-
-
                 const uniformLength = 4+2+2;
                 const uniformSize = 4*4+
                                     2*4+
@@ -1406,7 +1808,6 @@
                 observer.observe(canvas);
             }
 
-
             async function main() {
                 // await drawTriangleHardCoded();
                 //await drawColoredTriangle();
@@ -1417,9 +1818,14 @@
                 //await computeDouble2();
                 //await returnSequenceIndices();
                 //await computeRandomFloat();
-                await computeRandomFloat();
-               // await drawTrianglesWithUniform();
+                //await computeRandomFloat();
+                //await computeRandomFloat2();
+                //await computeRandomFloat3();
+                //await computeRandomFloat4();
+                // await drawTrianglesWithUniform();
             };
+
+
 
             main();
 
