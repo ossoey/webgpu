@@ -1808,6 +1808,171 @@
                 observer.observe(canvas);
             }
 
+            async function drawTriangleWithUniform2(){
+               const adapter = await navigator.gpu.requestAdapter();
+               if(!adapter) {
+                alert(`Browser does not support webgpu`);
+                return;
+               }
+
+               const device = await adapter.requestDevice();
+               if(!device){
+                alert(`Not able to request device`);
+               }
+
+               const canvas = document.querySelector(`canvas`);
+               const context = canvas.getContext(`webgpu`);
+               const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+               context.configure({
+                device, 
+                format: canvasFormat
+               });
+
+
+               let random = (start=0.,end=1.) =>{
+                 return start + Math.random()*(end - start);
+               }
+
+               const shaderModule = device.createShaderModule({
+                 label: ` Draw triangle with uniforms2, shaderModule`,
+                 code: `
+                     
+                     struct TheStruct {
+                        color: vec4f,
+                        scale: vec2f, 
+                        offset: vec2f
+                     };
+
+                     
+                     @group(0) @binding(0) var <uniform> thestruct: TheStruct;
+
+                     @vertex fn vs(@builtin(vertex_index) vertexIndex : u32) -> @builtin(position) vec4f {
+
+                        var pos = array(
+                            vec2f(0,0.5),
+                            vec2f(-0.5,0),
+                            vec2f(0.5,0)
+                        );
+
+                        return vec4f( pos[vertexIndex]*thestruct.scale + thestruct.offset,0,1);
+
+                     }
+
+                     @fragment fn fs()->@location(0)  vec4f{
+                        return thestruct.color;
+                     }
+
+                 `
+               });
+
+               const pipeline = device.createRenderPipeline({
+                 label: `Draw triangle with uniform 2, pipeline`,
+                 layout: `auto`, 
+                 vertex: {
+                    entryPoint: `vs`, 
+                    module: shaderModule
+                 },
+                 fragment: {
+                    entryPoint: `fs`, 
+                    module: shaderModule, 
+                    targets:[{format: canvasFormat}]
+                 }
+               });
+
+
+
+                const thestruct_length = 4 +2 +2;
+                const thestruct_size = 4*4+
+                                       2*4+
+                                       2*4;
+
+                const colorOffset  = 0;
+                const scaleOffset  = 4;
+                const offsetOffset = 6 ;
+
+                const objectCount = 100;
+                
+                const objectsInfo = [];
+
+
+                for(let i = 0 ; i<objectCount; i++){
+
+                    const data = new Float32Array(thestruct_length);
+                    data.set([random(0.2,0.9),random(0.2,0.9),random(0.2,0.9),1],colorOffset);
+                    data.set([random(-0.9,0.9),random(-0.9,0.9)],offsetOffset);
+                    
+                    const uniform = device.createBuffer({
+                        label: `Draw triangles with uniform  obj ${i}, uniform`,
+                        size: thestruct_size,
+                        usage: GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST
+                    });
+
+
+                    const  bindgroup = device.createBindGroup({
+                        label: ` Draw triangles with uniform , obj ${i}, bindGroup`,
+                        layout: pipeline.getBindGroupLayout(0),
+                        entries:[{binding:0, resource: {buffer: uniform}}]
+
+                    });
+
+                    objectsInfo.push({
+                        scale: random(0.2, 0.9) ,
+                        data,
+                        uniform, 
+                        bindgroup 
+                    });
+
+
+                }
+                 
+                const renderPassDescriptor = {
+                    colorAttachments:[
+                   
+                     {
+                      colorValue: [0,0,0,1],
+                      loadOp: `clear`, 
+                      storeOp: `store`,
+
+                    }
+                    
+                    ]
+                }
+
+
+                function render(){
+
+                    renderPassDescriptor.colorAttachments[0].view = context.getCurrentTexture().createView();
+
+                    const cmdEncoder = device.createCommandEncoder({
+                        label: ` Draw triangle with uniform, cmdEncoder`
+                    });
+
+                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
+                    pass.setPipeline(pipeline);
+
+                    const aspect = canvas.width/canvas.height;
+
+                    for(const {scale,data,uniform, bindgroup} of objectsInfo) {
+                     
+                        data.set([scale/aspect, scale ], scaleOffset);
+                        device.queue.writeBuffer(uniform, 0, data);
+                        pass.setBindGroup(0,bindgroup);
+                        pass.draw(3);
+                        
+
+                    }  
+                    pass.end();
+                    device.queue.submit([cmdEncoder.finish()]);
+
+                }
+
+                render();
+
+
+
+
+
+            }
             async function main() {
                 // await drawTriangleHardCoded();
                 //await drawColoredTriangle();
@@ -1823,6 +1988,7 @@
                 //await computeRandomFloat3();
                 //await computeRandomFloat4();
                 // await drawTrianglesWithUniform();
+                await drawTriangleWithUniform2();
             };
 
 
