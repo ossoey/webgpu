@@ -2330,6 +2330,184 @@
 
             }
 
+            async function drawTriangleWithUniformInterStage3(){
+
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`This browser does not support webgpu!`);
+                    return
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device){
+                    alert(`Not able to request device!`);
+                    return
+                }
+
+                const canvas = document.querySelector(`canvas`);
+                const context = canvas.getContext(`webgpu`);
+                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+                context.configure({
+                    device, 
+                    format: canvasFormat
+                });
+
+                const shaderModule  =  device.createShaderModule({
+                    label: `Draw triangles with uniform interstage3, shaderModule` , 
+                    code: `
+                    
+                        struct TheStruct {
+                            color: vec4f,
+                            color1: vec4f, 
+                            color2: vec4f, 
+                            scale: vec2f, 
+                            offset: vec2f,
+                        }; 
+
+                        struct OutPos {
+                            @builtin(position) posi : vec4f, 
+                            @location(0) color : vec4f
+                        }
+                    
+
+                        @group(0) @binding(0) var<uniform> thestruct: TheStruct;
+                        
+                        @vertex fn vs(@builtin(vertex_index) vertexIndex: u32) -> OutPos{
+
+                            var pos = array(
+                                vec2f(0, 0.5), 
+                                vec2f(-0.5, 0), 
+                                vec2f(0.5, 0)
+                            );
+
+                            var color = array(
+                                thestruct.color, 
+                                thestruct.color1,
+                                thestruct.color2
+                            );
+
+                            var out : OutPos; 
+
+                            out.posi = vec4f(pos[vertexIndex]*thestruct.scale + thestruct.offset, 0,1);
+                            out.color = color[vertexIndex];
+
+                            return out;
+
+                        }
+
+                        @fragment fn fs(out: OutPos)-> @location(0) vec4f {
+                            return out.color;
+                        }
+
+                    `
+                });
+
+                const pipeline = device.createRenderPipeline({
+                    label: ` Draw triangles with uniform interstage 3, pipeline`, 
+                    layout: `auto`, 
+                    vertex: {
+                        entryPoint: `vs`, 
+                        module: shaderModule
+                    }, 
+                    fragment: {
+                        entryPoint: `fs`, 
+                        module: shaderModule, 
+                        targets: [{ format: canvasFormat}]
+                    }
+                });
+
+                const uniformData_length = 4+4+4+2+2;
+                const uniformData_size =   4*4 +
+                                           4*4 + 
+                                           4*4 +
+                                           2*4 +
+                                           2*4;
+
+                const colorOffset =  0;
+                const color1Offset = 4;
+                const color2Offset = 8;
+                const scaleOffset =  12;
+                const offsetOffset = 14; 
+
+                const objectCount = 100;
+                const objectsInfo  = [];
+
+
+                const random = (start =0 , end = 1) =>{
+
+                    return start + Math.random()*(end-start);
+
+                }
+
+                for(let i = 0; i<objectCount; i++){
+
+                    const data = new Float32Array(uniformData_length);
+                    data.set([random(0.1, 0.8), random(0.1, 0.8),random(0.1, 0.8),1], colorOffset);
+                    data.set([random(0.3, 0.3), random(0.3, 0.3),random(0.3, 0.3),1], color1Offset);
+                    data.set([random(0.3, 0.3), random(0.3, 0.3),random(0.3, 0.3),1], color2Offset);
+                    data.set([random(-0.99,0.99), random(-0.99,0.99)], offsetOffset);
+
+                    const uniform = device.createBuffer({
+                        label: `Draw triangles with uniform3, uniform ${i}`, 
+                        size: uniformData_size, 
+                        usage: GPUBufferUsage.UNIFORM| GPUBufferUsage.COPY_DST
+                    }); 
+
+                    const bindgroup = device.createBindGroup({
+                        label: `Draw triangles with uniform3, bindgroup ${i} `, 
+                        layout: pipeline.getBindGroupLayout(0), 
+                        entries: [{binding: 0, resource: {buffer: uniform }}]
+                    });
+
+                    objectsInfo.push({
+                    scale: random(0.3,0.8),
+                    data, 
+                    uniform, 
+                    bindgroup
+                    });
+                }
+
+
+                const renderPassDesc = {
+                    colorAttachments: [
+                        { colorValue: [0,0,0,1], 
+                        loadOp:`clear`, 
+                        storeOp: `store`
+                        
+                        }
+                    ]
+                };
+
+
+                function render(){
+                    renderPassDesc.colorAttachments[0].view = context.getCurrentTexture().createView();
+
+                    const cmdEncoder = device.createCommandEncoder({
+                        label: ` Draw triangles with uniform3, cmdEncoder !`
+                    });
+
+                    const pass = cmdEncoder.beginRenderPass(renderPassDesc);
+
+                    const aspect = canvas.width/canvas.height;
+
+                    for(const { scale, data, uniform, bindgroup} of objectsInfo) {
+
+                        data.set([scale/aspect, scale], scaleOffset);
+                        device.queue.writeBuffer(uniform, 0,data);
+
+                        pass.setPipeline(pipeline);
+                        pass.setBindGroup(0, bindgroup);
+                        pass.draw(3);
+                    }
+
+                    pass.end();
+                    device.queue.submit([cmdEncoder.finish()]);
+                }
+
+                render();
+
+                }
+
             async function main() {
                 // await drawTriangleHardCoded();
                 //await drawColoredTriangle();
@@ -2346,7 +2524,8 @@
                 //await computeRandomFloat4();
                 // await drawTrianglesWithUniform();
                 //await drawTriangleWithUniformInterStage();
-                await drawTriangleWithUniformInterStage2();
+                //await drawTriangleWithUniformInterStage2();
+                await drawTriangleWithUniformInterStage3();
             };
 
 
