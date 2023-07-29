@@ -2580,6 +2580,8 @@
                         @fragment fn fs(out: OutPos)-> @location(0) vec4f {
                             return out.color;
                         }
+
+                
                     `
                 });
 
@@ -2719,6 +2721,188 @@
 
                 }
 
+            async function drawTrianglesWithSeperateUniforms(){
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`This browser does not support webgpu!`);
+                    return;
+                }
+
+                const device = await adapter.requestDevice();
+                if (!device){
+                    alert(`Not able to request device !`);
+                    return;
+                }
+
+                const canvas = document.querySelector(`canvas`);
+                const context = canvas.getContext(`webgpu`);
+                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+                context.configure({
+                    device, 
+                    format: canvasFormat
+                });
+
+
+                function random (start = 0, end= 1){
+
+                    return start + Math.random()*(end-start);
+                }
+
+                const shaderModule = device.createShaderModule({
+                    label: `Draw triangles with seperate uniforms, shaderModule`, 
+                    code:`
+                    
+                      struct MyStruct {
+                        color: vec4f, 
+                        offset: vec2f 
+                      };
+
+                      struct Other {
+                        scale: vec2f
+                      };
+
+                      @group(0) @binding(0) var<uniform> mystruct: MyStruct;
+                      @group(0) @binding(1) var<uniform> other: Other;
+
+                      @vertex fn vs(@builtin(vertex_index) vertexIndex : u32) -> @builtin(position) vec4f {
+                        var pos = array(
+                            vec2f(0,0.5), 
+                            vec2f(-0.5, 0),
+                            vec2f(0.5,0)
+                        );
+
+                        
+                        var oth = other.scale; 
+                         
+                        return vec4f(pos[vertexIndex]*other.scale + mystruct.offset ,0,1); 
+                        }
+
+                      @fragment fn fs()-> @location(0) vec4f {
+                        return   mystruct.color; // mystruct.color;
+                      }
+
+                    `
+                });
+
+                const pipeline = device.createRenderPipeline({
+                    label: ` Draw triangles with seperate uniforms, pipeline`, 
+                    layout: `auto`, 
+                    vertex: {
+                        entryPoint : `vs`, 
+                        module: shaderModule
+                    } , 
+
+                    fragment: {
+                        entryPoint: `fs`, 
+                        module: shaderModule, 
+                        targets: [{format: canvasFormat}]
+                    }
+                });
+
+
+
+                const numObject = 100;
+                const objectsInfo = [];
+                const buffer_size = 4*4+
+                                    2*4+
+                                    2*4;
+
+                const buffer_length = 4+2+2;
+
+                const bufferColorOffset = 0;
+                const bufferOffsetOffset = 4; 
+                const bufferScaleOffset = 6;
+
+                for(let i= 0; i< numObject; i++){
+
+                    const buffer = device.createBuffer({
+                        label: ` Draw triangles with seperate uniforms buffer ${i}`, 
+                        size:  buffer_size, 
+                        usage: GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST
+                    });
+
+                    const data = new Float32Array(buffer_length);
+
+                    data.set([random(0.6,0.8),random(0.6,0.8),random(0.6,0.8),1], bufferColorOffset);
+                    data.set([random(-0.9,0.9),random(-0.9,0.9)], bufferOffsetOffset);
+
+                    device.queue.writeBuffer(buffer,0, data);
+
+                    const bufferScale  = device.createBuffer({
+                        label: ` Draw triangles with seperate uniforms buffer ${i}`, 
+                        size:  2*4, 
+                        usage: GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST
+                    });
+
+
+                    const dataScale = new Float32Array(2);
+
+
+                    const bindGroup = device.createBindGroup({
+                        label: `Draw triangles with seperate uniforms bindGroup ${i}`, 
+                        layout : pipeline.getBindGroupLayout(0), 
+                        entries: [
+                            {binding: 0, resource: {buffer: buffer}}, 
+                            {binding: 1, resource: {buffer: bufferScale}}, 
+
+                        ]
+                    });
+
+
+                    objectsInfo.push({
+                        scale: random(0.3, 0.6) ,
+                        buffer, 
+                        bufferScale,
+                        data, 
+                        dataScale,
+                        bindGroup
+                    });
+
+                }
+
+                
+                const renderPassDesc = {
+                    colorAttachments : [{
+                        colorValue: [0,0,0,1], 
+                        loadOp:`clear`, 
+                        storeOp: `store`
+                    }]
+                };
+
+                function render(){
+                    renderPassDesc.colorAttachments[0].view = context.getCurrentTexture().createView();
+
+                    const aspect = canvas.width / canvas.height;  
+
+                    const cmdEncoder = device.createCommandEncoder({
+                        label: `Draw triangles with seperate uniforms, cmdEncoder`
+                    });
+
+                    const pass = cmdEncoder.beginRenderPass(renderPassDesc);
+
+                    pass.setPipeline(pipeline);
+
+                    for(const {scale, buffer,bufferScale, data,dataScale, bindGroup} of objectsInfo) {
+
+                        
+                        dataScale.set([scale/aspect, scale],0);
+
+                        device.queue.writeBuffer(bufferScale,0, dataScale);
+
+                        pass.setBindGroup(0,bindGroup);
+                        pass.draw(3);
+
+                    }
+                     
+                    pass.end();
+                    device.queue.submit([cmdEncoder.finish()]);
+                }
+
+                render();
+              
+
+            }
+
             async function main() {
                 // await drawTriangleHardCoded();
                 //await drawColoredTriangle();
@@ -2736,7 +2920,8 @@
                 // await drawTrianglesWithUniform();
                 //await drawTriangleWithUniformInterStage();
                 //await drawTriangleWithUniformInterStage2();
-                await drawTriangleWithUniformInterStage4();
+                //await drawTriangleWithUniformInterStage4();
+                await drawTrianglesWithSeperateUniforms();
             };
 
 
