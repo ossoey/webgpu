@@ -3313,6 +3313,105 @@
 
             }
 
+            async function computeDouble4()  {
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`This browser does not support webgpu`);
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device){
+                    alert(`Not able to request device`);
+                }
+
+                const shaderModule = device.createShaderModule({
+                    label: `Compute double 4, shaderModule`, 
+                    code : `
+                    
+                     @group(0) @binding(0) var<storage, read_write> data: array<f32>;
+                     @group(0) @binding(1) var<storage, read> data1: array<f32>;
+
+
+                     @compute @workgroup_size(1) fn compute_double(@builtin(global_invocation_id) id: vec3u) {
+
+                        var i = id.x; 
+
+                        data[i] = 2.0*data1[i]+1.0;
+                     }
+                    
+                    `
+                });
+
+
+                const pipeline = device.createComputePipeline({
+                    label: `Compute double 4, pipeline`, 
+                    layout: `auto`, 
+                    compute: {
+                        entryPoint: `compute_double`, 
+                        module: shaderModule
+                    }
+                });
+
+
+                const dataInput = new Float32Array([1,3,5]);
+
+                const bufferInput = device.createBuffer({
+                    label: `Compute double 4, bufferInput`, 
+                    size: dataInput.byteLength, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC|GPUBufferUsage.COPY_DST
+                });
+
+
+                const dataAdditionalInput = new Float32Array([11,33,55]);
+
+                const bufferAdditionalInput = device.createBuffer({
+                    label: `Compute double 4, bufferInput`, 
+                    size: dataAdditionalInput.byteLength, 
+                    usage: GPUBufferUsage.STORAGE |GPUBufferUsage.COPY_DST
+                });
+
+                device.queue.writeBuffer(bufferAdditionalInput, 0, dataAdditionalInput);
+
+                const bufferOutput = device.createBuffer({
+                    label: `Compute double 4, bufferOutput`, 
+                    size: dataInput.byteLength, 
+                    usage: GPUBufferUsage.MAP_READ| GPUBufferUsage.COPY_DST
+                });
+
+                const bindGroup = device.createBindGroup({
+                    label: `Compute double 4, bindGroup`, 
+                    layout: pipeline.getBindGroupLayout(0),
+                    entries: [{binding:0, resource: {buffer:bufferInput}},
+                              {binding:1, resource: {buffer:bufferAdditionalInput}}
+                        ]});
+                
+
+                var compute = async () => {
+                    const cmdEncoder = device.createCommandEncoder({
+                        label:`Compute double 4, cmdEncoder`
+                    });
+
+                    const pass = cmdEncoder.beginComputePass();
+                    pass.setPipeline(pipeline);
+                    pass.setBindGroup(0,bindGroup);
+                    pass.dispatchWorkgroups(dataInput.length);
+                    pass.end();
+
+                    cmdEncoder.copyBufferToBuffer(bufferInput, 0, bufferOutput,0, bufferOutput.size);
+
+                    device.queue.submit([cmdEncoder.finish()]);
+
+                    await bufferOutput.mapAsync(GPUMapMode.READ);
+                    const dataOutput = new Float32Array(bufferOutput.getMappedRange().slice());
+                    bufferOutput.unmap();
+                    console.log(dataInput);
+                    console.log(dataOutput);
+
+                }
+                
+                await compute();
+
+            }
 
 
             async function main() {
@@ -3335,8 +3434,8 @@
                 //await drawTriangleWithUniformInterStage4();
                 // await drawTrianglesWithSeperateUniforms();
                 //await drawTrianglesWithSeperateStorages();
-                await drawTrianglesWithSeperateStoragesGradiant();
-                
+                //await drawTrianglesWithSeperateStoragesGradiant();
+                await computeDouble4();
 
             };
 
