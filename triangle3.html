@@ -3659,6 +3659,237 @@
 
             }
 
+            async function drawGradientTrianglesWithSingleStorage() {
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter){
+                    alert(`This browser does not support webgpu`);
+                    return; 
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device) {
+                    alert(`Not able to request device`);
+                    return;
+                }
+
+                const canvas = document.querySelector(`canvas`);
+                const context = canvas.getContext(`webgpu`);
+                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+                context.configure({
+                    device, 
+                    format: canvasFormat
+                }); 
+
+                const shaderModule = device.createShaderModule({
+                    label:`Draw gradient triangles with single storage`, 
+                    code: `
+                    
+                        struct DataColorOffset {
+                            color: vec4f, 
+                            offset: vec2f
+                        };
+
+                        struct DataScale {
+                            scale: vec2f
+                        };
+
+                        struct DataGradientColor {
+                            color1: vec4f, 
+                            color2: vec4f
+                        }
+
+                        struct DataTransfer {
+                            @builtin(position) posi: vec4f, 
+                            @location(0) color: vec4f
+                        }
+
+                        @group(0) @binding(0) var<storage,read> dataColorOffset: array<DataColorOffset>;
+                        @group(0) @binding(1) var<storage,read> dataScale: array<DataScale>; 
+                        @group(0) @binding(2) var<storage, read> dataGradientColor: array<DataGradientColor>;
+
+                        
+                        @vertex fn vs(@builtin(vertex_index) vi : u32, 
+                                      @builtin(instance_index) ii: u32)->DataTransfer {
+
+                            var pos = array(
+
+                                vec2f(0,0.5), 
+                                vec2f(-0.5, 0), 
+                                vec2f(0.5,0)
+
+                            );
+
+                            var color = array (
+                                dataColorOffset[ii].color, 
+                                dataGradientColor[ii].color1, 
+                                dataGradientColor[ii].color2
+
+                            );
+                            
+                            var transfer : DataTransfer;
+
+                            transfer.posi = vec4f(pos[vi] * dataScale[ii].scale + dataColorOffset[ii].offset,0,1);
+
+                            transfer.color = color[vi]; 
+
+                            return transfer; 
+                        }
+
+                        @fragment fn fs(dataTransfer: DataTransfer)-> @location(0) vec4f {
+
+                            return dataTransfer.color; 
+                        }
+                        
+                    `
+                }); 
+
+                const pipeline = device.createRenderPipeline({
+                    label: `Draw gredient triangles with single storage`, 
+                    layout: `auto`, 
+                    vertex : {
+                        entryPoint: `vs`, 
+                        module: shaderModule, 
+                    }, 
+
+                    fragment: {
+                        entryPoint: `fs`, 
+                        module: shaderModule, 
+                        targets: [
+                            {format: canvasFormat}
+                        ]
+                    }
+                }) ; 
+
+
+
+                let random = (start=1, end= 1) => {
+                    return start + Math.random()*(end-start);
+                }
+
+                const numObjects = 800000;
+                const objectsInfo = [];
+
+                const dataColorOffset_length = (4+2+2)*numObjects;
+                const dataColorOffset_size = (4*4 +
+                                              2*4 +
+                                              2*4  
+                                             )*numObjects
+                                            
+                const dataColorOffsetStrideColor = 0; 
+                const dataColorOffsetStrideOffset = 4; 
+                const dataColorOffsetStrideAmount = (4+2+2);
+
+
+                const dataColorOffset = new Float32Array(dataColorOffset_length);
+
+                const bufferColorOffset = device.createBuffer({
+                    label: `Draw gradient triangles with single storage, bufferColorOffset `, 
+                    size: dataColorOffset_size, 
+                    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
+                });
+
+
+
+                const dataGradientColor_length = (4+4)*numObjects;
+                const dataGradientColor_size = (4*4+
+                                                4*4)*numObjects;
+
+                const dataGradientColorStrideColor1 = 0;
+                const dataGradientColorStrideColor2 = 4; 
+                const dataGradientColorStrideAmount = (4+4);                                               
+                
+                const dataGradientColor = new Float32Array(dataGradientColor_length);
+
+                const bufferGradientColor = device.createBuffer({
+                    label: `Draw gradient triangles with single storage, bufferGradienColor`, 
+                    size: dataGradientColor_size, 
+                    usage: GPUBufferUsage.STORAGE| GPUBufferUsage.COPY_DST
+                });
+
+
+                const dataScale_length =  2*numObjects; 
+                const dataScale_size   =  (2*4)* numObjects;
+                const dataScaleStride  =  0;
+                const dataScaleStrideAmount = 2;      
+
+                const dataScale = new Float32Array(dataScale_length);
+                const bufferScale = device.createBuffer({
+                    label: `Draw gradient triangles with single storage, bufferScale `, 
+                    size : dataScale_size, 
+                    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
+                });
+
+                for(let i = 0; i< numObjects; i++) {
+
+                    dataColorOffset.set([random(0.2,0.9),random(0.2,0.9),random(0.2,0.9),1],dataColorOffsetStrideAmount*i+dataColorOffsetStrideColor);
+                    dataColorOffset.set([random(-0.9,0.9),random(-0.9,0.9)],dataColorOffsetStrideAmount*i+dataColorOffsetStrideOffset);
+
+                    dataGradientColor.set([random(0.2,0.9), random(0.2,0.9),random(0.2,0.9),1],dataGradientColorStrideAmount*i + dataGradientColorStrideColor1 );
+                    dataGradientColor.set([random(0.2,0.9), random(0.2,0.9),random(),1],dataGradientColorStrideAmount*i + dataGradientColorStrideColor2 );
+
+                   
+                    objectsInfo.push({
+                        scale: random(0.2,0.6)
+                    });
+                }
+
+                device.queue.writeBuffer(bufferColorOffset,0,dataColorOffset);
+                device.queue.writeBuffer(bufferGradientColor, 0, dataGradientColor);
+                
+                const bindGroup = device.createBindGroup({
+                    label:` Draw gradient triangles with single storage, bindGroup`, 
+                    layout: pipeline.getBindGroupLayout(0), 
+                    entries: [
+                        {binding: 0, resource: {buffer: bufferColorOffset}}, 
+                        {binding: 1, resource: {buffer: bufferScale}}, 
+                        {binding: 2, resource : {buffer: bufferGradientColor}}
+                    ]
+                });
+
+
+                const renderPassDesc = {
+                    colorAttachments : [
+                        {colorValue: [0,0,0,1], 
+                         loadOp : `clear`, 
+                         storeOp: `store`
+                        
+                        }
+                    ]
+                }; 
+
+
+                let render = () => {
+
+                    renderPassDesc.colorAttachments[0].view = context.getCurrentTexture().createView();
+
+                    const aspect =  canvas.width/canvas.height; 
+
+                    const cmdEncoder = device.createCommandEncoder({
+                        label: `Draw gradient triangles with single storage, cmdEncoder `
+                    }); 
+
+                    const pass = cmdEncoder.beginRenderPass(renderPassDesc); 
+                    pass.setPipeline(pipeline);
+                
+                    
+                    objectsInfo.forEach(( {scale}, ndx)=>{
+                        dataScale.set([scale/aspect, scale], dataScaleStrideAmount*ndx + dataScaleStride);
+                    })
+
+                    device.queue.writeBuffer(bufferScale,0,dataScale);
+
+                    pass.setBindGroup(0, bindGroup);
+                    pass.draw(3,numObjects);
+                    pass.end();
+
+                    device.queue.submit([cmdEncoder.finish()]);
+            
+                }
+
+                render();
+
+            }
+
             async function main() {
                 // await drawTriangleHardCoded();
                 //await drawColoredTriangle();
@@ -3681,8 +3912,8 @@
                 //await drawTrianglesWithSeperateStorages();
                 //await drawTrianglesWithSeperateStoragesGradiant();
                 //await computeDouble4();
-                await drawGradientTrianglesWithSeperateStorage();
-
+                //await drawGradientTrianglesWithSeperateStorage();
+                drawGradientTrianglesWithSingleStorage();
             };
 
 
