@@ -17,830 +17,28 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/vfs_fonts.js"></script>
         
         <style>
-            :root {
 
-            --padding-right-left:20vw;   
-            --header-padding:5px var(--padding-right-left);
-            --padding-right-left-querymedia:2vw;  
-            --header-padding-querymedia:5px var(--padding-right-left-querymedia);
-            --header-margin: 0 2vh;
-
-            --main-head-color: #505050de;
-            --main-body--color: #ffffff;
-            --main-font-family: Arial, Helvetica, sans-serif;
-            --main-font-color: black;
-            --main-line-color: rgba(0, 217, 255, 0.787);
-            --main-padding:5px 10vw;
-
-            --table-head-color:rgba(54, 37, 4, 0.787);
-            --table-body-color1:rgba(0, 217, 255, 0.787);
-            --table-alternate-color2:rgb(255, 209, 73);
-            --table-font-family: Arial, Helvetica, sans-serif;
-            --table-font-color:rgba(54, 37, 4, 0.787);
-            
-            --h1-font-size: 24px;
-            --h2-font-size: 20px;
-            } 
-
-            *{
-                margin: 0; 
-                padding: 0;
-                box-sizing: border-box;  
-            }
-
-            #header-id{
-                padding:var( --header-padding);
-            }
-
-            #logo-menu-id{
-                display: flex;
-                justify-content: space-between;
-            }
-
-            #menu-button-id{
-                cursor: pointer;
-            }
-
-            .menu-subbutton {
-                width: 20px;
-                height: 2px;
-                background-color:var( --main-line-color); 
-                margin: 2px;
-            }
-
-            nav{
-                display: flex;
-                justify-content: end;
-            }
-
-            #menu-id{
-                position: absolute;
-                top: 20px;
-                right:var(--padding-right-left);
-                display: none;
-            }
-
-            .nav-item{
-                cursor: pointer;
-                border: 2px var(--table-body-color1) solid;
-                margin: 3px 0;
-            }
-
-
-
-            #main-id{
-                display: flex;
-                justify-content: center;
-            }
-
-
-            #home-id{
-                padding:var( --header-padding);
-             
-            }
-
-            .home-menu-item{
-                cursor: pointer;
-                margin: 3px 0;
-                border: 2px var(--table-body-color1) solid;
-            }
-
-
-
-
-
-
-            .fielsetclass {
-                border: none;
-                margin-bottom: 20px;
-                border-top: 2px var(--table-body-color1) solid;
-            }
-
-             legend {
-                margin: 5px 0;
-              
-            }
-
-            .containerinputframe{
-                display: grid;
-                grid-template-columns: repeat(3, 1fr); /* Three equal-sized columns */
-                grid-gap: 3px; /* Adjust the gap between items */
-              
-            }
-
-            .inputtext{
-                padding: 4px 6px;
-                margin: 0 8px;
-            }
-
-            .inputlabel{
-              
-                margin: 0 8px;
-            }
-
-            .containsubmitbutton{
-                display: grid;
-                grid-template-columns: repeat(3, 1fr); /* Three equal-sized columns */
-                grid-gap: 3px; /* Adjust the gap between items */
-              
-            }
-
-            .submitbutton{
-                border: 2px var(--table-alternate-color2) solid;
-                background-color: var(--main-head-color);
-                cursor: pointer;
-                padding: 5px 7px;
-            }
-
-            .table-striped tbody tr:nth-child(even) {
-                background-color:var(--table-body-color1);
-            }
-            .table-striped tbody tr:nth-child(odd) {
-                background-color:var(--table-alternate-color2);
-            }
-
-
-   
-
-
-            #footer-id{
-                padding:var( --header-padding);
-            }
-
-           @media (max-width:900px) {
-                #header-id{
-                    padding:var(    --header-padding-querymedia );
-                }
-
-                #menu-id{
  
-                    right:var(--padding-right-left-querymedia);
- 
-                }
+            html, body {
+            margin: 0;     
+            height: 100%;   
+            }
 
-                #home-id{
-                    padding:var(    --header-padding-querymedia );
-                }
-
-                #footer-id{
-                    padding:var(  --header-padding-querymedia );
-                }
-
-                .containerinputframe{
-                    display: block;
-                }
-
-           }         
+            canvas {
+            display: block;  
+            width: 100%;     
+            height: 100%;
+            }
 
         </style>
 
     </head>
     <body>
-
-        <div id="header-id"> 
-
-            <div id="logo-menu-id">
-                <div id="logo-frame-id">
-                    <div id="logo-id"> <h1>Webgpu</h1></div>
-                    <div id="module-id"> <h2>Triangle 3</h2></div>
-                </div> 
-                <div id="menu-button-id">
-                    <div class="menu-subbutton"></div>
-                    <div class="menu-subbutton"></div>
-                    <div class="menu-subbutton"></div>
-                </div>
-            </div>
-            <nav>
-                <div id="menu-id">
-                    <div class="nav-item">Vector addition</div>
-                    <div class="nav-item">Dot product</div>
-                    <div class="nav-item">Magnitude</div>
-                    <div class="nav-item">Distance</div>  
-                    <div class="nav-item"id="Compute-id"> <a href="compute.html">Compute</a></div>
-                    <div class="nav-item" id="homepage-id"> <a href="index.html">Home</a></div>  
-                </div>
-            </nav>
-        </div>
-
-        <div id="main-id">
-
-            <form id="vector-addition-id">
-                
-                <fieldset id="fieldsetinput-id" class="fielsetclass">
-                    <legend><h4> Input &nbsp;</h4></legend>
-                    <div class="containerinputframe" >
-                              <div> <canvas> </canvas></div>
-                    </div>
-                </fieldset>
-
-                <fieldset id="fieldsetsubmit-id" class="fielsetclass">
-                    <legend> <h4> Submit  &nbsp;</h4></legend>
-                    <div  class="containsubmitbutton">
-                        <button class="submitbutton" id="run">Run</button>
-        
-                        <button class="submitbutton" id="clear">Clear</button>    
-                    </div>
-                </fieldset>
-
-                <fieldset id="fieldsetresult-id" class="fielsetclass">
-                    <legend><h4> Output  &nbsp; </h4></legend>
-                    <div  id="tableframe-id">
-                        <table  class="table-striped">
-                          <thead>
-                            <tr>
-                              <th>Column 1</th>
-                              <th>Column 2</th>
-                              <th>Column 3</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Row 1, Column 1</td>
-                              <td>Row 1, Column 2</td>
-                              <td>Row 1, Column 3</td>
-                            </tr>
-                            <tr>
-                              <td>Row 2, Column 1</td>
-                              <td>Row 2, Column 2</td>
-                              <td>Row 2, Column 3</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                    </div>
-                </fieldset>
-
-
-               
-            </form>
-
-        </div>
-        
-        <div id="footer-id">
-            <h3> webgpu.Ossoey.com &#169;Copyright 2023 </h3>
-        </div>  
+        <canvas> </canvas>
 
         <script  type="module" >
-             const menu_button = document.getElementById('menu-button-id');
-             const menu_id = document.getElementById('menu-id');
 
-             menu_button.addEventListener('click', () => {
-             if (menu_id.style.display === 'block') {
-                 menu_id.style.display = 'none'; // Hide the element
-             } else {
-                
-                 menu_id.style.display = 'block'; // Display the element
-             }
-             });
-
-            // const run = document.getElementById('run');
-
-            // run.addEventListener('click', () => {
-     
-            // });
-
-
-             // wgsl language
-             // type
-
-            async function drawTriangleHardCoded(){
-                
-                const adapter = await navigator.gpu.requestAdapter();
-                if(!adapter){
-                    alert(`This browser does not support webgpu`);
-                    return;
-                }
-
-                const device = await adapter.requestDevice();
-                if(!device){
-                    alert(`Not able to request device`);
-                    return;
-                }
-
-                const canvas = document.querySelector(`canvas`);
-                const context = canvas.getContext(`webgpu`);
-                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-                context.configure({
-                    device, 
-                    format:canvasFormat
-                });
-
-                const shaderModule = device.createShaderModule({
-                    label:`Triangle HardCoded, ShaderModule`, 
-                    code: `
-                        @vertex  fn vs(@builtin(vertex_index) vertexIndex :u32)-> @builtin(position) vec4f{
-                            var pos = array(
-                                vec2f(0,0.5),
-                                vec2f(-0.5, -0.75),
-                                vec2f(0.5, -0.75)
-                            );
-
-                            return vec4f(pos[vertexIndex],0,1);
-                        }
-
-                        @fragment fn fs()->@location(0) vec4f{
-
-                            return vec4f(0,0,1,1);
-                        }
-                    `
-                });
-
-                const pipeline = device.createRenderPipeline({
-                    label: `Triangle HardCoded, Pipelline`, 
-                    layout: `auto`, 
-                    vertex: {
-                        entryPoint: `vs`, 
-                        module : shaderModule
-                    }, 
-                    fragment: {
-                        entryPoint :`fs`, 
-                        module: shaderModule, 
-                        targets: [{
-                            format: canvasFormat
-                        }]
-                    }
-                });
-
-
-                const renderPassDescriptor = {
-                    colorAttachments:[{
-                        view : context.getCurrentTexture().createView(),
-                        clearValue: [0,0,0,1],
-                        loadOp:`clear`, 
-                        storeOp: `store`,
-                    }]
-                };
-
-                function render(){
-                    const cmdEncoder = device.createCommandEncoder({
-                        label: `Triangle HardCoded, cmdEncoder`
-                    });
-
-                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
-                    pass.setPipeline(pipeline);
-                    pass.draw(3);
-                    pass.end();
-                    device.queue.submit([cmdEncoder.finish()]);
-
-
-                }
-
-                render();
-
-            }
-            
-            async function drawColoredTriangle(){
-                
-                const adapter = await navigator.gpu.requestAdapter();
-                if(!adapter){
-                    alert(`This browser does not support webgpu`);
-                    return;
-                }
-
-                const device = await adapter.requestDevice();
-                if(!device){
-                    alert(`Not able to request device`);
-                    return;
-                }
-
-                const canvas = document.querySelector(`canvas`);
-                const context = canvas.getContext(`webgpu`);
-                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-                context.configure({
-                    device, 
-                    format:canvasFormat
-                });
-
-                const shaderModule = device.createShaderModule({
-                    label:`Colored Triangle, ShaderModule`, 
-                    code: `
-
-                        struct OutValues{
-                            @builtin(position) posi : vec4f, 
-                            @location(0) color: vec4f
-                        }
-
-                        @vertex  fn vs(@builtin(vertex_index) vertexIndex :u32)-> OutValues{
-                            var pos = array(
-                                vec2f(0,0.5),
-                                vec2f(-0.5, -0.75),
-                                vec2f(0.5, -0.75)
-                            );
-
-                            var color = array(
-                                vec4f(1,0,0,1),
-                                vec4f(0,1,0,1),
-                                vec4f(0,0,1,1)
-                            );
-
-                            var out: OutValues;
-
-                            out.posi = vec4f(pos[vertexIndex],0,1);
-                            out.color = color[vertexIndex];
-
-                            return out;
-
-                        }
-
-                        @fragment fn fs(params:OutValues)->@location(0) vec4f{
-
-                            return params.color;
-                        }
-                    `
-                });
-
-                const pipeline = device.createRenderPipeline({
-                    label: `Colored Triangle, Pipelline`, 
-                    layout: `auto`, 
-                    vertex: {
-                        entryPoint: `vs`, 
-                        module : shaderModule
-                    }, 
-                    fragment: {
-                        entryPoint :`fs`, 
-                        module: shaderModule, 
-                        targets: [{
-                            format: canvasFormat
-                        }]
-                    }
-                });
-
-
-                const renderPassDescriptor = {
-                    colorAttachments:[{
-                        view : context.getCurrentTexture().createView(),
-                        clearValue: [0,0,0,1],
-                        loadOp:`clear`, 
-                        storeOp: `store`,
-                    }]
-                };
-
-                function render(){
-                    const cmdEncoder = device.createCommandEncoder({
-                        label: `Colored Triangle, cmdEncoder`
-                    });
-
-                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
-                    pass.setPipeline(pipeline);
-                    pass.draw(3);
-                    pass.end();
-                    device.queue.submit([cmdEncoder.finish()]);
-
-
-                }
-
-                render();
-
-            }
-     
-            async function drawInsideTriangleMesh(){
-                
-                const adapter = await navigator.gpu.requestAdapter();
-                if(!adapter){
-                    alert(`This browser does not support webgpu`);
-                    return;
-                }
-
-                const device = await adapter.requestDevice();
-                if(!device){
-                    alert(`Not able to request device`);
-                    return;
-                }
-
-                const canvas = document.querySelector(`canvas`);
-                const context = canvas.getContext(`webgpu`);
-                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-                context.configure({
-                    device, 
-                    format:canvasFormat
-                });
-
-                const shaderModule = device.createShaderModule({
-                    label:`Draw indide triangle mesh, ShaderModule`, 
-                    code: `
-
-                        struct OutValues{
-                            @builtin(position) posi : vec4f, 
-                            @location(0) color: vec4f
-                        }
-
-                        @vertex  fn vs(@builtin(vertex_index) vertexIndex :u32)-> OutValues{
-                            var pos = array(
-                                vec2f(0,0.5),
-                                vec2f(-0.5, -0.75),
-                                vec2f(0.5, -0.75)
-                            );
-
-                            var color = array(
-                                vec4f(1,0,0,1),
-                                vec4f(0,1,0,1),
-                                vec4f(0,0,1,1)
-                            );
-
-                            var out: OutValues;
-
-                            out.posi = vec4f(pos[vertexIndex],0,1);
-                            out.color = color[vertexIndex];
-
-                            return out;
-
-                        }
-
-                        @fragment fn fs(params:OutValues)->@location(0) vec4f{
-                            
-                            var color = vec4f(0,0,1,0);
-
-                            if(params.posi.x>0)&&(params.posi.x<100){
-                                color = vec4f(1,1,1,0);
-                            }
-                            return color;
-                        }
-                    `
-                });
-
-                const pipeline = device.createRenderPipeline({
-                    label: `Draw inside triangle mesh, Pipelline`, 
-                    layout: `auto`, 
-                    vertex: {
-                        entryPoint: `vs`, 
-                        module : shaderModule
-                    }, 
-                    fragment: {
-                        entryPoint :`fs`, 
-                        module: shaderModule, 
-                        targets: [{
-                            format: canvasFormat
-                        }]
-                    }
-                });
-
-
-                const renderPassDescriptor = {
-                    colorAttachments:[{
-                        view : context.getCurrentTexture().createView(),
-                        clearValue: [0,0,0,1],
-                        loadOp:`clear`, 
-                        storeOp: `store`,
-                    }]
-                };
-
-                function render(){
-                    const cmdEncoder = device.createCommandEncoder({
-                        label: `Draw inside triangle mesh, cmdEncoder`
-                    });
-
-                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
-                    pass.setPipeline(pipeline);
-                    pass.draw(3);
-                    pass.end();
-                    device.queue.submit([cmdEncoder.finish()]);
-
-
-                }
-
-                render();
-
-            }
-     
-            async function drawRectInsideTriangleMesh(){
-                
-                const adapter = await navigator.gpu.requestAdapter();
-                if(!adapter){
-                    alert(`This browser does not support webgpu`);
-                    return;
-                }
-
-                const device = await adapter.requestDevice();
-                if(!device){
-                    alert(`Not able to request device`);
-                    return;
-                }
-
-                const canvas = document.querySelector(`canvas`);
-                const context = canvas.getContext(`webgpu`);
-                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-                context.configure({
-                    device, 
-                    format:canvasFormat
-                });
-
-                const shaderModule = device.createShaderModule({
-                    label:`Draw rect inside triangle mesh, ShaderModule`, 
-                    code: `
-
-                        struct OutValues{
-                            @builtin(position) posi : vec4f, 
-                            @location(0) color: vec4f
-                        }
-
-                        @vertex  fn vs(@builtin(vertex_index) vertexIndex :u32)-> OutValues{
-                            var pos = array(
-                                vec2f(0,0.5),
-                                vec2f(-0.5, -0.75),
-                                vec2f(0.5, -0.75)
-                            );
-
-                            var color = array(
-                                vec4f(1,0,0,1),
-                                vec4f(0,1,0,1),
-                                vec4f(0,0,1,1)
-                            );
-
-                            var out: OutValues;
-
-                            out.posi = vec4f(pos[vertexIndex],0,1);
-                            out.color = color[vertexIndex];
-
-                            return out;
-
-                        }
-
-                        @fragment fn fs(params:OutValues)->@location(0) vec4f{
-                            
-                            var color = vec4f(0,0,1,0);
-
-                            if(params.posi.x>140)&&(params.posi.x<150)
-                            &&(params.posi.y>82)&&(params.posi.y<100){
-                                color = vec4f(1,1,1,0);
-                            }
-
-                            if(params.posi.x>140+15)&&(params.posi.x<150+15)
-                            &&(params.posi.y>88)&&(params.posi.y<100){
-                                color = vec4f(1,1,1,0);
-                            }
-
-                            
-                            if(params.posi.x>140+15+15)&&(params.posi.x<150+15+15)
-                            &&(params.posi.y>88)&&(params.posi.y<100){
-                                color = vec4f(1,1,1,0);
-                            }
-
-                            return color;
-                        }
-                    `
-                });
-
-                const pipeline = device.createRenderPipeline({
-                    label: `Draw rect inside triangle mesh, Pipelline`, 
-                    layout: `auto`, 
-                    vertex: {
-                        entryPoint: `vs`, 
-                        module : shaderModule
-                    }, 
-                    fragment: {
-                        entryPoint :`fs`, 
-                        module: shaderModule, 
-                        targets: [{
-                            format: canvasFormat
-                        }]
-                    }
-                });
-
-
-                const renderPassDescriptor = {
-                    colorAttachments:[{
-                        view : context.getCurrentTexture().createView(),
-                        clearValue: [0,0,0,1],
-                        loadOp:`clear`, 
-                        storeOp: `store`,
-                    }]
-                };
-
-                function render(){
-                    const cmdEncoder = device.createCommandEncoder({
-                        label: `Draw rect inside triangle mesh, cmdEncoder`
-                    });
-
-                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
-                    pass.setPipeline(pipeline);
-                    pass.draw(3);
-                    pass.end();
-                    device.queue.submit([cmdEncoder.finish()]);
-
-
-                }
-
-                render();
-
-            }
-
-            async function drawInsideTriangleMeshWithRectObject(){
-                
-                const adapter = await navigator.gpu.requestAdapter();
-                if(!adapter){
-                    alert(`This browser does not support webgpu`);
-                    return;
-                }
-
-                const device = await adapter.requestDevice();
-                if(!device){
-                    alert(`Not able to request device`);
-                    return;
-                }
-
-                const canvas = document.querySelector(`canvas`);
-                const context = canvas.getContext(`webgpu`);
-                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
-                context.configure({
-                    device, 
-                    format:canvasFormat
-                });
-
-                const shaderModule = device.createShaderModule({
-                    label:`Draw inside triangle mesh with rectangle object, ShaderModule`, 
-                    code: `
-
-                        struct OutValues{
-                            @builtin(position) posi : vec4f, 
-                            @location(0) color: vec4f
-                        }
-
-                        @vertex  fn vs(@builtin(vertex_index) vertexIndex :u32)-> OutValues{
-                            var pos = array(
-                                vec2f(0,0.5),
-                                vec2f(-0.5, -0.75),
-                                vec2f(0.5, -0.75)
-                            );
-
-                            var color = array(
-                                vec4f(1,0,0,1),
-                                vec4f(0,1,0,1),
-                                vec4f(0,0,1,1)
-                            );
-
-                            var out: OutValues;
-
-                            out.posi = vec4f(pos[vertexIndex],0,1);
-                            out.color = color[vertexIndex];
-
-                            return out;
-
-                        }
-                        
-                        fn rect(flow_x:f32,flow_y:f32, pos_x:f32,pos_y:f32, width_x:f32, width_y:f32, colorBackGroundPtr: ptr<function,vec4f>,rectColor: vec4f){
-
-                            if(flow_x>pos_x)&&(flow_x<pos_x+width_x)
-                            &&(flow_y>pos_y)&&(flow_y<pos_y+width_y){                   
-                                 *colorBackGroundPtr = rectColor;
-                            }
-                           
-                        }    
-
-                        @fragment fn fs(params:OutValues)->@location(0) vec4f{
-
-                            var color = vec4f(1,0,0,0);
-
-                            rect(params.posi.x,params.posi.y, 150,88, 14, 14, &color,vec4f(0,0,1,0));
-
-                            rect(params.posi.x,params.posi.y, 170,88, 3.8, 7, &color,vec4f(1,1,0,0));
-                   
-                            rect(params.posi.x,params.posi.y, 180,100, 3.8, 7, &color,vec4f(1,1,1,1));
-
-                            return color;
-                        }
-                    `
-                });
-
-                const pipeline = device.createRenderPipeline({
-                    label: `Draw inside triangle mesh with rect object, Pipeline`, 
-                    layout: `auto`, 
-                    vertex: {
-                        entryPoint: `vs`, 
-                        module : shaderModule
-                    }, 
-                    fragment: {
-                        entryPoint :`fs`, 
-                        module: shaderModule, 
-                        targets: [{
-                            format: canvasFormat
-                        }]
-                    }
-                });
-
-
-                const renderPassDescriptor = {
-                    colorAttachments:[{
-                        view : context.getCurrentTexture().createView(),
-                        clearValue: [0,0,0,1],
-                        loadOp:`clear`, 
-                        storeOp: `store`,
-                    }]
-                };
-
-                function render(){
-                    const cmdEncoder = device.createCommandEncoder({
-                        label: `Draw inside triangle mesh with rect object, cmdEncoder`
-                    });
-
-                    const pass = cmdEncoder.beginRenderPass(renderPassDescriptor);
-                    pass.setPipeline(pipeline);
-                    pass.draw(3);
-                    pass.end();
-                    device.queue.submit([cmdEncoder.finish()]);
-                }
-
-                render();
-            }
-
+         
             async function computeDouble(){
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
@@ -1966,7 +1164,22 @@
 
                 }
 
+                               
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
                 render();
+                }
+
+                });
+               
+                observer.observe(canvas);
+
 
 
 
@@ -2151,10 +1364,21 @@
 
                 }
 
+                                
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
                 render();
+                }
 
-
-
+                });
+               
+                observer.observe(canvas);
 
 
             }
@@ -2326,7 +1550,22 @@
                     device.queue.submit([cmdEncoder.finish()]);
                 }
 
+                               
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
                 render();
+                }
+
+                });
+               
+                observer.observe(canvas);
+
 
             }
 
@@ -2504,9 +1743,24 @@
                     device.queue.submit([cmdEncoder.finish()]);
                 }
 
+                               
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
                 render();
-
                 }
+
+                });
+               
+                observer.observe(canvas);
+
+
+            }
 
             async function drawTriangleWithUniformInterStage4(){
 
@@ -2717,9 +1971,24 @@
                     device.queue.submit([cmdEncoder.finish()]);
                 }
 
+                                
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
                 render();
-
                 }
+
+                });
+               
+                observer.observe(canvas);
+
+
+             }
 
             async function drawTrianglesWithSeperateUniforms(){
                 const adapter = await navigator.gpu.requestAdapter();
@@ -2898,7 +2167,22 @@
                     device.queue.submit([cmdEncoder.finish()]);
                 }
 
+                                
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
                 render();
+                }
+
+                });
+               
+                observer.observe(canvas);
+
               
 
             }
@@ -3080,7 +2364,22 @@
                     device.queue.submit([cmdEncoder.finish()]);
                 }
 
+                                
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
                 render();
+                }
+
+                });
+               
+                observer.observe(canvas);
+
               
 
             }
@@ -3308,7 +2607,22 @@
                     device.queue.submit([cmdEncoder.finish()]);
                 }
 
+                                
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
                 render();
+                }
+
+                });
+               
+                observer.observe(canvas);
+
               
 
             }
@@ -3654,7 +2968,22 @@
 
                }
 
-               render();
+                               
+               const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
+                render();
+                }
+
+                });
+               
+                observer.observe(canvas);
+
                  
 
             }
@@ -3886,7 +3215,22 @@
             
                 }
 
+                
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
                 render();
+                }
+
+                });
+               
+                observer.observe(canvas);
+
 
             }
 
@@ -4128,17 +3472,31 @@
 
                 }
 
+                const observer = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                // re-render
                 render();
+                }
+
+                });
+               
+                observer.observe(canvas);
+                
 
                 
 
             }
+           
+            
+           
             async function main() {
-                // await drawTriangleHardCoded();
-                //await drawColoredTriangle();
-                //await drawInsideTriangleMesh();
-                //await drawRectInsideTriangleMesh();
-                //await drawInsideTriangleMeshWithRectObject();
+           
+          
                 //await computeDouble();
                 //await computeDouble2();
                 //await returnSequenceIndices();
@@ -4147,17 +3505,17 @@
                 //await computeRandomFloat2();
                 //await computeRandomFloat3();
                 //await computeRandomFloat4();
-                // await drawTrianglesWithUniform();
+                //await drawTrianglesWithUniform();
                 //await drawTriangleWithUniformInterStage();
                 //await drawTriangleWithUniformInterStage2();
                 //await drawTriangleWithUniformInterStage4();
-                // await drawTrianglesWithSeperateUniforms();
+                //await drawTrianglesWithSeperateUniforms();
                 //await drawTrianglesWithSeperateStorages();
                 //await drawTrianglesWithSeperateStoragesGradiant();
                 //await computeDouble4();
                 //await drawGradientTrianglesWithSeperateStorage();
-                //drawGradientTrianglesWithSingleStorage();
-                drawGradientTrianglesWithSingleStorage1(); 
+                //await drawGradientTrianglesWithSingleStorage();
+                //await drawGradientTrianglesWithSingleStorage1(); 
             };
 
 
