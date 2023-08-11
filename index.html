@@ -3756,7 +3756,7 @@
                     format: canvasFormat
                 }); 
 
-                const mainLabel = `Draw gradient triangles with single storage 2`;
+                const mainLabel = `Draw gradient triangles with single storage 3`;
 
                 const shaderModule = device.createShaderModule({
                     label: mainLabel + `, shaderModule`, 
@@ -3771,9 +3771,7 @@
                             scale: vec2f
                         }; 
 
-                        struct Triangles {
-                            positions: array<vec2f, 3>;
-                        }
+                      
 
                         struct DataGradientColor {
 
@@ -3789,15 +3787,10 @@
                         @group(0) @binding(0) var<storage,read> dataColorOffset: array<DataColorOffset>; 
                         @group(0) @binding(1) var<storage,read> dataScale :array<DataScale>; 
                         @group(0) @binding(2) var<storage,read> dataGradientColor: array<DataGradientColor>; 
-                        @group(0) @binding(3) var<storage,read> triangles: array<Triangles>; 
+                        @group(0) @binding(3) var<storage,read> triangles: array<vec2f, 3>;
 
                         @vertex fn vs(@builtin(vertex_index) vi: u32, @builtin(instance_index) ii: u32)->DataTransfer {
 
-                            var trianglepos = array(
-                                vec2f(0,0.5), 
-                                vec2f(-0.5,0),
-                                vec2f(0.5, 0)
-                            );
 
                             var colorfusion = array(
                                 dataColorOffset[ii].color, 
@@ -3807,7 +3800,7 @@
 
                             var transfer: DataTransfer; 
 
-                            transfer.posi = vec4f( trianglepos[vi]*dataScale[ii].scale + dataColorOffset[ii].offset, 0, 1);
+                            transfer.posi = vec4f( triangles[vi]*dataScale[ii].scale + dataColorOffset[ii].offset, 0, 1);
                             transfer.color = colorfusion[vi];
 
                             return transfer; 
@@ -3843,6 +3836,26 @@
 
                    const  numObjects = 100; 
                    const  objectsInfos = []; 
+
+
+                   const dataTrianglesStride = 2+2+2;
+                   const dataTrianglesLength = dataTrianglesStride;
+                   const dataTrianglesSize = dataTrianglesLength*4;
+                   const dataTriangles = new Float32Array(dataTrianglesLength );
+
+                   dataTriangles.subarray(0, 2).set([0,0.5]);
+                   dataTriangles.subarray(2, 4).set([-0.5,0]);
+                   dataTriangles.subarray(4, 6).set([0.5,0]);
+
+
+                   const bufferTriangles = device.createBuffer({
+                    label: mainLabel+`, bufferTriangles`, 
+                    size: dataTriangles.byteLength, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST
+                   });
+
+                   device.queue.writeBuffer(bufferTriangles,0,dataTriangles);
+
 
                    const dataColorOffsetStride = 4+2+2;
                    const dataColorOffsetColorOffset = 0;
@@ -3911,7 +3924,9 @@
                      entries: [
                         {binding: 0, resource :{buffer: bufferColorOffset}},
                         {binding: 1, resource :{buffer: bufferScale}},
-                        {binding: 2, resource :{buffer: bufferGradientColor}}
+                        {binding: 2, resource :{buffer: bufferGradientColor}},
+                        {binding: 3, resource :{buffer: bufferTriangles}}
+                        
                      ]
                    });
 
@@ -3997,7 +4012,8 @@
                 //await drawGradientTrianglesWithSeperateStorage();
                 //await drawGradientTrianglesWithSingleStorage();
                 //await drawGradientTrianglesWithSingleStorage1(); 
-                await drawGradientTriangleWithSingleStorage2();
+                //await drawGradientTriangleWithSingleStorage2();
+                await drawGradientTriangleWithSingleStorage3();
             
             };
 
