@@ -38,7 +38,11 @@
 
         <script  type="module" >
 
-         
+            
+             let random = (start = 0, end = 1) =>{
+                return start + Math.random()*(end-start);
+             }
+
             async function computeDouble(){
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
@@ -3492,8 +3496,8 @@
 
             }
            
-            
-           
+   
+
             async function main() {
            
           
@@ -3515,7 +3519,8 @@
                 //await computeDouble4();
                 //await drawGradientTrianglesWithSeperateStorage();
                 //await drawGradientTrianglesWithSingleStorage();
-                //await drawGradientTrianglesWithSingleStorage1(); 
+                await drawGradientTrianglesWithSingleStorage1(); 
+            
             };
 
 
