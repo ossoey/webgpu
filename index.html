@@ -30,20 +30,32 @@
             height: 100%;
             }
 
+ 
         </style>
 
     </head>
     <body>
         <canvas> </canvas>
+       
 
-        <script  type="module" >
 
-            
+        <script>
+ 
+
+        </script>
+        <script  type="module" id="scriptwebgpu" >
+            let functions = {};
+           
+            window.addEventListener(`load`,()=>{
+
+
+
+                
              let random = (start = 0, end = 1) =>{
                 return start + Math.random()*(end-start);
              }
 
-            async function computeDouble(){
+             functions.computeDouble = async ()=>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`This navigator doesn't support webgpu`);
@@ -133,7 +145,7 @@
 
             }
 
-            async function computeDouble2(){
+            functions.computeDouble2= async () =>{
 
 
                 const adapter = await navigator.gpu.requestAdapter();
@@ -222,7 +234,7 @@
 
             }
 
-            async function returnSequenceIndices(){
+            functions.returnSequenceIndices= async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`Browser doesn't support webgpu!`);
@@ -310,7 +322,7 @@
                 await compute();
             }
 
-            async function computeRandomFloat(){
+            functions.computeRandomFloat= async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`This browser doesn' support webgpu`);
@@ -477,7 +489,7 @@
                 
             }
             
-            async function computeRandomFloat2(){
+            functions.computeRandomFloat2= async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`Browser doesn't support webg;`);
@@ -600,7 +612,7 @@
 
             }
 
-            async function computeRandomFloat3(){
+            functions.computeRandomFloat3= async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`Browser doesn't support webgpu!`);
@@ -714,7 +726,7 @@
                 compute();
             }
  
-            async function computeRandomFloat4(){
+            functions.computeRandomFloat4= async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`Browser doesn't support webgpu`);
@@ -832,7 +844,7 @@
 
             }
 
-            async function drawTrianglesWithUniform(){
+            functions.drawTrianglesWithUniform= async () =>{
 
 
                const  random =(start, end)=>{
@@ -1010,7 +1022,7 @@
                 observer.observe(canvas);
             }
 
-            async function drawTriangleWithUniform2(){
+            functions.drawTriangleWithUniform2= async () =>{
                const adapter = await navigator.gpu.requestAdapter();
                if(!adapter) {
                 alert(`Browser does not support webgpu`);
@@ -1191,7 +1203,7 @@
 
             }
        
-            async function drawTriangleWithUniformInterStage(){
+            functions.drawTriangleWithUniformInterStage= async () =>{
                const adapter = await navigator.gpu.requestAdapter();
                if(!adapter) {
                 alert(`Browser does not support webgpu`);
@@ -1388,7 +1400,7 @@
             }
   
 
-            async function drawTriangleWithUniformInterStage2(){
+            functions.drawTriangleWithUniformInterStage2= async () =>{
 
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
@@ -1573,7 +1585,7 @@
 
             }
 
-            async function drawTriangleWithUniformInterStage3(){
+            functions.drawTriangleWithUniformInterStage3= async () =>{
 
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
@@ -1766,7 +1778,7 @@
 
             }
 
-            async function drawTriangleWithUniformInterStage4(){
+            functions.drawTriangleWithUniformInterStage4= async () =>{
 
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
@@ -1994,7 +2006,7 @@
 
              }
 
-            async function drawTrianglesWithSeperateUniforms(){
+            functions.drawTrianglesWithSeperateUniforms= async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`This browser does not support webgpu!`);
@@ -2191,7 +2203,7 @@
 
             }
 
-            async function drawTrianglesWithSeperateStorages(){
+            functions.drawTrianglesWithSeperateStorages= async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`This browser does not support webgpu!`);
@@ -2388,7 +2400,7 @@
 
             }
 
-            async function drawTrianglesWithSeperateStoragesGradiant(){
+            functions.drawTrianglesWithSeperateStoragesGradiant= async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`This browser does not support webgpu!`);
@@ -2631,7 +2643,7 @@
 
             }
 
-            async function computeDouble4()  {
+            functions.computeDouble4= async () =>  {
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`This browser does not support webgpu`);
@@ -2731,7 +2743,7 @@
 
             }
 
-            async function drawGradientTrianglesWithSeperateStorage(){
+            functions.drawGradientTrianglesWithSeperateStorage= async () =>{
                
                 
                 let random = (start=0, end=1)=>{
@@ -2992,7 +3004,7 @@
 
             }
 
-            async function drawGradientTrianglesWithSingleStorage() {
+            functions.drawGradientTrianglesWithSingleStorage= async () => {
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter){
                     alert(`This browser does not support webgpu`);
@@ -3238,7 +3250,7 @@
 
             }
 
-            async function drawGradientTrianglesWithSingleStorage1(){
+            functions.drawGradientTrianglesWithSingleStorage1= async () =>{
 
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter) {
@@ -3496,7 +3508,7 @@
 
             }
            
-            async function drawGradientTriangleWithSingleStorage2(){
+            functions.drawGradientTriangleWithSingleStorage2= async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter) {
                     alert(`this browser does not support webgpu`);
@@ -3734,7 +3746,7 @@
 
             }
 
-            async function drawGradientTriangleWithSingleStorage3(){
+            functions.drawGradientTriangleWithSingleStorage3= async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter) {
                     alert(`this browser does not support webgpu`);
@@ -3990,7 +4002,9 @@
 
             }
 
-            async function drawGradientQuadsWithSingleStorage(){
+
+
+            functions.drawGradientQuadsWithSingleStorage = async () =>{
                 const adapter = await navigator.gpu.requestAdapter();
                 if(!adapter) {
                     alert(`this browser does not support webgpu`);
@@ -4094,7 +4108,7 @@
 
     
 
-                   const  numObjects = 60; 
+                   const  numObjects = 600; 
                    const  objectsInfos = []; 
 
 
@@ -4258,33 +4272,93 @@
             async function main() {
            
           
-                //await computeDouble();
-                //await computeDouble2();
+                //await functions.computeDouble();
+                //await functions.computeDouble2();
                 //await returnSequenceIndices();
-                //await computeRandomFloat();
-                //await computeRandomFloat();
-                //await computeRandomFloat2();
-                //await computeRandomFloat3();
-                //await computeRandomFloat4();
-                //await drawTrianglesWithUniform();
-                //await drawTriangleWithUniformInterStage();
-                //await drawTriangleWithUniformInterStage2();
-                //await drawTriangleWithUniformInterStage4();
-                //await drawTrianglesWithSeperateUniforms();
-                //await drawTrianglesWithSeperateStorages();
-                //await drawTrianglesWithSeperateStoragesGradiant();
-                //await computeDouble4();
-                //await drawGradientTrianglesWithSeperateStorage();
-                //await drawGradientTrianglesWithSingleStorage();
-                //await drawGradientTrianglesWithSingleStorage1(); 
-                //await drawGradientTriangleWithSingleStorage2();
-                //await drawGradientTriangleWithSingleStorage3();
-                await drawGradientQuadsWithSingleStorage();
+                //await functions.computeRandomFloat();
+                //await functions.computeRandomFloat();
+                //await functions.computeRandomFloat2();
+                //await functions.computeRandomFloat3();
+                //await functions.computeRandomFloat4();
+                //await functions.drawTrianglesWithUniform();
+                //await functions.drawTriangleWithUniformInterStage();
+                //await functions.drawTriangleWithUniformInterStage2();
+                //await functions.drawTriangleWithUniformInterStage4();
+                //await functions.drawTrianglesWithSeperateUniforms();
+                //await functions.drawTrianglesWithSeperateStorages();
+                //await functions.drawTrianglesWithSeperateStoragesGradiant();
+                //await functions.computeDouble4();
+                //await functions.drawGradientTrianglesWithSeperateStorage();
+                //await functions.drawGradientTrianglesWithSingleStorage();
+                //await functions.drawGradientTrianglesWithSingleStorage1(); 
+                //await functions.drawGradientTriangleWithSingleStorage2();
+                //await functions.drawGradientTriangleWithSingleStorage3();
+                await  functions.drawGradientQuadsWithSingleStorage();
             };
 
 
 
+
+            let elt = document.createElement(`div`);
+                elt.style.position = `absolute`;
+                elt.style.top = `1%`;
+                elt.style.right = `1%`;
+                elt.style.background=`blue`;
+                elt.style.boxShadow = `-3px 5px black`;
+
+                document.querySelector(`body`).appendChild(elt);
+ 
+
+                let htmlLabel = document.createElement(`label`);
+                htmlLabel.innerHTML = `List experiences`;
+                htmlLabel.style.display = `block`;
+                elt.appendChild(htmlLabel);
+
+                let htmlSelect = document.createElement(`select`);
+                htmlSelect.style.display =`block`;
+
+                elt.appendChild(htmlSelect);
+
+
+
+                Object.keys(functions).forEach(key =>{
+                    
+                    let htmlOption = document.createElement(`option`);
+                    htmlOption.innerHTML = key; 
+                    htmlSelect.appendChild(htmlOption);
+                    
+                });
+
+                htmlSelect.addEventListener(`change`, ()=>{
+
+                     functions[htmlSelect.value]();
+                })
+
+
+                //for(const fonction of functions) {
+                 //   console.log(fonction);
+                //}
+
+
+                // <label for="cars">Choose a car:</label>
+
+                // <select name="cars" id="cars">
+                // <option value="volvo">Volvo</option>
+                // <option value="saab">Saab</option>
+                // <option value="mercedes">Mercedes</option>
+                // <option value="audi">Audi</option>
+                // </select>
+
+
             main();
+
+
+
+
+
+            })
+           
+          
 
         </script>
 
