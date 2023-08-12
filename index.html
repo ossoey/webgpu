@@ -4838,50 +4838,268 @@
             }
 
 
+            functions.drawGradientQuadsWithSingleColorStorage2 = async () =>{
+                const adapter = await navigator.gpu.requestAdapter();
+                if(!adapter) {
+                    alert(`this browser does not support webgpu`);
+                    return; 
+                }
+
+                const device = await adapter.requestDevice();
+                if(!device){
+                    alert(`Not able to request device`); 
+                    return; 
+                }
+
+                const canvas = document.querySelector(`canvas`);
+                const context = canvas.getContext(`webgpu`); 
+
+                const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+                context.configure({
+                    device,
+                    format: canvasFormat
+                }); 
+
+                const mainLabel = `Draw Gradient Quads With Single Color Storage 2 `;
+
+                const shaderModule = device.createShaderModule({
+                    label: mainLabel + `, shaderModule`, 
+                    code : `
+                    
+                        struct DataColorOffset {
+                            offset: vec2f, 
+                        }; 
+
+                        struct DataScale {
+                            scale: vec2f
+                        }; 
+ 
+                        struct DataTransfer {
+                            @builtin(position) posi: vec4f, 
+                            @location(0) color: vec4f
+                        };
+
+                        struct Colors{
+                            colors: array<vec4f, 6>
+                        };
+
+                        @group(0) @binding(0) var<storage,read> dataColorOffset: array<DataColorOffset>; 
+                        @group(0) @binding(1) var<storage,read> dataScale :array<DataScale>; 
+                        @group(0) @binding(2) var<storage,read> quads: array<vec2f, 6>;
+                        @group(0) @binding(3) var<storage,read> colors: array<Colors>;
+
+                        @vertex fn vs(@builtin(vertex_index) vi: u32, @builtin(instance_index) ii: u32)->DataTransfer {
+
+              
+                            var transfer: DataTransfer; 
+
+                            transfer.posi = vec4f( quads[vi]*dataScale[ii].scale + dataColorOffset[ii].offset, 0, 1);
+                            transfer.color = colors[ii].colors[vi];
+
+                            return transfer; 
+                        }
+
+                        @fragment fn fs(transfer: DataTransfer)-> @location(0) vec4f {
+                            return transfer.color;
+                        }
+                    
+                    `
+                }); 
+
+
+                const pipeline = device.createRenderPipeline({
+                    label: mainLabel+`, pipeline`, 
+                    layout: `auto`, 
+                    vertex: {
+                        entryPoint : `vs`, 
+                        module: shaderModule
+                    } , 
+
+                    fragment: {
+                        entryPoint: `fs`, 
+                        module: shaderModule, 
+                        targets: [
+                            {format: canvasFormat}
+                        ]
+                    }
+                });
+
+
+    
+
+                   const  numObjects = 150000; 
+                   const  objectsInfos = []; 
+
+
+                   const dataQuadsStride = 2+2+2+2+2+2;
+                                         
+                   const dataQuadsLength = dataQuadsStride;
+                   const dataQuadsSize = dataQuadsLength*4;
+                   const dataQuads = new Float32Array(dataQuadsStride);
+
+                   dataQuads.subarray(0, 2).set([0,0.5]);
+                   dataQuads.subarray(2, 4).set([-0.5,0]);
+                   dataQuads.subarray(4, 6).set([0.5,0]);
+
+                   dataQuads.subarray(6, 8).set([1,0.5]);
+                   dataQuads.subarray(8, 10).set([0,0.5]);
+                   dataQuads.subarray(10, 12).set([0.5,0]);
+
+
+                   const bufferQuads = device.createBuffer({
+                    label: mainLabel+`, bufferTriangles`, 
+                    size: dataQuadsSize, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST
+                   });
+
+                   device.queue.writeBuffer(bufferQuads,0,dataQuads);
 
 
 
+                   const dataColorsStride = 4+4+4+4+4+4;
+                   const dataColorsLength = dataColorsStride*numObjects;
+                   const dataColorSize = 4*dataColorsLength;
+                   const dataColors = new Float32Array(dataColorsLength);
+  
+                   
 
-            // let elt = document.createElement(`div`);
-            //     elt.style.position = `absolute`;
-            //     elt.style.top = `1%`;
-            //     elt.style.right = `1%`;
-            //     elt.style.background=`blue`;
-            //     elt.style.boxShadow = `-3px 5px black`;
+                   const bufferColors = device.createBuffer({
+                    label: mainLabel+`,bufferColors`, 
+                    size : dataColorSize, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST
+                   });
 
-            //     document.querySelector(`body`).appendChild(elt);
+                   //device.queue.writeBuffer(bufferColors,0,dataColors);
+                   
+
+
+
+                   const dataColorOffsetStride = 2;
+                   const dataColorOffsetOffsetOffset = 0;
+                   
+                   const dataColorOffsetLength = dataColorOffsetStride*numObjects;
+                   const dataColorOffsetSize  = 4*dataColorOffsetLength ; 
+                   const dataColorOffset = new Float32Array(dataColorOffsetLength);
+
+                   const bufferColorOffset = device.createBuffer({
+                    label: mainLabel+`, bufferColorOffset`, 
+                    size: dataColorOffsetSize, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST
+                   });
+
  
 
-            //     let htmlLabel = document.createElement(`label`);
-            //     htmlLabel.innerHTML = `List experiences`;
-            //     htmlLabel.style.display = `block`;
-            //     elt.appendChild(htmlLabel);
-
-            //     let htmlSelect = document.createElement(`select`);
-            //     htmlSelect.style.display =`block`;
-
-            //     elt.appendChild(htmlSelect);
 
 
+                   for (let i = 0; i<numObjects; i++){
 
-            //     Object.keys(functions).forEach(key =>{
-                    
-            //         let htmlOption = document.createElement(`option`);
-            //         htmlOption.innerHTML = key; 
-            //         htmlSelect.appendChild(htmlOption);
-                    
-            //     });
+            
+                        dataColorOffset.set([random(-1.98,1.98),random(-1.98,1.98)],dataColorOffsetStride*i+ dataColorOffsetOffsetOffset);
+                
+                        dataColors.subarray(dataColorsStride*i+0,dataColorsStride*i+4).set([random(0.5,1), random(0.8,1),random(0.1,0.2),1]);
+                        dataColors.subarray(dataColorsStride*i+4,dataColorsStride*i+8).set([random(0.5,1), random(0.8,1),random(0.1,0.2),1]);
+                        dataColors.subarray(dataColorsStride*i+8,dataColorsStride*i+12).set([random(0.5,1), random(0.8,1),random(0.1,0.2),1]);
 
-            //     htmlSelect.addEventListener(`change`, ()=>{
+                        dataColors.subarray(dataColorsStride*i+12,dataColorsStride*i+16).set([random(0.5,1), random(0.8,1),random(),1]);
+                        dataColors.subarray(dataColorsStride*i+16,dataColorsStride*i+20).set([random(0.5,1), random(0,0),random(),1]);
+                        dataColors.subarray(dataColorsStride*i+20,dataColorsStride*i+24).set([random(1,1), random(0,0),random(),1]);
 
-            //           functions[htmlSelect.value]();
-            //     })
+                        objectsInfos.push({
+
+                            scale: random(0.001,0.033)
+                        })
+                   };
+
+                   device.queue.writeBuffer(bufferColorOffset,0,dataColorOffset);
+               
+                   device.queue.writeBuffer(bufferColors,0,dataColors);
+
+                   const dataScaleStride = 2;
+                   const dataScaleLength = dataScaleStride*numObjects;
+                   const dataScaleSize = dataScaleLength*4;
+                   const dataScale = new Float32Array(dataScaleLength);
+
+                   const bufferScale = device.createBuffer({
+                    label: mainLabel+`, bufferColorOffset`, 
+                    size: dataScaleSize, 
+                    usage: GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST
+                   });
+
+
+                   const bindGroup = device.createBindGroup({
+                     label: mainLabel +`, bindGroup`, 
+                     layout: pipeline.getBindGroupLayout(0), 
+                     entries: [
+                        {binding: 0, resource :{buffer: bufferColorOffset}},
+                        {binding: 1, resource :{buffer: bufferScale}},
+                        {binding: 2, resource :{buffer: bufferQuads}}, 
+                        {binding: 3, resource: {buffer: bufferColors}}
+                        
+                     ]
+                   });
+
+                   const renderPassDesc = {
+                      colorAttachments : [
+                        {
+                            colorValue: [0,0,0,1], 
+                            loadOp : `clear`, 
+                            storeOp: `store`
+                        }
+                      ]
+                   };
+
+                   let render = () => {
+
+                        renderPassDesc.colorAttachments[0].view = context.getCurrentTexture().createView();
+
+                        let aspect = canvas.width/canvas.height; 
+ 
+                        
+                        const cmdEncoder = device.createCommandEncoder({
+                            label: mainLabel +` ,cmdEncoder`
+                        });
+
+                 
+                        const pass = cmdEncoder.beginRenderPass(renderPassDesc);
+                        pass.setPipeline(pipeline);
+
+                        objectsInfos.forEach(({scale},ndx)=>{
+
+                            dataScale.set([scale/aspect, scale], ndx*dataScaleStride+0);
+
+                        });
+
+                        device.queue.writeBuffer(bufferScale,0,dataScale);
+
+                        pass.setBindGroup(0,bindGroup);
+                        pass.draw(6,numObjects);
+                        pass.end();
+
+                        device.queue.submit([cmdEncoder.finish()]);
+
+
+                   }
+
+                    const observer = new ResizeObserver(entries => {
+                    for (const entry of entries) {
+                    const canvas = entry.target;
+                    const width = entry.contentBoxSize[0].inlineSize;
+                    const height = entry.contentBoxSize[0].blockSize;
+                    canvas.width = Math.max(1, Math.min(width, device.limits.maxTextureDimension2D));
+                    canvas.height = Math.max(1, Math.min(height, device.limits.maxTextureDimension2D));
+                    // re-render
+                    render();
+                    }
+
+                    });
+                
+                    observer.observe(canvas);
+                
+
+            }
 
 
 
-
-            // })
-           
             window.addEventListener(`load`, ()=>{
           
 
