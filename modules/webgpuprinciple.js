@@ -11,6 +11,8 @@ async function main() {
     }
   
     // Get a WebGPU context from the canvas and configure it
+    document.querySelector(`canvas`).remove();
+    document.querySelector(`body`).append( document.createElement(`canvas`));
     const canvas = document.querySelector('canvas');
     const context = canvas.getContext('webgpu');
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -100,7 +102,7 @@ async function main() {
    
   }
 
-  async function main1() {
+ async function main1() {
     const adapter = await navigator.gpu?.requestAdapter();
     const device = await adapter?.requestDevice();
     if (!device) {
@@ -109,6 +111,8 @@ async function main() {
     }
   
     // Get a WebGPU context from the canvas and configure it
+    document.querySelector(`canvas`).remove();
+    document.querySelector(`body`).append( document.createElement(`canvas`));
     const canvas = document.querySelector('canvas');
     const context = canvas.getContext('webgpu');
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
