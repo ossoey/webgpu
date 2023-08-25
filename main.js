@@ -1,28 +1,31 @@
 
-let simplebut = document.querySelector(`.simpletri`);
-let simplebut1 = document.querySelector(`.simpletri1`);
+window.addEventListener(`load`, ()=>{
 
-simplebut.addEventListener(`click`, ()=>{
 
     import(`./modules/webgpuprinciple.js`).then((module)=>{
 
-       //  document.querySelector(`canvas`).remove();
-        // document.querySelector(`body`).append( document.createElement(`canvas`));
-        module.main();
-        console.log(module.element);
-    })
+        module.functions_entries[0].func();
 
-});
+        let list = document.createElement(`select`);
+        document.querySelector(`#menu`).append(list);
+
+        module.functions_entries.forEach((elt,index)=>{
+
+            let subElt = document.createElement(`option`);
+        
+            subElt.innerHTML = elt.desc;
+            subElt.functionId = index;
+            subElt.setAttribute(`id`, index);
+            list.appendChild(subElt);
+
+        });
+
+        list.addEventListener(`change`,(event)=>{
+            let select = event.target.options[event.target.selectedIndex];
+            module.functions_entries[select.functionId].func();           
+        });
+
+    });
 
 
-simplebut1.addEventListener(`click`, ()=>{
-
-    import(`./modules/webgpuprinciple.js`).then((module)=>{
-        //document.querySelector(`canvas`).remove();
-        //document.querySelector(`body`).append( document.createElement(`canvas`));
-
-        module.main1();
-        console.log(module.element);
-    })
-
-});
+})
