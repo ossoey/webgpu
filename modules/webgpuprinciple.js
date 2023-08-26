@@ -15,9 +15,9 @@ let  hexToRgba = (hexColor)=> {
 
 let  hexToRgbaNormal = ( hexColor )=> {
   let {r,g,b} = hexToRgba( hexColor);
-  r = r/255;
-  g = g/255;
-  b = b/255;
+  r = (r/255).toFixed(2);
+  g = (g/255).toFixed(2);
+  b = (b/255).toFixed(2);
   return {r,g,b};
 }
 
@@ -588,7 +588,7 @@ let functions_entries = [
     entry : ()=>{
 
         let obj = {};
-        obj.desc = `ui color triangle Structure`
+        obj.desc = `ui colored triangle Structure`
         
         obj.r = 0.3,  obj.g = 0.4, obj.b = 0.5
 
@@ -604,8 +604,9 @@ let functions_entries = [
 
           obj.htmlInputColor.addEventListener(`input`,(event)=>{
 
-            obj.r,obj.g,obj.b = hexToRgbaNormal(event.target.value);
-            obj.func();
+            let  {r,g,b} = hexToRgbaNormal(event.target.value);
+            obj.r =r; obj.g =g;obj.b=b;
+
               console.log( obj.r,obj.g,obj.b);
           })
 
@@ -687,11 +688,13 @@ let functions_entries = [
               format: presentationFormat,
             });
           
+            const mainLabel = `ui colored triangle Structure`;
+
             const module = gpuDevice.createShaderModule({
               label: 'our hardcoded red triangle shaders',
               code: `
 
-
+                @group(0) @binding(0) var<uniform> color: vec4f; 
    
                 @vertex fn vs(
                   @builtin(vertex_index) vi : u32
@@ -707,7 +710,7 @@ let functions_entries = [
                 }
           
                 @fragment fn fs() -> @location(0) vec4f {
-                  return vec4f(${obj.r},${obj.g},${obj.b},1);
+                  return color;
                 }
               `,
             });
@@ -725,6 +728,23 @@ let functions_entries = [
                 targets: [{ format: presentationFormat }],
               },
             });
+
+
+            const colorData = new Float32Array(4);
+
+            const colorBuffer = gpuDevice.createBuffer({
+              label: mainLabel+`,colorBuffer`, 
+              size: 4*4, 
+              usage: GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST
+            });
+
+            const bindGroup = gpuDevice.createBindGroup({
+              label: mainLabel+`,bindGroup`,
+              layout: pipeline.getBindGroupLayout(0), 
+              entries: [
+                {binding: 0, resource:{buffer: colorBuffer}}
+              ]
+            })
           
             const renderPassDescriptor = {
               label: 'our basic canvas renderPass',
@@ -746,6 +766,9 @@ let functions_entries = [
               const encoder =  gpuDevice.createCommandEncoder({ label: 'our encoder' });
               const pass = encoder.beginRenderPass(renderPassDescriptor);
               pass.setPipeline(pipeline);
+              colorData.set([ obj.r,obj.g,obj.b,1.], 0);
+              gpuDevice.queue.writeBuffer(colorBuffer,0, colorData);
+              pass.setBindGroup(0,bindGroup);
               pass.draw(3);   
               pass.end();
           
@@ -753,8 +776,8 @@ let functions_entries = [
               gpuDevice.queue.submit([commandBuffer]);
               requestAnimationFrame(render);
             }
-        
             requestAnimationFrame(render);
+         
           
             const observer = new ResizeObserver(entries => {
               for (const entry of entries) {
@@ -763,6 +786,7 @@ let functions_entries = [
                 const height = entry.contentBoxSize[0].blockSize;
                 canvas.width = Math.max(1, Math.min(width, gpuDevice.limits.maxTextureDimension2D));
                 canvas.height = Math.max(1, Math.min(height, gpuDevice.limits.maxTextureDimension2D));
+               
               }
             });
 
