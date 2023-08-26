@@ -30,8 +30,14 @@ let reloadCanvas = () =>{
 let createUIInputsContainer = () =>{
 
   let uiInputsContainer = document.createElement(`div`);
-  uiInputsContainer.setAttribute(`id`,`uiInputsContainer`);
-  uiInputsContainer.style.display = `inline`;
+  
+    uiInputsContainer.setAttribute(`id`,`uiInputsContainer`);
+    uiInputsContainer.style.display = "flex";
+    uiInputsContainer.style.flexDirection ="row";
+    uiInputsContainer.style.flexWrap = "nowrap";
+    uiInputsContainer.style.justifyContent = "flex-start";
+    uiInputsContainer.style.alignItems = "center";
+    
   document.querySelector(`#menu`).appendChild(uiInputsContainer);
 
 }
@@ -48,6 +54,7 @@ let createUIFunctionList = () =>{
 
 
   functions_entries[0].entry().func();
+
 
   let selectContainer = document.createElement(`div`);
 
@@ -588,19 +595,22 @@ let functions_entries = [
     entry : ()=>{
 
         let obj = {};
-        obj.desc = `ui colored triangle Structure`
+        obj.desc = `ui colored triangle`
         
         obj.r = 0.3,  obj.g = 0.4, obj.b = 0.5
 
         obj.uiLoad = ()=>{
           createUIInputsContainer(); 
 
+          obj.htmlInputColorLabel = document.createElement(`div`);
+          obj.htmlInputColorLabel.innerHTML = `Color`;
+          obj.htmlInputColorLabel.style.padding = "0 5px"
+          document.querySelector(`#uiInputsContainer`).appendChild(obj.htmlInputColorLabel);
+
           obj.htmlInputColor =  document.createElement(`input`);
           obj.htmlInputColor.setAttribute(`type`,"color");
           obj.htmlInputColor.setAttribute(`value`,"#e66465");
-          obj.htmlInputColor.setAttribute(`value`,"#e66465");
-          obj.htmlInputColor.setAttribute(`id`,"idcolor");
-          obj.htmlInputColor.style.display = `inline`;
+          document.querySelector(`#uiInputsContainer`).appendChild(obj.htmlInputColor);
 
           obj.htmlInputColor.addEventListener(`input`,(event)=>{
 
@@ -610,7 +620,7 @@ let functions_entries = [
               console.log( obj.r,obj.g,obj.b);
           })
 
-          document.querySelector(`#uiInputsContainer`).appendChild(obj.htmlInputColor);
+        
           
       
  
@@ -688,7 +698,7 @@ let functions_entries = [
               format: presentationFormat,
             });
           
-            const mainLabel = `ui colored triangle Structure`;
+            const mainLabel = `ui colored triangle`;
 
             const module = gpuDevice.createShaderModule({
               label: 'our hardcoded red triangle shaders',
@@ -804,7 +814,6 @@ let functions_entries = [
     }
 
   } ,
-
 
 ];
 
