@@ -38,7 +38,7 @@ let createUIInputsContainer = () =>{
     uiInputsContainer.style.justifyContent = "flex-start";
     uiInputsContainer.style.alignItems = "center";
     
-  document.querySelector(`#menu`).appendChild(uiInputsContainer);
+    document.querySelector(`#menu`).appendChild(uiInputsContainer);
 
 }
 
@@ -156,18 +156,16 @@ let functions_entries = [
             });
           
             const module = gpuDevice.createShaderModule({
-              label: 'our hardcoded red triangle shaders',
+              label: obj.desc,
               code: `
-
-
    
                 @vertex fn vs(
                   @builtin(vertex_index) vi : u32
                 ) -> @builtin(position) vec4f {
                   let pos = array(
-                    vec2f( 0.0,  0.5),  // top center
-                    vec2f(-0.5, -0.5),  // bottom left
-                    vec2f( 0.5, -0.5)   // bottom right
+                    vec2f( 0.0,  0.5),   
+                    vec2f(-0.5, -0.5),   
+                    vec2f( 0.5, -0.5)   
                   );
 
                                   
@@ -181,7 +179,7 @@ let functions_entries = [
             });
           
             const pipeline =  gpuDevice.createRenderPipeline({
-              label: 'our hardcoded red triangle pipeline',
+              label: obj.desc,
               layout: 'auto',
               vertex: {
                 module,
@@ -195,7 +193,7 @@ let functions_entries = [
             });
           
             const renderPassDescriptor = {
-              label: 'our basic canvas renderPass',
+              label: obj.desc,
               colorAttachments: [
                 {
                  
@@ -242,7 +240,6 @@ let functions_entries = [
          initializeWebGPU();
 
         }
-
 
         return obj;
     }
@@ -318,18 +315,17 @@ let functions_entries = [
             });
           
             const module = gpuDevice.createShaderModule({
-              label: 'our hardcoded red triangle shaders',
+              label: obj.desc,
               code: `
 
 
-    
                 @vertex fn vs(
                   @builtin(vertex_index) vi : u32
                 ) -> @builtin(position) vec4f {
                   let pos = array(
-                    vec2f( 0.0,  0.5),  // top center
-                    vec2f(-0.5, -0.5),  // bottom left
-                    vec2f( 0.5, -0.5)   // bottom right
+                    vec2f( 0.0,  0.5),   
+                    vec2f(-0.5, -0.5),   
+                    vec2f( 0.5, -0.5)    
                   );
 
                                   
@@ -343,7 +339,7 @@ let functions_entries = [
             });
           
             const pipeline =  gpuDevice.createRenderPipeline({
-              label: 'our hardcoded red triangle pipeline',
+              label: obj.desc,
               layout: 'auto',
               vertex: {
                 module,
@@ -357,7 +353,7 @@ let functions_entries = [
             });
           
             const renderPassDescriptor = {
-              label: 'our basic canvas renderPass',
+              label: obj.desc,
               colorAttachments: [
                 {
                   
@@ -481,11 +477,8 @@ let functions_entries = [
               });
             
               const module = gpuDevice.createShaderModule({
-                label: 'our hardcoded red triangle shaders',
+                label: obj.desc,
                 code: `
-
-
-          
 
                   struct Transfer {
                       @builtin(position) posi: vec4f,
@@ -496,9 +489,9 @@ let functions_entries = [
                     @builtin(vertex_index) vi : u32
                   ) -> Transfer {
                     let pos = array(
-                      vec2f( 0.0,  0.5),  // top center
-                      vec2f(-0.5, -0.5),  // bottom left
-                      vec2f( 0.5, -0.5)   // bottom right
+                      vec2f( 0.0,  0.5),  
+                      vec2f(-0.5, -0.5),   
+                      vec2f( 0.5, -0.5)    
                     );
 
                     let colors = array(
@@ -522,7 +515,7 @@ let functions_entries = [
               });
             
               const pipeline =  gpuDevice.createRenderPipeline({
-                label: 'our hardcoded red triangle pipeline',
+                label: obj.desc,
                 layout: 'auto',
                 vertex: {
                   module,
@@ -536,7 +529,7 @@ let functions_entries = [
               });
             
               const renderPassDescriptor = {
-                label: 'our basic canvas renderPass',
+                label: obj.desc,
                 colorAttachments: [
                   {
                     
@@ -617,23 +610,12 @@ let functions_entries = [
             let  {r,g,b} = hexToRgbaNormal(event.target.value);
             obj.r =r; obj.g =g;obj.b=b;
 
-              console.log( obj.r,obj.g,obj.b);
-          })
+          });
 
         
-          
-      
- 
-
         }
         
-        obj.ui = ()=>{
-
-   
   
-          return {r:obj.r,g:obj.g,b:obj.b}
-        }
-
         obj.func = async () =>{
           
           obj.uiLoad();
@@ -701,7 +683,7 @@ let functions_entries = [
             const mainLabel = `ui colored triangle`;
 
             const module = gpuDevice.createShaderModule({
-              label: 'our hardcoded red triangle shaders',
+              label: obj.desc,
               code: `
 
                 @group(0) @binding(0) var<uniform> color: vec4f; 
@@ -710,9 +692,9 @@ let functions_entries = [
                   @builtin(vertex_index) vi : u32
                 ) -> @builtin(position) vec4f {
                   let pos = array(
-                    vec2f( 0.0,  0.5),  // top center
-                    vec2f(-0.5, -0.5),  // bottom left
-                    vec2f( 0.5, -0.5)   // bottom right
+                    vec2f( 0.0,  0.5),   
+                    vec2f(-0.5, -0.5),   
+                    vec2f( 0.5, -0.5)    
                   );
 
                                   
@@ -726,7 +708,7 @@ let functions_entries = [
             });
           
             const pipeline =  gpuDevice.createRenderPipeline({
-              label: 'our hardcoded red triangle pipeline',
+              label: obj.desc,
               layout: 'auto',
               vertex: {
                 module,
@@ -814,6 +796,250 @@ let functions_entries = [
     }
 
   } ,
+
+  {
+       
+    entry : ()=>{
+
+        let obj = {};
+        obj.desc = `ui gradient triangle`
+        
+        obj.r = 0.3,  obj.g = 0.4, obj.b = 0.5
+
+
+        obj.uiLoadColorPickers = (index,color)=>{
+          
+          obj.colorPickers[index].htmlInputColorLabel = document.createElement(`div`);
+          obj.colorPickers[index].htmlInputColorLabel.innerHTML = `Color`+index;
+          obj.colorPickers[index].htmlInputColorLabel.style.padding = "0 5px"
+          document.querySelector(`#uiInputsContainer`).appendChild(obj.colorPickers[index].htmlInputColorLabel);
+
+          obj.colorPickers[index].htmlInputColor =  document.createElement(`input`);
+          obj.colorPickers[index].htmlInputColor.setAttribute(`type`,"color");
+          obj.colorPickers[index].htmlInputColor.setAttribute(`value`,color);
+          document.querySelector(`#uiInputsContainer`).appendChild(obj.colorPickers[index].htmlInputColor);
+
+          obj.colorPickers[index].htmlInputColor.addEventListener(`input`,(event)=>{
+
+            let  {r,g,b} = hexToRgbaNormal(event.target.value);
+            obj.colorPickers[index].r =r; obj.colorPickers[index].g =g; obj.colorPickers[index].b=b;
+
+          });
+
+ 
+            let  {r,g,b} = hexToRgbaNormal(obj.colorPickers[index].htmlInputColor.value);
+            obj.colorPickers[index].r =r; obj.colorPickers[index].g =g; obj.colorPickers[index].b=b;
+ 
+        }
+
+
+        obj.uiLoad = ()=>{
+
+          createUIInputsContainer(); 
+
+          obj.colorPickers = [{},{},{}];
+          obj.uiLoadColorPickers(0,"#DD3698");
+          obj.uiLoadColorPickers(1,"#36109E");
+          obj.uiLoadColorPickers(2,"#E6DB65");
+
+        }
+        
+ 
+        obj.func = async () =>{
+          
+          obj.uiLoad();
+
+          let gpuDevice = null;
+
+          async function initializeWebGPU() {
+            // Check to ensure the user agent supports WebGPU.
+            if (!('gpu' in navigator)) {
+                console.error("User agent doesn’t support WebGPU.");
+                return false;
+            }
+        
+            // Request an adapter.
+            const gpuAdapter = await navigator.gpu.requestAdapter();
+        
+            // requestAdapter may resolve with null if no suitable adapters are found.
+            if (!gpuAdapter) {
+                console.error('No WebGPU adapters found.');
+                return false;
+            }
+        
+            // Request a device.
+            // Note that the promise will reject if invalid options are passed to the optional
+            // dictionary. To avoid the promise rejecting always check any features and limits
+            // against the adapters features and limits prior to calling requestDevice().
+            gpuDevice = await gpuAdapter.requestDevice();
+        
+            // requestDevice will never return null, but if a valid device request can’t be
+            // fulfilled for some reason it may resolve to a device which has already been lost.
+            // Additionally, devices can be lost at any time after creation for a variety of reasons
+            // (ie: browser resource management, driver updates), so it’s a good idea to always
+            // handle lost devices gracefully.
+            gpuDevice.lost.then((info) => {
+                console.error(`WebGPU device was lost: ${info.message}`);
+        
+                gpuDevice = null;
+        
+                // Many causes for lost devices are transient, so applications should try getting a
+                // new device once a previous one has been lost unless the loss was caused by the
+                // application intentionally destroying the device. Note that any WebGPU resources
+                // created with the previous device (buffers, textures, etc) will need to be
+                // re-created with the new one.
+                if (info.reason != 'destroyed') {
+                    initializeWebGPU();
+                }
+            });
+        
+            onWebGPUInitialized();
+        
+            return true;
+        }
+        
+        function onWebGPUInitialized() {
+            
+            reloadCanvas();
+            const canvas = document.querySelector('canvas');
+            const context = canvas.getContext('webgpu');
+            const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+            context.configure({
+              device:gpuDevice,
+              format: presentationFormat,
+            });
+          
+            const mainLabel =  obj.desc;
+
+            const module = gpuDevice.createShaderModule({
+              label: 'our hardcoded red triangle shaders',
+              code: `
+
+
+
+                struct Transfer {
+                  @builtin(position) posi: vec4f, 
+                  @location(0) color : vec4f
+                }
+
+                @group(0) @binding(0) var<uniform> colors: array<vec4f,3>; 
+         
+
+                @vertex fn vs(
+                  @builtin(vertex_index) vi : u32
+                ) ->  Transfer {
+                  let pos = array(
+                    vec2f( 0.0,  0.5),   
+                    vec2f(-0.5, -0.5),   
+                    vec2f( 0.5, -0.5)   
+                  );
+
+                  var transfer : Transfer;
+                  transfer.posi  = vec4f(pos[vi], 0.0, 1.0);
+                  transfer.color = colors[vi];
+                                  
+                  return transfer;
+                }
+          
+                @fragment fn fs(transfer: Transfer) -> @location(0) vec4f {
+                  return transfer.color;
+                }
+              `,
+            });
+          
+            const pipeline =  gpuDevice.createRenderPipeline({
+              label: 'our hardcoded red triangle pipeline',
+              layout: 'auto',
+              vertex: {
+                module,
+                entryPoint: 'vs',
+              },
+              fragment: {
+                module,
+                entryPoint: 'fs',
+                targets: [{ format: presentationFormat }],
+              },
+            });
+
+
+            const colorsData = new Float32Array(12);
+
+            const colorsBuffer = gpuDevice.createBuffer({
+              label: mainLabel+`,colorBuffer`, 
+              size: 4*4*4, 
+              usage: GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST
+            });
+
+            const bindGroup = gpuDevice.createBindGroup({
+              label: mainLabel+`,bindGroup`,
+              layout: pipeline.getBindGroupLayout(0), 
+              entries: [
+                {binding: 0, resource:{buffer: colorsBuffer}}
+              ]
+            })
+          
+            const renderPassDescriptor = {
+              label: 'our basic canvas renderPass',
+              colorAttachments: [
+                {
+                 
+                  clearValue: [0.3, 0.3, 0.3, 1],
+                  loadOp: 'clear',
+                  storeOp: 'store',
+                },
+              ],
+            };
+          
+            function render() {
+  
+              renderPassDescriptor.colorAttachments[0].view =
+                  context.getCurrentTexture().createView();
+          
+              const encoder =  gpuDevice.createCommandEncoder({ label: 'our encoder' });
+              const pass = encoder.beginRenderPass(renderPassDescriptor);
+              pass.setPipeline(pipeline);
+              colorsData.set([ obj.colorPickers[0].r,obj.colorPickers[0].g,obj.colorPickers[0].b,1.], 0);
+              colorsData.set([ obj.colorPickers[1].r,obj.colorPickers[1].g,obj.colorPickers[1].b,1.], 4);
+              colorsData.set([ obj.colorPickers[2].r,obj.colorPickers[2].g,obj.colorPickers[2].b,1.], 8);
+
+              gpuDevice.queue.writeBuffer(colorsBuffer,0, colorsData);
+              pass.setBindGroup(0,bindGroup);
+              pass.draw(3);   
+              pass.end();
+          
+              const commandBuffer = encoder.finish();
+              gpuDevice.queue.submit([commandBuffer]);
+              requestAnimationFrame(render);
+            }
+            requestAnimationFrame(render);
+         
+          
+            const observer = new ResizeObserver(entries => {
+              for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, gpuDevice.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, gpuDevice.limits.maxTextureDimension2D));
+               
+              }
+            });
+
+            observer.observe(canvas);
+           
+          
+        }
+        
+         initializeWebGPU();
+
+        }
+
+
+        return {desc:obj.desc, func: obj.func};
+    }
+
+  } ,
+
 
 ];
 
