@@ -5,6 +5,9 @@
 
 //    Authored by ebanga@ossoey.com/ebanga@hotmail.com  
 
+
+
+
 window.addEventListener(`load`, ()=>{
 
     import(`./modules/webgpuprinciple.js`).then((module)=>{
