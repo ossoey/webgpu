@@ -83,7 +83,6 @@ Ebk.Rand.fRange = (params={range:[0.,1.], clamp:[0,1]})=>{
 
  }
 
-
  Ebk.Rand.iRange = (params={range:[0,1], clamp:[0,1]})=>{
     //check previous attributs 
     let rand = Ebk.Rand.fRange(params) ;
@@ -95,12 +94,36 @@ Ebk.Rand.fRange = (params={range:[0.,1.], clamp:[0,1]})=>{
 
 Ebk.Rand.fRanges = (params={ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,1],[0.2,0.4],[0.8,0.87]]})=> {
     
+    let rangesClampsInfo = `Attributs ranges or clamps are required. eg ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,1],[0.2,0.4],[0.8,0.87]]. ranges.length == clamps.length `; 
+    
     if (!(Ebk.isObject(params) )) {
         console.error(`Params is not an object`);
         return null;
     }else {
   
+       if ((!Ebk.isInObject(`ranges`,params))||(!Ebk.isInObject(`clamps`,params))){
+        console.error(rangesClampsInfo);
+        return null;
+       } else {
+        if((!Ebk.isArray(params.ranges))||(!Ebk.isArray(params.clamps))||(params.ranges.length!=params.clamps.length)){
+            console.error(rangesClampsInfo);
+            return null;
+        } else {
 
+            for (let i=0; i<params.ranges.length;i++){
+                if (((!Ebk.isNumber(params.ranges[i][0]))||(!Ebk.isNumber(params.ranges[i][1])))||
+                ((!Ebk.isNumber(params.clamps[i][0]))||(!Ebk.isNumber(params.clamps[i][1])))){
+                 console.error(rangesClampsInfo);
+                 return null;
+             } 
+            }
+      
+
+           let pickRangeIndex = Ebk.Rand.iRange({range:[0, params.ranges.length],clamp:[0,1]}); 
+           return Ebk.Rand.fRange({range:params.ranges[pickRangeIndex],clamp:params.clamps[pickRangeIndex]});
+        }
+      
+       }
 
     }
 
@@ -166,6 +189,36 @@ Ebk.Rand.iRangeArray = (params={range:[0,1], clamp:[0,1], length:10})=>{
   
 }
 
+Ebk.Rand.fRangesArray = (params={ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,1],[0.2,0.4],[0.8,0.87]], length:10})=>{
+    let lengthInfo = `Attribut length has to be defined in params this way, length:number eg length:10`;
+    //check previous attributs 
+    let rand = Ebk.Rand.fRanges(params) ;
+    console.log(`fail`);
+    if (!(rand == null)){
+
+        if (!(Ebk.isInObject(`length`,params))){
+            console.error(lengthInfo);
+            return null;
+        } else{
+
+            if (!(Ebk.isNumber(params.length)) ){
+                console.error(lengthInfo);
+                return null;
+            } else{
+
+                let arr = [];
+                for(let i = 0; i<params.length;i++){
+                    console.log(i);
+                    arr.push(Ebk.Rand.fRanges(params));
+                }
+    
+                return arr;
+            }
+
+        }
+    } else return null; 
+  
+}
 
 Ebk.Rand.test = (params ={range:[0.,1.]})=>{
 
@@ -184,9 +237,18 @@ Ebk.Rand.tests = (paramsTestOptions =[
                    {range:[`a`,1.]},
                    {range:[`a`,`2`]},
                    {range:[1,`2`]},
-                   {range:[0.,1.],count:10},
-                   {range:[0,100],count:10,clamp:[0.5,0.51], length:`00`},
-                   {range:[0,100],count:10,clamp:[-0.2,0.51], length:10}
+                   {range:[0.,1.]},
+                   {range:[0,100],clamp:[0.5,0.51], length:`00`},
+                   {range:[0,100],clamp:[-0.2,0.51], length:10},
+                   {range:[0,100],clamp:[-0.2,0.51], length:10,clamps:[[0,1],[0.2,0.4],[0.8,0.87]]},
+                   {range:[0,100],clamp:[-0.2,0.51], length:10,ranges:[[0.,1.],[23, 60], [-7, 2]]},
+                   {range:[0,100],clamp:[-0.2,0.51], length:10,
+                   
+                    ranges:[[6,1.],[23, 60], [-7, 2]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0.8,0.87]]},
+                    
+                    {range:[0,100],clamp:[-0.2,0.51], length:10,
+                     ranges:[[0.,1.],[23, 60], [-7, 2]],clamps:[[0,1],[0.2,0.4],[0.8,0.87]]},
+                
            ])=>{
      paramsTestOptions.forEach((item,ndx)=>{
         console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
