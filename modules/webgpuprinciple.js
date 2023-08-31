@@ -1744,7 +1744,9 @@ let functions_entries = [
         obj.func = async () =>{
 
           Ebk.Rand.tests();
-          //console.log(Ebk.Rand.floatBetween([11,13] ));
+         // console.log(Ebk.Rand.fRanges() );
+
+          
           
           obj.uiLoad();
 

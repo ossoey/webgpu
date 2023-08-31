@@ -119,7 +119,7 @@ Ebk.Rand.fRanges = (params={ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,1],[0
             }
       
 
-           let pickRangeIndex = Ebk.Rand.iRange({range:[0, params.ranges.length],clamp:[0,1]}); 
+           let pickRangeIndex = Ebk.Rand.iRange({range:[0, params.ranges.length-1],clamp:[0,1]}); 
            return Ebk.Rand.fRange({range:params.ranges[pickRangeIndex],clamp:params.clamps[pickRangeIndex]});
         }
       
@@ -127,6 +127,15 @@ Ebk.Rand.fRanges = (params={ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,1],[0
 
     }
 
+}
+
+Ebk.Rand.iRanges = (params={ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,1],[0.2,0.4],[0.8,0.87]]})=>{
+    //check previous attributs 
+    let rand = Ebk.Rand.fRanges(params) ;
+    if (!(rand == null)){
+        return  Math.round(rand);
+    } else return null; 
+  
 }
 
 
@@ -193,7 +202,7 @@ Ebk.Rand.fRangesArray = (params={ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,
     let lengthInfo = `Attribut length has to be defined in params this way, length:number eg length:10`;
     //check previous attributs 
     let rand = Ebk.Rand.fRanges(params) ;
-    console.log(`fail`);
+
     if (!(rand == null)){
 
         if (!(Ebk.isInObject(`length`,params))){
@@ -208,7 +217,6 @@ Ebk.Rand.fRangesArray = (params={ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,
 
                 let arr = [];
                 for(let i = 0; i<params.length;i++){
-                    console.log(i);
                     arr.push(Ebk.Rand.fRanges(params));
                 }
     
@@ -219,6 +227,116 @@ Ebk.Rand.fRangesArray = (params={ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,
     } else return null; 
   
 }
+
+Ebk.Rand.iRangesArray = (params={ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,1],[0.2,0.4],[0.8,0.87]], length:10})=>{
+    let lengthInfo = `Attribut length has to be defined in params this way, length:number eg length:10`;
+    //check previous attributs 
+    let rand = Ebk.Rand.iRanges(params) ;
+
+    if (!(rand == null)){
+
+        if (!(Ebk.isInObject(`length`,params))){
+            console.error(lengthInfo);
+            return null;
+        } else{
+
+            if (!(Ebk.isNumber(params.length)) ){
+                console.error(lengthInfo);
+                return null;
+            } else{
+
+                let arr = [];
+                for(let i = 0; i<params.length;i++){
+                
+                    arr.push(Ebk.Rand.iRanges(params));
+                }
+    
+                return arr;
+            }
+
+        }
+    } else return null; 
+  
+}
+
+Ebk.Rand.mixNdx = (params={length:10})=>{
+     let lengthInfo = `Attribut length has to be defined in params this way, length:number eg length:10`;
+
+     let arrNDX = [], arrNDXOut = [];
+
+    if (!(Ebk.isObject(params))){
+
+        console.error(lengthInfo);
+        return null; 
+
+    } else{
+
+        if (!(Ebk.isInObject(`length`,params))){
+            console.error(lengthInfo);
+            return null;
+        } else{
+
+            if (!(Ebk.isNumber(params.length)) ){
+                console.error(lengthInfo);
+                return null;
+            } else{
+
+                for(let i=0;i<params.length; i++){
+                    arrNDX.push(i);
+                 }
+            
+                 while (arrNDX.length>1){
+                    let ndx = Ebk.Rand.iRanges({ranges:[[0,arrNDX.length-1]], clamps:[[0,1]]});
+                    arrNDXOut.push(arrNDX[ndx]);
+                    arrNDX.splice(ndx, 1);            
+                 }
+            
+                 arrNDXOut.push(arrNDX[0]);
+            
+                
+                 return arrNDXOut;
+
+            }
+
+        }
+
+    }
+   
+}    
+
+Ebk.Rand.mixArr = (params={arr:[10,1,{a:1},3,'23']})=>{
+    let arrInfo = `Attribut arr has to be defined in params this way, arr:[a1,a2,..,an] eg  arr:[10,1,{a:1},3,'23']`;
+
+   if (!(Ebk.isObject(params))){
+
+       console.error(arrInfo);
+       return null; 
+
+   } else{
+
+       if (!(Ebk.isInObject(`arr`,params))){
+           console.error(arrInfo);
+           return null;
+       } else{
+
+           if (!(Ebk.isArray(params.arr)) ){
+               console.error(arrInfo);
+               return null;
+           } else{
+
+                let mixedNdx = Ebk.Rand.mixNdx ({length:params.arr.length}),arrOut = [];                
+                mixedNdx.forEach((item)=>{
+                    arrOut.push(params.arr[item]);
+                });
+               
+                return arrOut;
+           }
+
+       }
+
+   }
+}    
+
 
 Ebk.Rand.test = (params ={range:[0.,1.]})=>{
 
@@ -246,9 +364,12 @@ Ebk.Rand.tests = (paramsTestOptions =[
                    
                     ranges:[[6,1.],[23, 60], [-7, 2]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0.8,0.87]]},
                     
-                    {range:[0,100],clamp:[-0.2,0.51], length:10,
-                     ranges:[[0.,1.],[23, 60], [-7, 2]],clamps:[[0,1],[0.2,0.4],[0.8,0.87]]},
-                
+                    {range:[0,100],clamp:[-0.2,0.51], length:20,
+                     ranges:[[0.,1.],[40, 60], [-7, -14],[102,200]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0,1]]},
+                     {range:[0,100],clamp:[-0.2,0.51], length:20,
+                    ranges:[[0.,1.],[40, 60], [-7, -14],[102,200]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0,1]],  arr:[10,1,{a:1},3,'23']},
+
+                    
            ])=>{
      paramsTestOptions.forEach((item,ndx)=>{
         console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
