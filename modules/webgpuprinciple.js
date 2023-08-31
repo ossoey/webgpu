@@ -1697,7 +1697,7 @@ let functions_entries = [
       
             obj.onWebGPUInitialized();
          
-            console.log(obj.objectsCountValue);
+            //console.log(obj.objectsCountValue);
             
           })
         }  
@@ -1743,7 +1743,7 @@ let functions_entries = [
  
         obj.func = async () =>{
 
-          Ebk.Rand.tests();
+          Ebk.Matrix.tests();
          // console.log(Ebk.Rand.fRanges() );
 
           
