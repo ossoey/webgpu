@@ -26,6 +26,9 @@ Ebk.isInObject = (prop,obj) =>{
     else return false;
 }
 
+
+/////// Ebk.Rand 
+
 Ebk.Rand = {};
 
 Ebk.Rand.float = (params={range:[0.,1.]})=>{
@@ -138,7 +141,6 @@ Ebk.Rand.iRanges = (params={ranges:[[0.,1.],[23, 60], [-7, 2]], clamps:[[0,1],[0
   
 }
 
-
 Ebk.Rand.fRangeArray = (params={range:[0,1], clamp:[0,1], length:10})=>{
     let lengthInfo = `Attribut length has to be defined in params this way, length:number eg length:10`;
     //check previous attributs 
@@ -167,7 +169,6 @@ Ebk.Rand.fRangeArray = (params={range:[0,1], clamp:[0,1], length:10})=>{
     } else return null; 
   
 }
-
 
 Ebk.Rand.iRangeArray = (params={range:[0,1], clamp:[0,1], length:10})=>{
     let lengthInfo = `Attribut length has to be defined in params this way, length:number eg length:10`;
@@ -378,6 +379,185 @@ Ebk.Rand.tests = (paramsTestOptions =[
     });
 }
 
+
+/////// Ebk.Matrix 
+
+Ebk.Matrix = {};
+
+Ebk.Matrix.vectAdd = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
+
+    let vectorsInfo = `v1 and v2 have to be define as array with the same type of numbers and same length, eg v1:[3,1,4],v2:[5,3,-8] `;
+
+    let vectResult = [];
+    if(!Ebk.isObject(params)){
+        console.error(vectorsInfo)
+        return null;
+    } else {
+
+        if((!Ebk.isArray(params.v1))||(!Ebk.isArray(params.v2))||(params.v1.length!=params.v2.length)){
+            console.error(vectorsInfo)
+            return null;
+        } else {
+                
+                params.v1.forEach((item,ndx)=>{
+                    vectResult.push(0);
+                    if((! Ebk.isNumber(params.v1[ndx]))||(! Ebk.isNumber(params.v2[ndx]))){
+                        console.error(vectorsInfo);
+                        return null;
+                    } 
+                });
+
+                params.v1.forEach((item,ndx)=>{
+                    vectResult[ndx] = item + params.v2[ndx];
+                });
+
+
+                 return vectResult;
+        }
+
+    }
+}
+
+
+
+Ebk.Matrix.vectScale = (params ={v:[5,3,-8], scalar:0.5}) =>{
+
+    let vectorsInfo = `v(array) and scalar(number) have to be define , eg {v:[5,3,-8], scalar:0.5} `;
+
+    let vectResult = [];
+    if(!Ebk.isObject(params)){
+        console.error(vectorsInfo)
+        return null;
+    } else {
+
+        if((!Ebk.isArray(params.v))||(!Ebk.isNumber(params.scalar))){
+            console.error(vectorsInfo)
+            return null;
+        } else {
+                
+                params.v.forEach((item,ndx)=>{
+                    vectResult.push(1);
+                    if((! Ebk.isNumber(params.v[ndx]))){
+                        console.error(vectorsInfo);
+                        return null;
+                    } 
+                });
+
+                params.v.forEach((item,ndx)=>{
+                    vectResult[ndx] = item*params.scalar;
+                });
+
+                 return vectResult;
+        }
+
+    }
+}
+
+Ebk.Matrix.vector = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
+    return Ebk.Matrix.vectAdd({v1:params.v2, v2: Ebk.Matrix.vectScale({v:params.v1,scalar:-1})});
+}
+
+Ebk.Matrix.dotProduct = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
+
+    let vectorsInfo = `v1 and v2 have to be define as array with the same type of numbers and same length, eg v1:[3,1,4],v2:[5,3,-8] `;
+
+    let vectResult = 0;
+    if(!Ebk.isObject(params)){
+        console.error(vectorsInfo)
+        return null;
+    } else {
+
+        if((!Ebk.isArray(params.v1))||(!Ebk.isArray(params.v2))||(params.v1.length!=params.v2.length)){
+            console.error(vectorsInfo)
+            return null;
+        } else {
+                
+                params.v1.forEach((item,ndx)=>{
+                     
+                    if((! Ebk.isNumber(params.v1[ndx]))||(! Ebk.isNumber(params.v2[ndx]))){
+                        console.error(vectorsInfo);
+                        return null;
+                    } 
+                });
+
+                params.v1.forEach((item,ndx)=>{
+                    vectResult += item*params.v2[ndx];
+                });
+
+
+                 return vectResult;
+        }
+
+    }
+}
+
+Ebk.Matrix.magnitude = (params ={v:[5,3,-8]}) =>{
+
+    let vectorsInfo = `v(array) has to be define , eg {v:[5,3,-8]} `;
+
+    let result = 0;
+    if(!Ebk.isObject(params)){
+        console.error(vectorsInfo)
+        return null;
+    } else {
+
+        if((!Ebk.isArray(params.v))){
+            console.error(vectorsInfo)
+            return null;
+        } else {
+                
+                params.v.forEach((item,ndx)=>{
+                
+                    if((! Ebk.isNumber(params.v[ndx]))){
+                        console.error(vectorsInfo);
+                        return null;
+                    } 
+                });
+
+                params.v.forEach((item,ndx)=>{
+                    result += Math.pow(item,2);
+                });
+
+                 return Math.sqrt(result);
+        }
+
+    }
+}
+
+Ebk.Matrix.distance = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
+    return  Ebk.Matrix.magnitude( {v:Ebk.Matrix.vector({v1:params.v1, v2:params.v2 }) } );
+}
+
+Ebk.Matrix.test = (params ={range:[0.,1.]})=>{
+
+    Object.keys(Ebk.Matrix).forEach(key =>{
+        if((key !==`tests`)&&(key !==`test`)){
+          console.log(key, `:` ,Ebk.Matrix[key](params));
+        }
+
+    });
+}
+
+Ebk.Matrix.tests = (paramsTestOptions =[
+                  
+                   {},
+                   {v1:[3,1]},    
+                   {v2:[5,3]},
+                   {v1:[3,1,1],v2:[5,3]},
+                   {v1:[3,`1`],v2:[5,3]},
+                   {v1:[3,1],v2:[5,6]},
+                   {v1:[3,1,9,20],v2:[5,6,10,-1]},
+                   {v:[3,1,9,`20`],scalar:0.5},
+                   {v1:[2,1],v2:[-1,2]},
+                   {v1:[1,0],v2:[0,1]},
+                    
+           ])=>{
+     paramsTestOptions.forEach((item,ndx)=>{
+        console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
+        console.log(`params:`, item);
+        Ebk.Matrix.test(item);
+    });
+}
 
 export {Ebk}
 export default Ebk;
