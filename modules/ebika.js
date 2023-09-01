@@ -521,7 +521,7 @@ Ebk.Matrix.vector = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
 }
 
 //Return some vecteur in a base(matrix) stretched by coords
-Ebk.Matrix.linearCombination = (params ={ matrix:[[3,1,4],[5,3,-8]],coords:[0.5,0.]}) =>{
+Ebk.Matrix.linearCombination = (params ={ matrix:[[3,1,4],[5,3,-8]],scalars:[0.5,0.]}) =>{
 
     let resultVector = [];
 
@@ -532,12 +532,12 @@ Ebk.Matrix.linearCombination = (params ={ matrix:[[3,1,4],[5,3,-8]],coords:[0.5,
         return null;
     } else {
 
-        if((!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.coords))||(!Ebk.isMatrixOfSameSubDimensions(params.matrix))){
+        if((!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.scalars))||(!Ebk.isMatrixOfSameSubDimensions(params.matrix))){
             console.error(linearCombinationChecker);
             return null;
         } else {
 
-            if(!(params.matrix.length === params.coords.length)){
+            if(!(params.matrix.length === params.scalars.length)){
                 console.error(linearCombinationChecker);
                 return null;
             } else {
@@ -548,7 +548,7 @@ Ebk.Matrix.linearCombination = (params ={ matrix:[[3,1,4],[5,3,-8]],coords:[0.5,
 
                 params.matrix.forEach((item,ndx)=>{
 
-                    resultVector  =   Ebk.Matrix.vectAdd({v1:resultVector,v2: Ebk.Matrix.vectScale({v:item,scalar:params.coords[ndx]})})  
+                    resultVector  =   Ebk.Matrix.vectAdd({v1:resultVector,v2: Ebk.Matrix.vectScale({v:item,scalar:params.scalars[ndx]})}); 
                 });
 
                 return resultVector;
@@ -646,16 +646,30 @@ Ebk.Matrix.add = (params ={ m1:[[3,1],[5,3]],m1:[[5,14],[1,7]]}) => {
    
 }
 
-Ebk.Matrix.mult = (params ={ m1:[[3,1],[5,3]],m1:[[5,14],[1,7]]}) => {
+Ebk.Matrix.mult = (params ={ m1:[[3,1],[5,3]],m2:[[5,14],[1,7]]}) => {
 
-    let vectorsInfo = ` `;
+    let vectorsInfo = `m1 and m2 have to be defined , eg m1:[[3,1],[5,3]],m2:[[5,14],[1,7]] `;
 
-    let vectResult = 0;
+    let mtxResult = [];
     if(!Ebk.isObject(params)){
         console.error(vectorsInfo)
         return null;
     } else {
+        if(! (Ebk.isMatrixOfNumbers(params.m1))||(!(Ebk.isMatrixOfNumbers(params.m2)))
+        
+        ||(!(Ebk.isMatrixOfSameSubDimensions(params.m1))) ||(!(Ebk.isMatrixOfSameSubDimensions(params.m2)))
+        ||(!(params.m1.length ===params.m2.length ))) {
 
+            console.error(vectorsInfo);
+            return null;
+        } else {
+
+            params.m2.forEach((item)=>{
+                mtxResult.push(Ebk.Matrix.linearCombination({matrix: params.m1,scalars:item}));
+            })
+
+            return mtxResult;
+        }
 
     }
    
@@ -714,8 +728,9 @@ Ebk.Matrix.tests = (paramsTestOptions =[
                    {v:[3,1,9,`20`],scalar:0.5},
                    {v1:[2,1],v2:[-1,2]},
                    {v1:[1,0],v2:[0,1]},
-                   { matrix:[[3,1,4],[5,3,-8]],coords:[0.5,0.,3]}
-                    
+                   { matrix:[[1,2,3],[1,0,2]],scalars:[1,-2]},
+                   { matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2]},
+                   {m2:[[1,3],[2,4]],m1:[[2,1],[0,2]]}
            ])=>{
      paramsTestOptions.forEach((item,ndx)=>{
         console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
