@@ -1743,7 +1743,17 @@ let functions_entries = [
  
         obj.func = async () =>{
 
-          Ebk.Matrix.tests();
+          Ebk.Matrix.tests([{ matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2], headNdx :0,
+          matrices:[ [[-3,-3,3],[0,-2,3],[0,-4,1]], [[-2,-3,2],[0,2,3],[-2,4,-4]]]
+         },
+
+         { matrix:[[2,-1],[1,-3]],scalars:[-1,1,-1/2],  headNdx :0,
+          matrices:[ [[1,2],[1,2]],[[2,1],[1,2]],[[1,3],[2,1]],[[1,0],[0,1]]  ]
+         }
+    
+    
+    
+    ]);
          // console.log(Ebk.Rand.fRanges() );
 
           
