@@ -43,11 +43,16 @@ Ebk.isMatrixOfNumbers = (value) =>{
         return false;
     } else { 
 
-        let ndx = 0;
-
+        let ndx = 1;
+        let arrLength = value[0].length;
+        isAllNumbers = Ebk.isArrayOfNumbers(value[0]);
+          
         while ((ndx < value.length)&&(isAllNumbers)) {
 
             isAllNumbers = Ebk.isArrayOfNumbers(value[ndx]);
+            if((value[ndx].length !==value[ndx].length)){
+                isAllNumbers = false;
+            }
             
             ndx++;
         }
@@ -57,26 +62,18 @@ Ebk.isMatrixOfNumbers = (value) =>{
 
 }
 
-Ebk.isMatrixOfSameSubDimensions = (value) =>{
-    let   isAllNumbers = true; 
+Ebk.isMatrixClusterOfNumbers = (cluster) =>{
+  let isAllNumber = true;
 
-    if(!Ebk.isArray(value)){
-        return false;
-    } else { 
+  let ndx = 0;
+  while(isAllNumber && ndx < cluster.length){
 
-        let ndx = 1;
-
-        while ((ndx < value.length)&&(isAllNumbers)) {
-
-            isAllNumbers =  (value[ndx].length === value[ndx-1].length)? true: false;
-            
-            ndx++;
-        }
-
-        return isAllNumbers;
-    }
-
-}
+    isAllNumber = Ebk.isMatrixOfNumbers(cluster[ndx]);
+    ndx++;
+  }
+  
+  return isAllNumber;
+}   
 
 
 Ebk.isObject = (value) =>{
@@ -147,7 +144,7 @@ Ebk.Rand.fRange = (params={range:[0.,1.], clamp:[0,1]})=>{
         return null;
      }
 
- }
+}
 
  Ebk.Rand.iRange = (params={range:[0,1], clamp:[0,1]})=>{
     //check previous attributs 
@@ -447,6 +444,10 @@ Ebk.Rand.tests = (paramsTestOptions =[
 
 Ebk.Matrix = {};
 
+Ebk.Matrix.arrGetSubarray =(arr, fromIndex, toIndex) => {
+    return      arr.slice(fromIndex, toIndex+1);
+}
+
 Ebk.Matrix.vectAdd = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
 
     let vectorsInfo = `v1 and v2 have to be define as array with the same type of numbers and same length, eg v1:[3,1,4],v2:[5,3,-8] `;
@@ -480,7 +481,6 @@ Ebk.Matrix.vectAdd = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
 
     }
 }
-
 
 
 Ebk.Matrix.vectScale = (params ={v:[5,3,-8], scalar:0.5}) =>{
@@ -521,7 +521,7 @@ Ebk.Matrix.vector = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
 }
 
 //Return some vecteur in a base(matrix) stretched by coords
-Ebk.Matrix.linearCombination = (params ={ matrix:[[3,1,4],[5,3,-8]],scalars:[0.5,0.]}) =>{
+Ebk.Matrix.linearCombination = (params ={ matrix:[[3,1,4],[5,3,-8]],scalars:[0.5,0.1]}) =>{
 
     let resultVector = [];
 
@@ -532,7 +532,7 @@ Ebk.Matrix.linearCombination = (params ={ matrix:[[3,1,4],[5,3,-8]],scalars:[0.5
         return null;
     } else {
 
-        if((!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.scalars))||(!Ebk.isMatrixOfSameSubDimensions(params.matrix))){
+        if((!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.scalars))){
             console.error(linearCombinationChecker);
             return null;
         } else {
@@ -633,13 +633,28 @@ Ebk.Matrix.distance = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
 
 Ebk.Matrix.add = (params ={ m1:[[3,1],[5,3]],m1:[[5,14],[1,7]]}) => {
 
-    let vectorsInfo = ` `;
-
-    let vectResult = 0;
+    let vectorsInfo = `m1 and m2 have to be defined. eg { m1:[[3,1],[5,3]],m1:[[5,14],[1,7]]} `;
+    
+    let mxResult = [];
     if(!Ebk.isObject(params)){
-        console.error(vectorsInfo)
+        console.error(vectorsInfo);
         return null;
     } else {
+
+        if(! (Ebk.isMatrixOfNumbers(params.m1))||(!(Ebk.isMatrixOfNumbers(params.m2)))
+        ||(!(params.m1.length ===params.m2.length ))) {
+
+            console.error(vectorsInfo);
+            return null;
+        } else {
+
+            params.m1.forEach((item,ndx)=>{
+                mxResult.push(Ebk.Matrix.vectAdd({v1:item,v2:params.m2[ndx]}));
+            })
+
+        
+            return mxResult;
+        }
 
 
     }
@@ -656,8 +671,6 @@ Ebk.Matrix.mult = (params ={ m1:[[3,1],[5,3]],m2:[[5,14],[1,7]]}) => {
         return null;
     } else {
         if(! (Ebk.isMatrixOfNumbers(params.m1))||(!(Ebk.isMatrixOfNumbers(params.m2)))
-        
-        ||(!(Ebk.isMatrixOfSameSubDimensions(params.m1))) ||(!(Ebk.isMatrixOfSameSubDimensions(params.m2)))
         ||(!(params.m1.length ===params.m2.length ))) {
 
             console.error(vectorsInfo);
@@ -675,41 +688,207 @@ Ebk.Matrix.mult = (params ={ m1:[[3,1],[5,3]],m2:[[5,14],[1,7]]}) => {
    
 }
 
-Ebk.Matrix.addArray = (params ={ matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]]}) => {
 
-    let vectorsInfo = ` `;
+Ebk.Matrix.addMatrices = (params ={ matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]]}) => {
 
-    let vectResult = 0;
+    let info = `matrices has to be defined. eg : { matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]]} `;
+
+    let result;
     if(!Ebk.isObject(params)){
-        console.error(vectorsInfo)
+        console.error(info)
         return null;
     } else {
 
+       if (!Ebk.isInObject(`matrices`,params)){
+            console.error(info)
+            return null;
+
+       } else {
+
+            if (!Ebk.isMatrixClusterOfNumbers(params.matrices)){
+                console.error(info)
+                return null;
+            } else {
+            
+                result = Ebk.Matrix.add({m1:params.matrices[0],m2:params.matrices[1]});
+
+                let ndx = 2;
+
+                while(ndx<params.matrices.length){
+
+                    result = Ebk.Matrix.add({m1: result,m2:params.matrices[ndx]});
+                    ndx++;
+                }
+
+                return result;
+            }
+
+       }
 
     }
    
 }
 
-Ebk.Matrix.multArray = (params ={ matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]]}) => {
+Ebk.Matrix.multMatrices = (params ={ matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]]}) => {
 
-    let vectorsInfo = ` `;
+    let info = `matrices has to be defined. eg : { matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]]} `;
 
-    let vectResult = 0;
+    let result;
     if(!Ebk.isObject(params)){
-        console.error(vectorsInfo)
+        console.error(info)
         return null;
     } else {
 
-
-    }
+        if (!Ebk.isInObject(`matrices`,params)){
+             console.error(info)
+             return null;
+ 
+        } else {
+ 
+             if (!Ebk.isMatrixClusterOfNumbers(params.matrices)){
+                 console.error(info)
+                 return null;
+             } else {
+             
+                 result = Ebk.Matrix.mult({m1:params.matrices[0],m2:params.matrices[1]});
+ 
+                 let ndx = 2;
+ 
+                 while(ndx<params.matrices.length){
+ 
+                     result = Ebk.Matrix.mult({m1: result,m2:params.matrices[ndx]});
+                     ndx++;
+                 }
+ 
+                 return result;
+             }
+ 
+        }
+ 
+     }
    
 }
 
+
+Ebk.Matrix.determinant2D = (params ={ matrix:[[3,1],[5,3]]}) =>{
+
+
+    let info =`2D matrix has to be defined. eg ={ matrix:[[3,1],[5,3]]}`;
+
+    if(!Ebk.isObject(params)){
+        console.error(info);
+        return null;
+    } else {
+       if(!Ebk.isInObject(`matrix`, params)) {
+            console.error(info);
+            return null;
+
+       } else {
+
+            if(!Ebk.isMatrixOfNumbers(params.matrix)){
+                console.error(info);
+                return null;
+            } else {
+                if (!(params.matrix[0].length == 2)){
+                    console.error(info);
+                    return null;  
+                } else {
+                    return  params.matrix[0][0]*params.matrix[1][1] -   params.matrix[0][1]*params.matrix[1][0]
+                }
+            }
+
+       }
+ 
+
+    }
+}
+
+Ebk.Matrix.subMatrix = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]], headNdx :1}) =>{
+
+
+    let info =`matrix has to be defined. eg ={ matrix:[[3,1],[5,3]]}`;
+
+    if(!Ebk.isObject(params)){
+        console.error(info);
+        return null;
+    } else {
+       if((!Ebk.isInObject(`matrix`, params))||(!Ebk.isInObject(`headNdx`, params))){  
+            console.error(info);
+            return null;
+
+       } else {
+
+            if((!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isNumber(params.headNdx))){
+                console.error(info);
+                return null;
+            } else {
+                    
+                let result = [];
+
+
+                    let ndx_ = 0
+                    while (ndx_ < params.matrix.length){
+
+                        if (ndx_ !== params.headNdx) {
+
+                     
+                             result.push(Ebk.Matrix.arrGetSubarray(params.matrix[ndx_], 1,params.matrix[ndx_].length-1 ));
+                        }
+
+                        ndx_ ++;
+                    }
+               
+
+                 return result;
+
+
+            }
+
+       }
+ 
+    }
+}
+
+Ebk.Matrix.subMatrices = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]]}) =>{
+
+
+    let info =`matrix has to be defined. eg ={ matrix:[[3,1],[5,3]]}`;
+
+    if(!Ebk.isObject(params)){
+        console.error(info);
+        return null;
+    } else {
+       if((!Ebk.isInObject(`matrix`, params)) ){  
+            console.error(info);
+            return null;
+
+       } else {
+
+            if((!Ebk.isMatrixOfNumbers(params.matrix))){
+                console.error(info);
+                return null;
+            } else {
+                    
+                let result = [];
+               
+                params.matrix.forEach((item,ndx)=>{
+
+                    result.push(Ebk.Matrix.subMatrix({matrix:params.matrix,headNdx:ndx}));
+                })
+
+                 return result;
+
+            }
+
+       }
+ 
+    }
+}
 
 Ebk.Matrix.test = (params ={range:[0.,1.]})=>{
 
     Object.keys(Ebk.Matrix).forEach(key =>{
-        if((key !==`tests`)&&(key !==`test`)){
+        if((key !==`tests`)&&(key !==`test`)&&(key !==`arrGetSubarray`)  )     {
           console.log(key, `:` ,Ebk.Matrix[key](params));
         }
 
@@ -728,8 +907,10 @@ Ebk.Matrix.tests = (paramsTestOptions =[
                    {v:[3,1,9,`20`],scalar:0.5},
                    {v1:[2,1],v2:[-1,2]},
                    {v1:[1,0],v2:[0,1]},
-                   { matrix:[[1,2,3],[1,0,2]],scalars:[1,-2]},
-                   { matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2]},
+                   { matrix:[[1,2,3],[1,0,2]],scalars:[1,-2], headNdx :0,}, 
+                   { matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2],  headNdx :0,
+                    matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]]
+                },
                    {m2:[[1,3],[2,4]],m1:[[2,1],[0,2]]}
            ])=>{
      paramsTestOptions.forEach((item,ndx)=>{
