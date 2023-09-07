@@ -885,53 +885,135 @@ Ebk.Matrix.subMatrices = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]]}) =>{
     }
 }
 
-Ebk.Matrix.determinant = (params ={ matrix:[[3,1],[5,3]]}) =>{
+// Ebk.Matrix.determinant = (params ={ matrix:[[3,1],[5,3]]}) =>{
 
-    let info =`matrix has to be defined. eg ={ matrix:[[3,1],[5,3]]}`;
+//     let info =`matrix has to be defined. eg ={ matrix:[[3,1],[5,3]]}`;
 
-    if(!Ebk.isObject(params)){
-        console.error(info);
-        return null;
-    } else {
-       if((!Ebk.isInObject(`matrix`, params))){  
-            console.error(info);
-            return null;
+//     if(!Ebk.isObject(params)){
+//         console.error(info);
+//         return null;
+//     } else {
+//        if((!Ebk.isInObject(`matrix`, params))){  
+//             console.error(info);
+//             return null;
 
-       } else {
+//        } else {
 
-            if((!Ebk.isMatrixOfNumbers(params.matrix))){
-                console.error(info);
-                return null;
-            } else { 
+//             if((!Ebk.isMatrixOfNumbers(params.matrix))){
+//                 console.error(info);
+//                 return null;
+//             } else { 
 
-                if (params.matrix[0].length ==2){
+//                 if (params.matrix[0].length ==2){
 
-                    return Ebk.Matrix.determinant2D({matrix:params.matrix});
+//                     return Ebk.Matrix.determinant2D({matrix:params.matrix});
 
-                } else if  (params.matrix[0].length ==3){
+//                 } else if  (params.matrix[0].length ==3){
               
 
-                    let det1 = params.matrix[0][0]*Ebk.Matrix.determinant2D({matrix:Ebk.Matrix.subMatrix({matrix:params.matrix,headNdx:0})});
-                    let det2 = params.matrix[1][0]*Ebk.Matrix.determinant2D({matrix:Ebk.Matrix.subMatrix({matrix:params.matrix,headNdx:1})});
-                    let det3 = params.matrix[2][0]*Ebk.Matrix.determinant2D({matrix:Ebk.Matrix.subMatrix({matrix:params.matrix,headNdx:2})});
-                    return  det1 - det2+ det3;
+//                     let det1 = params.matrix[0][0]*Ebk.Matrix.determinant2D({matrix:Ebk.Matrix.subMatrix({matrix:params.matrix,headNdx:0})});
+//                     let det2 = params.matrix[1][0]*Ebk.Matrix.determinant2D({matrix:Ebk.Matrix.subMatrix({matrix:params.matrix,headNdx:1})});
+//                     let det3 = params.matrix[2][0]*Ebk.Matrix.determinant2D({matrix:Ebk.Matrix.subMatrix({matrix:params.matrix,headNdx:2})});
+//                     return  det1 - det2+ det3;
 
-                } else if  (params.matrix[0].length >3){
+//                 } else if  (params.matrix[0].length >3){
 
-                    let detSum = 1;
 
-                    params.matrix.forEach((item,ndx)=>{
-                        detSum+=Math.pow(-1,ndx) * item[0]*Ebk.Matrix.determinant({matrix:Ebk.Matrix.subMatrix({matrix:params.matrix,headNdx:ndx})});
-                    });
+       
+//                 }
 
-                    return detSum;
-                }
-
-            }
+//             }
                     
-        } 
-    }
+//         } 
+//     }
+//  }
+
+Ebk.Matrix.determinant = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,22,24,25]]}) =>{
+    let matrix =[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,22,24,25]]
+    
+     let object = {},
+          data = {};
+      
+     object.ini = ()=>{
+        data.coef = 1;
+        data.matrix = matrix.slice();
+        data.children = [];
+     }
+
+    
+     object.extend = (struct)=>{
+
+        struct.matrix.forEach((item,ndx)=>{
+            
+            struct.children.push({
+                coef : Math.pow(-1,ndx)*item[0], 
+                matrix: Ebk.Matrix.subMatrix({matrix:struct.matrix,headNdx:ndx}),
+                children:[]
+            });
+        });
+
+        struct.children.forEach(subStruct=>{
+           // if(subStruct.matrix.length>2)
+               object.extend(subStruct);
+        })
+
+    
+     }
+
+         
+ 
+ 
+     object.ini (matrix);
+    object.extend (data);
+    //object.extend1(data);
+ 
+    return  data  ;
+
  }
+
+ Ebk.Matrix.determinant1 = ( ) =>{
+   // let matrix =[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,22,24,25]]
+    //let matrix =[[-2,-1,2],[2,1,0],[-3,3,-1]]
+    let matrix =[[1,2,8],[6,7,9],[4,3,5]]
+   
+  let sum = 0;
+    let obj ={};
+
+    let result =[]
+
+    obj.det = (mat) =>{
+
+        if(mat.length >= 3 ) {
+            
+          
+            for(let vecNdx =0;vecNdx< mat.length;vecNdx++) {
+
+                result.push(  Math.pow(-1,vecNdx)*mat[vecNdx][0]*obj.det(Ebk.Matrix.subMatrix({matrix:mat, headNdx:vecNdx})));
+            }
+
+            let sum = 0;
+            result.forEach(value =>{
+                sum+=value;
+            })
+
+
+            return sum ;
+                         
+        }
+        else {
+
+            return  mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0];
+
+        }
+    }
+   
+         
+ 
+   return obj.det(matrix);
+ 
+
+ }
+
 
 Ebk.Matrix.test = (params ={range:[0.,1.]})=>{
 
