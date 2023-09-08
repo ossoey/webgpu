@@ -1244,5 +1244,75 @@ Ebk.Matrix.tests = (paramsTestOptions =[
     });
 }
 
+/////// Ebk.Trajectory
+
+Ebk.Trajectory = class EbkTrajectory{
+    #path;
+    #target;
+    constructor(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}){
+
+        let info =`path has to be defined. eg {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}`;
+
+        if(!Ebk.isObject(params)){
+            console.error(info);
+            return null;
+        } else {
+           if((!Ebk.isInObject(`path`, params))){  
+                console.error(info);
+                return null;
+    
+           } else {
+    
+                if((!Ebk.isMatrixOfNumbers(params.path))){
+                    console.error(info);
+                    return null;
+                } else {
+                        
+                    this.#path= params.path;
+                
+                }
+            
+
+           } 
+        }
+
+    }
+
+    _update(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}){
+        let info =`path has to be defined. eg {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}`;
+
+        if(!Ebk.isObject(params)){
+            console.error(info);
+            return null;
+        } else {
+           if((!Ebk.isInObject(`path`, params))){  
+                console.error(info);
+                return null;
+    
+           } else {
+    
+                if((!Ebk.isMatrixOfNumbers(params.path))){
+                    console.error(info);
+                    return null;
+                } else {
+                    this.#path= params.path;   
+                }
+            
+
+           } 
+        }
+    }
+
+    _updateAndLocate(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3}){
+    
+    }
+
+    locate(params ={target:0.3}){
+    
+    }
+   
+    
+};
+
 export {Ebk}
 export default Ebk;
