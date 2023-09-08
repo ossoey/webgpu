@@ -444,8 +444,19 @@ Ebk.Rand.tests = (paramsTestOptions =[
 
 Ebk.Matrix = {};
 
-Ebk.Matrix.arrGetSubarray =(arr, fromIndex, toIndex) => {
+Ebk.Matrix.arrGetSubarray =(arr = [1,2,3,4,5,6,7,8,9], fromIndex = 2, toIndex = 5 ) => {
     return      arr.slice(fromIndex, toIndex+1);
+}
+
+Ebk.Matrix.arrGetSubarrayWithoutIndex =(arr = [1,2,3,4,5,6,7,8,9], withoutIndex = 2) => {
+
+    if (withoutIndex < 0 || withoutIndex >= arr.length) {  
+        return arr.slice();
+      }
+      
+      // Create a subarray before the index and after the index, then concatenate them
+      return arr.slice(0,withoutIndex).concat(arr.slice(withoutIndex + 1));
+
 }
 
 Ebk.Matrix.vectAdd = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
@@ -803,7 +814,7 @@ Ebk.Matrix.determinant2D = (params ={ matrix:[[3,1],[5,3]]}) =>{
     }
 }
 
-Ebk.Matrix.subMatrix = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]], headNdx :1}) =>{
+Ebk.Matrix.subHeadMatrix = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]], headNdx :1}) =>{
 
 
     let info =`matrix has to be defined. eg ={ matrix:[[3,1],[5,3]]}`;
@@ -849,6 +860,59 @@ Ebk.Matrix.subMatrix = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]], headNdx :1
     }
 }
 
+Ebk.Matrix.subMatrix = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]], colNdx :1,rowNdx:2}) =>{
+
+
+    let info =`matrix,colNdx,rowNdx have to be defined. eg ={ matrix:[[3,1],[5,3]] ,colNdx :1,rowNdx:2}`;
+
+    if(!Ebk.isObject(params)){
+        console.error(info);
+        return null;
+    } else {
+       if((!Ebk.isInObject(`matrix`, params))||(!Ebk.isInObject(`colNdx`, params))||(!Ebk.isInObject(`rowNdx`, params))){  
+            console.error(info);
+            return null;
+
+       } else {
+
+            if((!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isNumber(params.colNdx))||(!Ebk.isNumber(params.rowNdx))){
+                console.error(info);
+                return null;
+            } else {
+                    
+                if((! ((params.colNdx >=0) && (params.colNdx <params.matrix.length)))||(! ((params.rowNdx >=0) && (params.rowNdx <params.matrix.length)))){
+                    console.error(info);
+                    return null;
+                } else {
+
+                  let result = [];
+
+                    let ndx_ = 0
+                    while (ndx_ < params.matrix.length){
+
+                        if (ndx_ !== params.colNdx) {
+                     
+                             result.push( Ebk.Matrix.arrGetSubarrayWithoutIndex (params.matrix[ndx_], params.rowNdx) );
+                        }
+
+                        ndx_ ++;
+                    }
+               
+
+                 return result;                  
+                }
+
+
+
+
+            }
+
+       }
+ 
+    }
+}
+
+
 
 Ebk.Matrix.subMatrices = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]]}) =>{
 
@@ -872,11 +936,17 @@ Ebk.Matrix.subMatrices = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]]}) =>{
                     
                 let result = [];
                
-                params.matrix.forEach((item,ndx)=>{
+                  for(let col = 0; col<params.matrix.length; col++) {
+                      let colValues = [];
+                    for(let row = 0; row<params.matrix.length; row++) {
 
-                    result.push(Ebk.Matrix.subMatrix({matrix:params.matrix,headNdx:ndx}));
-                })
+                        colValues.push(Ebk.Matrix.subMatrix({matrix:params.matrix, colNdx:col, rowNdx:row}));
+                    }  
 
+                    result.push(colValues);
+
+                  }
+                
                  return result;
 
             }
@@ -886,6 +956,51 @@ Ebk.Matrix.subMatrices = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]]}) =>{
     }
 }
 
+Ebk.Matrix.adj = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,22,24,25]]}) =>{
+
+    let info =`matrix has to be defined. eg ={ matrix:[[3,1],[5,3]]}`;
+
+    if(!Ebk.isObject(params)){
+        console.error(info);
+        return null;
+    } else {
+
+        if((!Ebk.isInObject(`matrix`, params))){  
+            console.error(info);
+            return null;
+
+       } else {
+
+            if((!Ebk.isMatrixOfNumbers(params.matrix))){
+                console.error(info);
+                return null;
+            } else {
+        
+
+                let result = [];
+
+                for(let row = 0;row<params.matrix.length; row++){
+                    let colValues = [];
+                    for(let col = 0;col<params.matrix.length; col++){
+
+                       colValues.push( params.matrix[col][row]);
+             
+                    }
+
+                    result.push(colValues);
+                   
+                }
+                
+      
+               
+               return result;
+          
+            }
+       }
+  
+    }
+
+}
 
 Ebk.Matrix.determinant = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,22,24,25]]}) =>{
 
@@ -896,7 +1011,7 @@ Ebk.Matrix.determinant = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,1
         return null;
     } else {
 
-        if((!Ebk.isInObject(`matrix`, params))||(!Ebk.isInObject(`headNdx`, params))){  
+        if((!Ebk.isInObject(`matrix`, params))){  
             console.error(info);
             return null;
 
@@ -920,7 +1035,7 @@ Ebk.Matrix.determinant = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,1
                       
                         for(let vecNdx =0;vecNdx< mat.length;vecNdx++) {
             
-                            result.push(  Math.pow(-1,vecNdx)*mat[vecNdx][0]*obj.det(Ebk.Matrix.subMatrix({matrix:mat, headNdx:vecNdx})));
+                            result.push(  Math.pow(-1,vecNdx)*mat[vecNdx][0]*obj.det(Ebk.Matrix.subHeadMatrix({matrix:mat, headNdx:vecNdx})));
                         }
             
                         result.forEach(value =>{
@@ -930,7 +1045,7 @@ Ebk.Matrix.determinant = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,1
                         return sum ;
                                      
                     }
-                    else {
+                    else if(mat.length ==2) {
             
                         return  mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0];
             
@@ -955,7 +1070,7 @@ Ebk.Matrix.inverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15
         return null;
     } else {
 
-        if((!Ebk.isInObject(`matrix`, params))||(!Ebk.isInObject(`headNdx`, params))){  
+        if((!Ebk.isInObject(`matrix`, params))){  
             console.error(info);
             return null;
 
@@ -977,11 +1092,21 @@ Ebk.Matrix.inverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15
                     
                     let result = [];
 
-                    subMatrices.forEach((matrix,matrixNdx)=>{
-                        result.push((1/det)*Ebk.Matrix.determinant({matrix:matrix}));
+                    for(let col = 0;col<subMatrices.length; col++){
+                        let colValues = [];
+                        for(let row = 0;row<subMatrices.length; row++){
 
-                    });
-                    return subMatrices;
+                           colValues.push( Math.pow(-1,col+row)*(1/det) * Ebk.Matrix.determinant( {matrix:  Ebk.Matrix.adj({matrix:subMatrices[col][row]})  }));
+                 
+                        }
+
+                        result.push(colValues);
+                       
+                    }
+                    
+
+
+                    return result;
                 }
           
             }
@@ -991,11 +1116,20 @@ Ebk.Matrix.inverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15
 
 }
 
+
+Ebk.Matrix.testInverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,22,24,25]]}) =>{
+    let matrix = params.matrix; 
+    let inverse = Ebk.Matrix.inverse({matrix:params.matrix});
+    return { matrix, inverse, 
+            text1: Ebk.Matrix.multMatrices({matrices:[matrix,inverse]}),  text2: Ebk.Matrix.multMatrices({matrices:[matrix,inverse]})   }
+}
+
+
  Ebk.Matrix.determinant1 = ( ) =>{
-   // let matrix =[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,22,24,25]]
+   let matrix =[[16,17,18],[1,2,3],[6,7,8] ]
    // let matrix =[[-2,-1,2],[2,1,0],[-3,3,-1]]
     //let matrix =[[2,-1,2],[5,2,1],[0,3,-2]]
-    let matrix = [[1,2,-1,2],[ 0,5,2,1],[4,0,3,-2],[-6,3,5,3]]; //  [[1,2,8],[6,7,9],[4,3,5]]
+  //  let matrix = [[1,2,-1,2],[ 0,5,2,1],[4,0,3,-2],[-6,3,5,3]]; //  [[1,2,8],[6,7,9],[4,3,5]]
     //let matrix = [[2,0,0,0],[1,-1,0,0],[0,0,2,0 ],[-3,1,-5,1]]; //  [[1,2,8],[6,7,9],[4,3,5]]
 
 
@@ -1008,13 +1142,13 @@ Ebk.Matrix.inverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15
          let result =[] 
          let sum = 0; 
         
-        if(mat.length > 2 ) {
+        if(mat.length >=  3) {
             
           
             
             for(let vecNdx =0;vecNdx< mat.length;vecNdx++) {
 
-                result.push(  Math.pow(-1,vecNdx)*mat[vecNdx][0]*obj.det(Ebk.Matrix.subMatrix({matrix:mat, headNdx:vecNdx})));
+                result.push(  Math.pow(-1,vecNdx)*mat[vecNdx][0]*obj.det(Ebk.Matrix.subHeadMatrix({matrix:mat, headNdx:vecNdx})));
             }
 
             result.forEach(value =>{
@@ -1025,7 +1159,7 @@ Ebk.Matrix.inverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15
             return sum ;
                          
         }
-        else if (mat.length == 2)  {
+        else   {
 
             return  mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0];
 
@@ -1043,7 +1177,7 @@ Ebk.Matrix.inverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15
 Ebk.Matrix.test = (params ={range:[0.,1.]})=>{
 
     Object.keys(Ebk.Matrix).forEach(key =>{
-        if((key !==`tests`)&&(key !==`test`)&&(key !==`arrGetSubarray`)  )     {
+        if((key !==`tests`)&&(key !==`test`)&&(key !==`arrGetSubarray`)&&(key !==`arrGetSubarrayWithoutIndex`))   {
           console.log(key, `:` ,Ebk.Matrix[key](params));
         }
 
