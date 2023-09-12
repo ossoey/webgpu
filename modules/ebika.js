@@ -87,6 +87,51 @@ Ebk.isInObject = (prop,obj) =>{
 }
 
 
+Ebk.getPublicMethodOfClass  =(instance) => {
+    const prototype = Object.getPrototypeOf(instance);
+    const methodNames = Object.getOwnPropertyNames(prototype);
+  
+    return methodNames.filter((methodName) => {
+      const method = prototype[methodName];
+      return typeof method === "function" && method !== "constructor";
+    });
+}
+
+Ebk.ObjectInstance = {};
+
+Ebk.ObjectInstance.test = (className,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
+
+    let classInstance = new className(params);
+    let allFunctions = Ebk.getPublicMethodOfClass(classInstance);
+   
+    allFunctions.forEach(func =>{
+     
+        if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params));
+        
+    });
+
+}
+
+Ebk.ObjectInstance.tests = (className, paramsTestOptions =[
+                  
+    {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:-0.3},
+   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:10.58},
+   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.11},
+   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.2},
+   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.85},
+   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.92},
+   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.98},
+   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,1,10]],target:0.62},
+
+])=>{
+paramsTestOptions.forEach((item,ndx)=>{
+console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
+console.log(`params:`, item);
+Ebk.ObjectInstance.test(className, item);
+});
+}
+
+
 /////// Ebk.Rand 
 
 Ebk.Rand = {};
@@ -1405,36 +1450,13 @@ Ebk.Trajectory = class EbkTrajectory{
 Ebk.TrajectoryTests = {};
 
 Ebk.TrajectoryTests.test = (params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
-
-    function getPublicMethods(instance) {
-        const prototype = Object.getPrototypeOf(instance);
-        const methodNames = Object.getOwnPropertyNames(prototype);
-      
-        return methodNames.filter((methodName) => {
-          const method = prototype[methodName];
-          return typeof method === "function" && method !== "constructor";
-        });
-    }
-
-
-
-    let traj = new Ebk.Trajectory(params);
-
-
-    let allFunctions = getPublicMethods(traj);
    
-    allFunctions.forEach(func =>{
-     
-        if (!(func===  "constructor"))console.log(func, `:`,  traj[func](params));
-        
-    });
-
- 
+    Ebk.ObjectInstance.test( Ebk.Trajectory,params);
 }
 
 Ebk.TrajectoryTests.tests = (paramsTestOptions =[
                   
-                    {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:-0.3},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:-0.3},
                    {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:10.58},
                    {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.11},
                    {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.2},
@@ -1442,19 +1464,76 @@ Ebk.TrajectoryTests.tests = (paramsTestOptions =[
                    {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.92},
                    {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.98},
                    {path:[[1,2,3],[-2,2,3],[5,1,6],[0,1,10]],target:0.62},
-                   
-                   
-
-                   
-            
+                
            ])=>{
-     paramsTestOptions.forEach((item,ndx)=>{
-        console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
-        console.log(`params:`, item);
-        Ebk.TrajectoryTests.test(item);
-    });
+
+  
+    Ebk.ObjectInstance.tests(Ebk.Trajectory,paramsTestOptions );
+ 
 }
 
+Ebk.Cadence = class EbkCadenceElementary{
+    #params;
+    #infos;
+    constructor(params ={accent:{}, granularity:10}){
+
+        this.#params = params;
+        this._update( this.#params);
+
+    }
+
+    _update(params ={accent:{}, granularity:10}){
+        let info =`accent and  granularity have to be defined. eg {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}`;
+
+      
+    }
+
+ 
+    #computeInfos(){
+ 
+    }
+
+    locate(params ={step:1}){
+
+        let info =`step has to be defined . eg {step: 1} is`;
+
+  
+    
+    }
+
+    _updateAndLocate(params ={accent:{}, granularity:10,step:1}){
+        this._update(params);
+        return this.locate(params);
+    }
+
+    
+};
+
+
+Ebk.CadenceTests = {};
+
+Ebk.CadenceTests.test = (params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
+   
+    Ebk.ObjectInstance.test( Ebk.Trajectory,params);
+}
+
+Ebk.CadenceTests.tests = (paramsTestOptions =[
+                  
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:-0.3},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:10.58},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.11},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.2},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.85},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.92},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.98},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,1,10]],target:0.62},
+                
+           ])=>{
+
+  
+    Ebk.ObjectInstance.tests(Ebk.Trajectory,paramsTestOptions );
+ 
+}
 
 
 
