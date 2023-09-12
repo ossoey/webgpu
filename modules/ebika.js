@@ -3,7 +3,7 @@
 //    About Us page for Ossoey  website  
 
 //    Authored by ebanga@ossoey.com/ebanga@hotmail.com  
-
+ 
 const Ebk = {};
 
 Ebk.isNumber = (value) =>{
@@ -74,6 +74,7 @@ Ebk.isMatrixClusterOfNumbers = (cluster) =>{
   
   return isAllNumber;
 }   
+
 
 Ebk.isObject = (value) =>{
     if  ((value instanceof Object && value !== null)) return true
@@ -440,6 +441,15 @@ Ebk.Rand.tests = (paramsTestOptions =[
 /////// Ebk.Matrix 
 
 Ebk.Matrix = {};
+
+Ebk.Matrix.arrLoadElementNtimes =(elt,times) => {
+    let arr = [];
+
+     for(let i=0;i<times; i++){
+        arr.push(elt);
+     }
+    return      arr;
+}
 
 Ebk.Matrix.arrGetSubarray =(arr = [1,2,3,4,5,6,7,8,9], fromIndex = 2, toIndex = 5 ) => {
     return      arr.slice(fromIndex, toIndex+1);
@@ -1247,34 +1257,12 @@ Ebk.Matrix.tests = (paramsTestOptions =[
 /////// Ebk.Trajectory
 
 Ebk.Trajectory = class EbkTrajectory{
-    #path;
-    #target;
+    #params;
+    #infos;
     constructor(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}){
 
-        let info =`path has to be defined. eg {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}`;
-
-        if(!Ebk.isObject(params)){
-            console.error(info);
-            return null;
-        } else {
-           if((!Ebk.isInObject(`path`, params))){  
-                console.error(info);
-                return null;
-    
-           } else {
-    
-                if((!Ebk.isMatrixOfNumbers(params.path))){
-                    console.error(info);
-                    return null;
-                } else {
-                        
-                    this.#path= params.path;
-                
-                }
-            
-
-           } 
-        }
+        this.#params = params;
+        this._update( this.#params);
 
     }
 
@@ -1295,7 +1283,9 @@ Ebk.Trajectory = class EbkTrajectory{
                     console.error(info);
                     return null;
                 } else {
-                    this.#path= params.path;   
+                    this.#params = params;
+                    this.#computeInfos();
+                    
                 }
             
 
@@ -1303,16 +1293,170 @@ Ebk.Trajectory = class EbkTrajectory{
         }
     }
 
-    _updateAndLocate(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3}){
+    #computeDistances(){
+        this.#infos = {};
+        this.#infos.distances = [];
+        this.#infos.distances.push( 0);
+        this.#infos.cumulativeDistances = [];
+        this.#infos.cumulativeDistances.push( 0);
+        let cumulativeDistance = 0;
+        this.#params.path.forEach((item,ndx)=>{
+            if (ndx >0){
+                let distance = Ebk.Matrix.distance({v1:this.#params.path[ndx-1],v2:this.#params.path[ndx]});
+                this.#infos.distances.push( distance );
+                cumulativeDistance+= distance;
+                this.#infos.cumulativeDistances.push(cumulativeDistance);
+            }
+        });
+    }
+
+    #computeRatios(){
+        
+        this.#infos.ratios = [];
+        this.#infos.cumulativeDistances.forEach((item,ndx)=>{
+      
+                this.#infos.ratios.push(  this.#infos.cumulativeDistances[ndx] /this.#infos.cumulativeDistances[this.#infos.cumulativeDistances.length-1]);
+         
+        });
+    }
+
+    #computeInfos(){
+        this.#computeDistances();
+        this.#computeRatios();  
+    }
+
+    #locateInterval(params ={target:0.3}){
+
+
+       if (params.target<= this.#infos.ratios[0]){
+         return [0,0];
+       } else  if (params.target>= this.#infos.ratios[this.#infos.ratios.length-1]){
+         return [this.#infos.ratios.length-1,this.#infos.ratios.length-1];
+       } else {
+     
+            let intervalNdx = 1;
+            while( (params.target > this.#infos.ratios[intervalNdx])){
+
+               intervalNdx++;
+            }    
+
+            return [intervalNdx-1,intervalNdx];
+        }
+    }
+
+    #locateIntervalRatio(target,interval=[0,1]){
+
+        let targetRatioSize = target -  this.#infos.ratios[interval[0]];
+        
+        return targetRatioSize /(this.#infos.ratios[interval[1]] -this.#infos.ratios[interval[0]])
+ 
+     }
+ 
+     locate(params ={target:0.3}){
+
+        let info =`target has to be defined . eg {target: 0.4}`;
+
+        if(!Ebk.isObject(params)){
+            console.error(info);
+            return null;
+        } else {
+           if((!Ebk.isInObject(`target`, params))){  
+                console.error(info);
+                return null;
+    
+           } else {
+    
+                if((!Ebk.isNumber(params.target))){
+                    console.error(info);
+                    return null;
+                } else {
+                       
+                  let interval =   this.#locateInterval(params);
+
+                  if (interval[0] == interval[1]){
+                     return this.#params.path[interval[1]];
+                  } else {
+                    
+                       let intervalVector =  Ebk.Matrix.vector({v1:this.#params.path[interval[0] ],v2:this.#params.path[interval[1]]});
+                       let intervalVectorScaled = Ebk.Matrix.vectScale({v:intervalVector,scalar:this.#locateIntervalRatio(params.target,interval), interval });
+                       this.position = Ebk.Matrix.vectAdd({v1:this.#params.path[interval[0]],v2:intervalVectorScaled});
+                     return     this.position;
+
+                  }
+   
+                }
+            
+           } 
+        }
     
     }
 
-    locate(params ={target:0.3}){
-    
+    _updateAndLocate(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3}){
+        this._update(params);
+        return this.locate(params);
     }
-   
+
+
+
+
     
 };
+
+Ebk.TrajectoryTests = {};
+
+Ebk.TrajectoryTests.test = (params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
+
+    function getPublicMethods(instance) {
+        const prototype = Object.getPrototypeOf(instance);
+        const methodNames = Object.getOwnPropertyNames(prototype);
+      
+        return methodNames.filter((methodName) => {
+          const method = prototype[methodName];
+          return typeof method === "function" && method !== "constructor";
+        });
+    }
+
+
+
+    let traj = new Ebk.Trajectory(params);
+
+
+    let allFunctions = getPublicMethods(traj);
+   
+    allFunctions.forEach(func =>{
+     
+        if (!(func===  "constructor"))console.log(func, `:`,  traj[func](params));
+        
+    });
+
+ 
+}
+
+Ebk.TrajectoryTests.tests = (paramsTestOptions =[
+                  
+                    {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:-0.3},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:10.58},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.11},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.2},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.85},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.92},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.98},
+                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,1,10]],target:0.62},
+                   
+                   
+
+                   
+            
+           ])=>{
+     paramsTestOptions.forEach((item,ndx)=>{
+        console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
+        console.log(`params:`, item);
+        Ebk.TrajectoryTests.test(item);
+    });
+}
+
+
+
 
 export {Ebk}
 export default Ebk;
