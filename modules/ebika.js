@@ -1306,9 +1306,7 @@ Ebk.Trajectory = class EbkTrajectory{
     #infos;
     constructor(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}){
 
-        this.#params = params;
-        this._update( this.#params);
-
+        this._update(  params);
     }
 
     _update(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}){
@@ -1332,9 +1330,7 @@ Ebk.Trajectory = class EbkTrajectory{
                     this.#computeInfos();
                     
                 }
-            
-
-           } 
+             } 
         }
     }
 
@@ -1441,9 +1437,6 @@ Ebk.Trajectory = class EbkTrajectory{
         return this.locate(params);
     }
 
-
-
-
     
 };
 
@@ -1472,66 +1465,119 @@ Ebk.TrajectoryTests.tests = (paramsTestOptions =[
  
 }
 
-Ebk.Cadence = class EbkCadenceElementary{
+Ebk.Rythm = class EbkRythm {
     #params;
     #infos;
-    constructor(params ={accent:{}, granularity:10}){
+    constructor(params ={type:{domain:[1,5], motion:(x)=>{return 2*x;},codomain:[2,10]}, granularity:10}){
 
-        this.#params = params;
-        this._update( this.#params);
-
+        this._update(params);
     }
 
-    _update(params ={accent:{}, granularity:10}){
-        let info =`accent and  granularity have to be defined. eg {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}`;
+    _update(params ={type:{domain:[1,10], motion:(x)=>{return 2*x;}}, granularity:10}){
+        let info =`type and granularity have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10}`;
 
+        if(!Ebk.isObject(params)){
+            console.error(info);
+            return null;
+        } else {
+
+            if ((!(this.isTypeRight(params.type)))||(!(Ebk.isInObject('granularity',params)))){
+                console.error(info);
+                return null;
+            } else{
+                if(!(Ebk.isNumber(params.granularity))){
+                    console.error(info);
+                    return null;
+                } else {
+                    this.#params = params;
+                    this.#infos = {};
+                    return true;
+                }
+
+            }
+   
+        }
+    }
+  
+    isTypeRight(type={domain:[1,10], motion:(x)=>{return 2*x;}}){
       
+        if(!Ebk.isObject(type)){    
+            return false;
+        } else {
+            if ((!(Ebk.isInObject('domain',type)))||(!(Ebk.isInObject('motion',type)))){         
+                return false;
+            } else {
+                if ((!(Ebk.isArrayOfNumbers(type.domain)))||(!( typeof type.motion ==='function'))){
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+    }
+    
+
+    #computeDomainEntry(params ={step:1}){
+       
     }
 
- 
     #computeInfos(){
- 
+        this.#infos
     }
 
     locate(params ={step:1}){
 
-        let info =`step has to be defined . eg {step: 1} is`;
+        let info =`step has to be defined . eg {step: 1}`;
 
-  
-    
+        if(!Ebk.isObject(params)){    
+            console.error(info);
+            return null;
+        } else {
+            if (!(Ebk.isInObject('step',params))){         
+                console.error(info);
+                return null;
+            } else {
+                if (!(Ebk.isNumber(params.step))){         
+                    console.error(info);
+                    return null;
+                } else {
+
+
+                }
+            }
+        }    
     }
 
-    _updateAndLocate(params ={accent:{}, granularity:10,step:1}){
+    _updateAndLocate(params ={step:1}){
         this._update(params);
         return this.locate(params);
     }
 
-    
+    locateInSample(params ={step:1}){
+
+        let info =`step has to be defined . eg {step: 1}`;
+    }
+
+    _updateAndLocateInSample(params ={step:1}){
+        this._update(params);
+        return this.locateInSample(params);
+    }
+
 };
 
 
-Ebk.CadenceTests = {};
+Ebk.RythmTests = {};
 
-Ebk.CadenceTests.test = (params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
-   
-    Ebk.ObjectInstance.test( Ebk.Trajectory,params);
-}
 
-Ebk.CadenceTests.tests = (paramsTestOptions =[
+Ebk.RythmTests.tests = (paramsTestOptions =[
                   
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:-0.3},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:10.58},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.11},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.2},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.85},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.92},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.98},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,1,10]],target:0.62},
+              {type:{domain:[1,5], motion:(x)=>{return 2*x;},codomain:[2,10]}, granularity:10,sample: [0,1]},
+              {type:{domain:[1,5], motion:(x)=>{return 2*x;},codomain:[2,10]}, granularity:10,sample: [-7,20]},
                 
            ])=>{
 
   
-    Ebk.ObjectInstance.tests(Ebk.Trajectory,paramsTestOptions );
+    Ebk.ObjectInstance.tests(Ebk.Rythm,paramsTestOptions );
  
 }
 
