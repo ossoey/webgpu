@@ -1763,7 +1763,7 @@ let functions_entries = [
 
        // Ebk.TrajectoryTests.tests();
 
-        Ebk.RythmTests.tests();
+       Ebk.Rythm.linearTests();
          // console.log(Ebk.Rand.fRanges() );
 
           
