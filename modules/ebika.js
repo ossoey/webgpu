@@ -1462,18 +1462,21 @@ Ebk.TrajectoryTests.tests = (paramsTestOptions =[
 
   
     Ebk.ObjectInstance.tests(Ebk.Trajectory,paramsTestOptions );
- 
 }
 
-Ebk.Rythm = class EbkRythm {
+Ebk.Rythm = {};
+
+ 
+
+Ebk.Rythm.linear = class EbkRythm {
     #params;
     #infos;
-    constructor(params ={type:{domain:[1,5], motion:(x)=>{return 2*x;},codomain:[2,10]}, granularity:10}){
+    constructor(params ={flow:(x)=>{return 2*x; }, granularity:10}){
 
         this._update(params);
     }
 
-    _update(params ={type:{domain:[1,10], motion:(x)=>{return 2*x;}}, granularity:10}){
+    _update(params ={flow:(x)=>{return 2*x; }, granularity:10}){
         let info =`type and granularity have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10}`;
 
         if(!Ebk.isObject(params)){
@@ -1481,7 +1484,7 @@ Ebk.Rythm = class EbkRythm {
             return null;
         } else {
 
-            if ((!(this.isTypeRight(params.type)))||(!(Ebk.isInObject('granularity',params)))){
+            if ((!(this.isflowRight(params.flow)))||(!(Ebk.isInObject('granularity',params)))){
                 console.error(info);
                 return null;
             } else{
@@ -1491,6 +1494,8 @@ Ebk.Rythm = class EbkRythm {
                 } else {
                     this.#params = params;
                     this.#infos = {};
+                    this.#infos.domain = [1,0];
+                    this.#infos.codomain = [this.#params.flow(this.#infos.domain[0]),this.#params.flow(this.#infos.domain[1])];
                     return true;
                 }
 
@@ -1499,26 +1504,30 @@ Ebk.Rythm = class EbkRythm {
         }
     }
   
-    isTypeRight(type={domain:[1,10], motion:(x)=>{return 2*x;}}){
+
+    isflowRight(flow =(x)=>{return 2*x }){
       
-        if(!Ebk.isObject(type)){    
+        if ((!( typeof flow ==='function'))){
             return false;
         } else {
-            if ((!(Ebk.isInObject('domain',type)))||(!(Ebk.isInObject('motion',type)))){         
-                return false;
-            } else {
-                if ((!(Ebk.isArrayOfNumbers(type.domain)))||(!( typeof type.motion ==='function'))){
-                    return false;
-                } else {
-                    return true;
-                }
-            }
+            return true;
         }
-    }
+     }
     
+    
+    #computeEntry(params ={step:1}){
+        
+       return ((this.#infos.domain[1] - this.#infos.domain[0])/this.#params.granularity)*params.step+this.#infos.domain [0];
+    }
 
-    #computeDomainEntry(params ={step:1}){
-       
+    #computeImage(params ={step:1}){
+    
+        return this.#params.flow(this.#computeEntry({step:params.step}));
+    }
+
+    #computeNormalizedImage(params = {step:1}){
+
+        return   Math.abs( (this.#computeImage({step:params.step}) - this.#computeImage({step:0}))/(this.#computeImage({step:this.#params.granularity}) - this.#computeImage({step:0})));
     }
 
     #computeInfos(){
@@ -1541,11 +1550,21 @@ Ebk.Rythm = class EbkRythm {
                     console.error(info);
                     return null;
                 } else {
-
-
+                    this.position = this.#computeNormalizedImage(params);
+                    return   this.position;
                 }
             }
         }    
+    }
+
+    locateCollection(){
+        let arr = [];
+
+        for(let i=0;i<=this.#params.granularity;i++){
+            arr.push(this.locate({step:i}));
+        }
+
+        return arr;
     }
 
     _updateAndLocate(params ={step:1}){
@@ -1553,31 +1572,84 @@ Ebk.Rythm = class EbkRythm {
         return this.locate(params);
     }
 
-    locateInSample(params ={step:1}){
-
-        let info =`step has to be defined . eg {step: 1}`;
-    }
-
-    _updateAndLocateInSample(params ={step:1}){
+    _updateAndLocateCollection(params){
         this._update(params);
-        return this.locateInSample(params);
+        let arr = [];
+
+        for(let i=0;i<=this.#params.granularity;i++){
+            arr.push(this.locate({step:i}));
+        }
+
+        return arr;
     }
+
+    locateAt(params ={step:1,sample: [10,-20]}){
+
+        let info =`step and sample have to be defined . eg {step: 1,sample: [10,-20]}`;
+
+        if(!Ebk.isObject(params)){    
+            console.error(info);
+            return null;
+        } else {
+            if ((!(Ebk.isInObject('step',params)))||(!(Ebk.isInObject('sample',params)))){         
+                console.error(info);
+                return null;
+            } else {
+                if ((!(Ebk.isNumber(params.step)))|| (!(Ebk.isArrayOfNumbers(params.sample)))){         
+                    console.error(info);
+                    return null;
+                } else {
+                    this.position = this.locate(params)*(params.sample[1]-params.sample[0])+params.sample[0];
+                    return   this.position;
+                }
+            }
+        }    
+
+    }
+
+    _updateAndLocateAt(params ={step:1,sample: [10,-20]}){
+        this._update(params);
+        return this.locateAt(params);
+    }
+
+    locateCollectionAt(params={sample:[-20,10]}){
+        let arr = [];
+
+        for(let i=0;i<=this.#params.granularity;i++){
+            arr.push(this.locateAt({step:i,sample: params.sample}));
+        }
+
+        return arr;
+    }
+
+    _updateLocateCollectionAt(params={flow:(x)=>{return  Math.pow(2,x)  }, granularity:500,step:3,sample:[100,200]}){
+        this._update(params);
+        let arr = [];
+
+        for(let i=0;i<=this.#params.granularity;i++){
+            arr.push(this.locateAt({step:i,sample: params.sample}));
+        }
+
+        return arr;
+    }
+
+
+    
+    
 
 };
 
 
-Ebk.RythmTests = {};
-
-
-Ebk.RythmTests.tests = (paramsTestOptions =[
-                  
-              {type:{domain:[1,5], motion:(x)=>{return 2*x;},codomain:[2,10]}, granularity:10,sample: [0,1]},
-              {type:{domain:[1,5], motion:(x)=>{return 2*x;},codomain:[2,10]}, granularity:10,sample: [-7,20]},
+Ebk.Rythm.linearTests = (paramsTestOptions =[
+    
+                {flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10]},
+                {flow:(x)=>{return 3*x; }, granularity:10,step:3,sample:[100,200]},
+                {flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1]},
                 
            ])=>{
 
   
-    Ebk.ObjectInstance.tests(Ebk.Rythm,paramsTestOptions );
+    Ebk.ObjectInstance.tests(Ebk.Rythm.linear,paramsTestOptions );
  
 }
 
