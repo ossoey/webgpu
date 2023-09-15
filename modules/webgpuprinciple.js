@@ -1743,6 +1743,8 @@ let functions_entries = [
  
         obj.func = async () =>{
 
+        //  Ebk.Rand.tests();
+
     //       Ebk.Matrix.tests([{ matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2], headNdx :0,
     //       matrices:[ [[-3,-3,3],[0,-2,3],[0,-4,1]], [[-2,-3,2],[0,2,3],[-2,4,-4]]]
     //      },
@@ -1763,8 +1765,14 @@ let functions_entries = [
 
        // Ebk.TrajectoryTests.tests();
 
-       Ebk.Rythm.linearTests();
-         // console.log(Ebk.Rand.fRanges() );
+       Ebk.ERythm.WavyTests([
+          {flow:(x)=>{return   Math.sin( x); }, granularity:10,step:3,sample:[1,100],messy:[0,0]},
+          {flow:(x)=>{return   Math.cos(x);}, granularity:10,step:3,sample:[1,100],messy:[0,0]},
+          {flow:(x)=>{return   Math.sin(x);}, granularity:10,step:3,sample:[1,100],messy:[0.8,0.89]},
+          {flow:(x)=>{return   Math.tan(x);}, granularity:10,step:3,sample:[1,100],messy:[0.8,0.89]},
+         ]);
+        
+       //  Ebk.ERythm.WavyTests
 
           
           
