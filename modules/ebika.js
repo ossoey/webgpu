@@ -97,6 +97,9 @@ Ebk.getPublicMethodOfClass  =(instance) => {
     });
 }
 
+
+
+
 Ebk.ObjectInstance = {};
 
 Ebk.ObjectInstance.test = (className,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
@@ -1464,37 +1467,38 @@ Ebk.TrajectoryTests.tests = (paramsTestOptions =[
     Ebk.ObjectInstance.tests(Ebk.Trajectory,paramsTestOptions );
 }
 
-Ebk.Rythm = {};
+Ebk.ERythm = {};
 
  
-
-Ebk.Rythm.linear = class EbkRythm {
+Ebk.ERythm.Linear = class EbkERythmLinear {
     #params;
     #infos;
-    constructor(params ={flow:(x)=>{return 2*x; }, granularity:10}){
+    constructor(params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}){
 
         this._update(params);
     }
 
-    _update(params ={flow:(x)=>{return 2*x; }, granularity:10}){
-        let info =`type and granularity have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10}`;
+    
+
+    _update(params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}){
+        let info =`type, granularity and messy have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10,messy:[-1,1]}`;
 
         if(!Ebk.isObject(params)){
             console.error(info);
             return null;
         } else {
 
-            if ((!(this.isflowRight(params.flow)))||(!(Ebk.isInObject('granularity',params)))){
+            if ((!(this.isflowRight(params.flow)))||(!(Ebk.isInObject('granularity',params)))||(!(Ebk.isInObject('messy',params)))){
                 console.error(info);
                 return null;
             } else{
-                if(!(Ebk.isNumber(params.granularity))){
+                if((!(Ebk.isNumber(params.granularity)))||(!(Ebk.isArrayOfNumbers(params.messy)))){
                     console.error(info);
                     return null;
                 } else {
                     this.#params = params;
                     this.#infos = {};
-                    this.#infos.domain = [1,0];
+                    this.#infos.domain = [1,10];
                     this.#infos.codomain = [this.#params.flow(this.#infos.domain[0]),this.#params.flow(this.#infos.domain[1])];
                     return true;
                 }
@@ -1521,8 +1525,24 @@ Ebk.Rythm.linear = class EbkRythm {
     }
 
     #computeImage(params ={step:1}){
+
+
+        if ((params.step == 0)||(params.step == this.#params.granularity)){
+            return this.#params.flow(this.#computeEntry({step:params.step}));
+        } else {
+            let prev = this.#params.flow(this.#computeEntry({step:(params.step-1)}));
+            let current = this.#params.flow(this.#computeEntry({step:params.step}));
+            
+            let next = this.#params.flow(this.#computeEntry({step:(params.step+1)}));
+            
+            let messyMin =  ((current+prev) /2);
+            let messyMax =  ((current+next) /2);
+
+            
+            return Ebk.Rand.fRange({range:[messyMin, messyMax],clamp:[(this.#params.messy[0]+1)/2,(this.#params.messy[1]+1)/2]})
+        }
     
-        return this.#params.flow(this.#computeEntry({step:params.step}));
+        
     }
 
     #computeNormalizedImage(params = {step:1}){
@@ -1530,9 +1550,6 @@ Ebk.Rythm.linear = class EbkRythm {
         return   Math.abs( (this.#computeImage({step:params.step}) - this.#computeImage({step:0}))/(this.#computeImage({step:this.#params.granularity}) - this.#computeImage({step:0})));
     }
 
-    #computeInfos(){
-        this.#infos
-    }
 
     locate(params ={step:1}){
 
@@ -1640,18 +1657,226 @@ Ebk.Rythm.linear = class EbkRythm {
 };
 
 
-Ebk.Rythm.linearTests = (paramsTestOptions =[
+Ebk.ERythm.LinearTests = (paramsTestOptions =[
     
-                {flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10]},
-                {flow:(x)=>{return 3*x; }, granularity:10,step:3,sample:[100,200]},
-                {flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1]},
+                {flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]},
+                {flow:(x)=>{return 3*x; }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
+                {flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1],messy:[0,1]},
+                {flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1],messy:[-1,-1]},
+                {flow:(x)=>{return  Math.pow(2,1/(x+1))  }, granularity:13,step:3,sample:[-1,1],messy:[-1,-1]},
                 
            ])=>{
 
   
-    Ebk.ObjectInstance.tests(Ebk.Rythm.linear,paramsTestOptions );
+    Ebk.ObjectInstance.tests(Ebk.ERythm.Linear,paramsTestOptions );
  
 }
+
+ 
+Ebk.ERythm.Wavy = class EbkERythmWavy {
+    #params;
+    #infos;
+    constructor(params ={flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
+
+        this._update(params);
+    }
+
+    
+
+    _update(params ={flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
+        let info =`type, granularity and messy have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10,messy:[-1,1]}`;
+
+        if(!Ebk.isObject(params)){
+            console.error(info);
+            return null;
+        } else {
+
+            if ((!(this.isflowRight(params.flow)))||(!(Ebk.isInObject('granularity',params)))||(!(Ebk.isInObject('messy',params)))){
+                console.error(info);
+                return null;
+            } else{
+                if((!(Ebk.isNumber(params.granularity)))||(!(Ebk.isArrayOfNumbers(params.messy)))){
+                    console.error(info);
+                    return null;
+                } else {
+                    this.#params = params;
+                    this.#infos = {};
+                    this.#infos.domain = [0,2*Math.PI];
+                    this.#infos.codomain = [1,-1];
+                    return true;
+                }
+
+            }
+   
+        }
+    }
+  
+
+    isflowRight(flow =(x)=>{return 2*x }){
+      
+        if ((!( typeof flow ==='function'))){
+            return false;
+        } else {
+            return true;
+        }
+     }
+    
+    
+    #computeEntry(params ={step:1}){
+        
+       return ((this.#infos.domain[1] - this.#infos.domain[0])/this.#params.granularity)*params.step+this.#infos.domain [0];
+    }
+
+    #computeImage(params ={step:1}){
+
+
+        if ((params.step == 0)||(params.step == this.#params.granularity)){
+            return this.#params.flow(this.#computeEntry({step:params.step}));
+        } else {
+            let prev = this.#params.flow(this.#computeEntry({step:(params.step-1)}));
+            let current = this.#params.flow(this.#computeEntry({step:params.step}));
+            
+            let next = this.#params.flow(this.#computeEntry({step:(params.step+1)}));
+            
+            let messyMin =  ((current+prev) /2);
+            let messyMax =  ((current+next) /2);
+
+            
+            return Ebk.Rand.fRange({range:[messyMin, messyMax],clamp:[(this.#params.messy[0]+1)/2,(this.#params.messy[1]+1)/2]})
+        }
+    
+        
+    }
+
+    #computeNormalizedImage(params = {step:1}){
+
+        return   Math.abs( (this.#computeImage({step:params.step})-1 )/(this.#infos.codomain[1]- this.#infos.codomain[0]));
+    }
+
+   
+
+    locate(params ={step:1}){
+
+        let info =`step has to be defined . eg {step: 1}`;
+
+        if(!Ebk.isObject(params)){    
+            console.error(info);
+            return null;
+        } else {
+            if (!(Ebk.isInObject('step',params))){         
+                console.error(info);
+                return null;
+            } else {
+                if (!(Ebk.isNumber(params.step))){         
+                    console.error(info);
+                    return null;
+                } else {
+                    this.position = this.#computeNormalizedImage(params);
+                    return   this.position;
+                }
+            }
+        }    
+    }
+
+    locateCollection(){
+        let arr = [];
+
+        for(let i=0;i<=this.#params.granularity;i++){
+            arr.push(this.locate({step:i}));
+        }
+
+        return arr;
+    }
+
+    _updateAndLocate(params ={step:1}){
+        this._update(params);
+        return this.locate(params);
+    }
+
+    _updateAndLocateCollection(params){
+        this._update(params);
+        let arr = [];
+
+        for(let i=0;i<=this.#params.granularity;i++){
+            arr.push(this.locate({step:i}));
+        }
+
+        return arr;
+    }
+
+    locateAt(params ={step:1,sample: [10,-20]}){
+
+        let info =`step and sample have to be defined . eg {step: 1,sample: [10,-20]}`;
+
+        if(!Ebk.isObject(params)){    
+            console.error(info);
+            return null;
+        } else {
+            if ((!(Ebk.isInObject('step',params)))||(!(Ebk.isInObject('sample',params)))){         
+                console.error(info);
+                return null;
+            } else {
+                if ((!(Ebk.isNumber(params.step)))|| (!(Ebk.isArrayOfNumbers(params.sample)))){         
+                    console.error(info);
+                    return null;
+                } else {
+                    this.position = this.locate(params)*(params.sample[1]-params.sample[0])+params.sample[0];
+                    return   this.position;
+                }
+            }
+        }    
+
+    }
+
+    _updateAndLocateAt(params ={step:1,sample: [10,-20]}){
+        this._update(params);
+        return this.locateAt(params);
+    }
+
+    locateCollectionAt(params={sample:[-20,10]}){
+        let arr = [];
+
+        for(let i=0;i<=this.#params.granularity;i++){
+            arr.push(this.locateAt({step:i,sample: params.sample}));
+        }
+
+        return arr;
+    }
+
+    _updateLocateCollectionAt(params={flow:(x)=>{return  Math.pow(2,x)  }, granularity:500,step:3,sample:[100,200]}){
+        this._update(params);
+        let arr = [];
+
+        for(let i=0;i<=this.#params.granularity;i++){
+            arr.push(this.locateAt({step:i,sample: params.sample}));
+        }
+
+        return arr;
+    }
+
+
+    
+    
+
+};
+
+
+Ebk.ERythm.WavyTests = (paramsTestOptions =[
+    
+                {flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]},
+                {flow:(x)=>{return Math.sin(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
+
+                
+           ])=>{
+
+  
+    Ebk.ObjectInstance.tests(Ebk.ERythm.Wavy,paramsTestOptions );
+ 
+}
+
+
+
+
 
 
 
