@@ -1765,17 +1765,19 @@ let functions_entries = [
 
        // Ebk.TrajectoryTests.tests();
 
-       Ebk.ERythm.WavyTests([
-          {flow:(x)=>{return   Math.sin( x); }, granularity:10,step:3,sample:[1,100],messy:[0,0]},
-          {flow:(x)=>{return   Math.cos(x);}, granularity:10,step:3,sample:[1,100],messy:[0,0]},
-          {flow:(x)=>{return   Math.sin(x);}, granularity:10,step:3,sample:[1,100],messy:[0.8,0.89]},
-          {flow:(x)=>{return   Math.tan(x);}, granularity:10,step:3,sample:[1,100],messy:[0.8,0.89]},
-         ]);
+      //  Ebk.ERythm.WavyTests([
+      //     {flow:(x)=>{return   Math.sin( x); }, granularity:10,step:3,sample:[1,100],messy:[0,0]},
+      //     {flow:(x)=>{return   Math.cos(x);}, granularity:10,step:3,sample:[1,100],messy:[0,0]},
+      //     {flow:(x)=>{return   Math.sin(x);}, granularity:10,step:3,sample:[1,100],messy:[0.8,0.89]},
+      //     {flow:(x)=>{return   Math.tan(x);}, granularity:10,step:3,sample:[1,100],messy:[0.8,0.89]},
+      //    ]);
         
        //  Ebk.ERythm.WavyTests
 
-          
-          
+       //Ebk.ERythm.createTests();
+
+       Ebk.RythmTests();
+       
           obj.uiLoad();
 
          
