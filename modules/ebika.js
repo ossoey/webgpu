@@ -135,6 +135,8 @@ Ebk.ObjectInstance.test(className, item);
 }
 
 
+
+
 /////// Ebk.Rand 
 
 Ebk.Rand = {};
@@ -1672,7 +1674,6 @@ Ebk.ERythm.LinearTests = (paramsTestOptions =[
  
 }
 
- 
 Ebk.ERythm.Wavy = class EbkERythmWavy {
     #params;
     #infos;
@@ -1874,9 +1875,109 @@ Ebk.ERythm.WavyTests = (paramsTestOptions =[
  
 }
 
+Ebk.ERythm.TYPE = {};
+Ebk.ERythm.TYPE.LINEAR = `LINEAR`;
+Ebk.ERythm.TYPE.WAVY = `WAVY`;
+
+Ebk.ERythm.create =  (params={ type: Ebk.ERythm.TYPE.LINEAR  ,flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]})=>{
+
+    if (params.type ===  Ebk.ERythm.TYPE.LINEAR){
+
+        return new Ebk.ERythm.Linear(params);
+
+    } else   if (params.type ===  Ebk.ERythm.TYPE.WAVY){
+
+        return new Ebk.ERythm.Wavy(params);
+    }
+}
+
+Ebk.ERythm.createTests =(paramsTestOptions =[
+    
+    {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]},
+    {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
+    {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return Math.pow(3,x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
+    {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.tan(x); }, granularity:10,step:3,sample:[5,25],messy:[0,0]},
+    
+])=>{
+
+    // let typeToClassName = (type)=>{
+    //     if (type ===Ebk.ERythm.TYPE.LINEAR) return Ebk.ERythm.Linear;
+    //     else if (type ===Ebk.ERythm.TYPE.WAVY) return Ebk.ERythm.Wavy;
+    // }
+
+    let test = (instance ,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
+
+        let allFunctions = Ebk.getPublicMethodOfClass(instance);
+       
+        allFunctions.forEach(func =>{
+         
+            if (!(func===  "constructor"))console.log(func, `:`,  instance[func](params));
+            
+        });
+    
+    }
+
+     paramsTestOptions.forEach((item,ndx)=>{
+        let inst = Ebk.ERythm.create(item);
+        console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
+        console.log(`ClassName:`,  inst.constructor.name,`Params`,item,);
+         test(inst, item);
+      });
+   
+}
 
 
+Ebk.Rythm = class EbkRythm {
+    #params;
+    #infos;
+    constructor(params ={type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
 
+        this.#params = params;
+        this.#infos = {};
+        this.#infos.trajectory = new Ebk.Trajectory({path:this.#params.sample});
+        this.#infos.eRythm =  Ebk.ERythm.create(this.#params);
+        
+    }
+
+
+    _update(params ={flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
+        let info =`type, granularity and messy have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10,messy:[-1,1]}`;
+
+ 
+    }
+
+    locate(params ={step:5}){
+
+        let ratio =  this.#infos.eRythm.locate({step:params.step })
+        return  this.#infos.trajectory.locate({target: ratio  });
+    }
+
+    locateCollection(){
+
+        let arr = [];
+        for(let i=0;i<=this.#params.granularity;i++){
+            arr.push( this.locate({step:i}));
+        }
+
+        return arr;
+    }
+
+}  
+
+
+Ebk.RythmTests = (paramsTestOptions =[
+    
+    {type:Ebk.ERythm.TYPE.WAVY, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1], step:0},
+    {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3},
+    {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[2,2,2],[3,3,3],[4,4,4]], flow:(x)=>{return  Math.pow(5,x); }, granularity:3,messy:[-1,1], step:3},
+
+    
+])=>{
+
+
+Ebk.ObjectInstance.tests(Ebk.Rythm,paramsTestOptions );
+
+}
 
 
 
