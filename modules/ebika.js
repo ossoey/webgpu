@@ -75,7 +75,6 @@ Ebk.isMatrixClusterOfNumbers = (cluster) =>{
   return isAllNumber;
 }   
 
-
 Ebk.isObject = (value) =>{
     if  ((value instanceof Object && value !== null)) return true
     else return false;
@@ -85,7 +84,6 @@ Ebk.isInObject = (prop,obj) =>{
     if  (obj.hasOwnProperty(prop)) return true
     else return false;
 }
-
 
 Ebk.getPublicMethodOfClass  =(instance) => {
     const prototype = Object.getPrototypeOf(instance);
@@ -98,20 +96,20 @@ Ebk.getPublicMethodOfClass  =(instance) => {
 }
 
 
-
-
 Ebk.ObjectInstance = {};
 
 Ebk.ObjectInstance.test = (className,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
 
-    let classInstance = new className(params);
-    let allFunctions = Ebk.getPublicMethodOfClass(classInstance);
+ 
+       let classInstance = new className(params);
+       let allFunctions = Ebk.getPublicMethodOfClass(classInstance);
    
-    allFunctions.forEach(func =>{
+       allFunctions.forEach(func =>{
      
         if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params));
         
-    });
+       });
+  
 
 }
 
@@ -133,8 +131,6 @@ console.log(`params:`, item);
 Ebk.ObjectInstance.test(className, item);
 });
 }
-
-
 
 
 /////// Ebk.Rand 
@@ -1469,9 +1465,12 @@ Ebk.TrajectoryTests.tests = (paramsTestOptions =[
     Ebk.ObjectInstance.tests(Ebk.Trajectory,paramsTestOptions );
 }
 
+
+/////// Ebk.ERythm 
+
 Ebk.ERythm = {};
 
- 
+/////// Ebk.ERythm.Linear
 Ebk.ERythm.Linear = class EbkERythmLinear {
     #params;
     #infos;
@@ -1483,7 +1482,7 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
     
 
     _update(params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}){
-        let info =`type, granularity and messy have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10,messy:[-1,1]}`;
+        let info =`  granularity and messy have to be defined. eg params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}`;
 
         if(!Ebk.isObject(params)){
             console.error(info);
@@ -1658,7 +1657,6 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
 
 };
 
-
 Ebk.ERythm.LinearTests = (paramsTestOptions =[
     
                 {flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]},
@@ -1674,6 +1672,7 @@ Ebk.ERythm.LinearTests = (paramsTestOptions =[
  
 }
 
+/////// Ebk.ERythm.Wavy
 Ebk.ERythm.Wavy = class EbkERythmWavy {
     #params;
     #infos;
@@ -1685,7 +1684,7 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
     
 
     _update(params ={flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
-        let info =`type, granularity and messy have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10,messy:[-1,1]}`;
+        let info =`flow, granularity and messy have to be defined. eg params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}`;
 
         if(!Ebk.isObject(params)){
             console.error(info);
@@ -1875,10 +1874,12 @@ Ebk.ERythm.WavyTests = (paramsTestOptions =[
  
 }
 
+
 Ebk.ERythm.TYPE = {};
 Ebk.ERythm.TYPE.LINEAR = `LINEAR`;
 Ebk.ERythm.TYPE.WAVY = `WAVY`;
 
+/////// ERythm.create
 Ebk.ERythm.create =  (params={ type: Ebk.ERythm.TYPE.LINEAR  ,flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]})=>{
 
     if (params.type ===  Ebk.ERythm.TYPE.LINEAR){
@@ -1889,6 +1890,9 @@ Ebk.ERythm.create =  (params={ type: Ebk.ERythm.TYPE.LINEAR  ,flow:(x)=>{return 
 
         return new Ebk.ERythm.Wavy(params);
     }
+
+
+
 }
 
 Ebk.ERythm.createTests =(paramsTestOptions =[
@@ -1900,10 +1904,7 @@ Ebk.ERythm.createTests =(paramsTestOptions =[
     
 ])=>{
 
-    // let typeToClassName = (type)=>{
-    //     if (type ===Ebk.ERythm.TYPE.LINEAR) return Ebk.ERythm.Linear;
-    //     else if (type ===Ebk.ERythm.TYPE.WAVY) return Ebk.ERythm.Wavy;
-    // }
+ 
 
     let test = (instance ,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
 
@@ -1926,16 +1927,55 @@ Ebk.ERythm.createTests =(paramsTestOptions =[
    
 }
 
-
+/////// Ebk.Rythm 
 Ebk.Rythm = class EbkRythm {
     #params;
     #infos;
+    #isCreate;
+    #msg;
     constructor(params ={type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
 
-        this.#params = params;
-        this.#infos = {};
-        this.#infos.trajectory = new Ebk.Trajectory({path:this.#params.sample});
-        this.#infos.eRythm =  Ebk.ERythm.create(this.#params);
+        let info =`  granularity and messy have to be defined. eg params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}`;
+        this.#msg = {};
+        this.#msg.NOTCREAT = 'Object is not created ';
+
+        this.#isCreate = false;
+
+        if(!(Ebk.isObject(params))){
+            console.error(info);
+            return null;
+        } else {
+
+            if(!(Ebk.isInObject(`type`,params))){
+                console.error(info);
+                return  ;
+
+            } else {
+
+                if  (!((( params.type ==Ebk.ERythm.TYPE.LINEAR)||( params.type ==Ebk.ERythm.TYPE.WAVY)))){
+                    console.error(info);
+                    return  ;
+                } else {
+
+                    
+                    this.#params = params;
+                    this.#infos = {};
+                    this.#infos.trajectory = new Ebk.Trajectory({path:this.#params.sample});
+                    this.#infos.eRythm =  Ebk.ERythm.create(this.#params);
+                    this.#isCreate = true;
+                }
+
+            }
+
+        }
+
+
+
+
+        // this.#params = params;
+        // this.#infos = {};
+        // this.#infos.trajectory = new Ebk.Trajectory({path:this.#params.sample});
+        // this.#infos.eRythm =  Ebk.ERythm.create(this.#params);
         
     }
 
@@ -1948,18 +1988,30 @@ Ebk.Rythm = class EbkRythm {
 
     locate(params ={step:5}){
 
-        let ratio =  this.#infos.eRythm.locate({step:params.step })
-        return  this.#infos.trajectory.locate({target: ratio  });
+        if (this.#isCreate) {
+             let ratio =  this.#infos.eRythm.locate({step:params.step })
+             return  this.#infos.trajectory.locate({target: ratio  });
+        } else {
+            return this.#msg.NOTCREAT;
+        }
+
     }
 
     locateCollection(){
 
-        let arr = [];
-        for(let i=0;i<=this.#params.granularity;i++){
-            arr.push( this.locate({step:i}));
+        if (this.#isCreate) {
+            let arr = [];
+            for(let i=0;i<=this.#params.granularity;i++){
+                arr.push( this.locate({step:i}));
+            }
+    
+            return arr;
+        }else {
+            console.error(this.#msg.NOTCREAT);
+            return null;
         }
 
-        return arr;
+
     }
 
 }  
@@ -1968,10 +2020,9 @@ Ebk.Rythm = class EbkRythm {
 Ebk.RythmTests = (paramsTestOptions =[
     
     {type:Ebk.ERythm.TYPE.WAVY, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1], step:0},
-    {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3},
-    {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[2,2,2],[3,3,3],[4,4,4]], flow:(x)=>{return  Math.pow(5,x); }, granularity:3,messy:[-1,1], step:3},
+    {type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3},
+    {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3},
 
-    
 ])=>{
 
 
