@@ -1776,7 +1776,9 @@ let functions_entries = [
 
        //Ebk.ERythm.createTests();
 
-       Ebk.RythmTests();
+         // Ebk.RythmTests();
+
+         Ebk.Sequence.tests();
        
           obj.uiLoad();
 

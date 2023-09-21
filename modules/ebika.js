@@ -85,6 +85,18 @@ Ebk.isInObject = (prop,obj) =>{
     else return false;
 }
 
+
+Ebk.isFunction=(flow =(x)=>{return 2*x })=>{
+      
+    if ((!( typeof flow ==='function'))){
+        return false;
+    } else {
+        return true;
+    }
+
+}
+
+
 Ebk.getPublicMethodOfClass  =(instance) => {
     const prototype = Object.getPrototypeOf(instance);
     const methodNames = Object.getOwnPropertyNames(prototype);
@@ -94,6 +106,51 @@ Ebk.getPublicMethodOfClass  =(instance) => {
       return typeof method === "function" && method !== "constructor";
     });
 }
+
+
+Ebk.ObjectName = {};
+
+
+Ebk.ObjectName.test = (objectName,params ={range:[0.,1.]})=>{
+
+    Object.keys(objectName).forEach(key =>{
+        if((key !==`tests`)&&(key !==`test`)){
+          console.log(key, `:` ,objectName[key](params));
+        }
+
+    });
+}
+
+Ebk.ObjectName.tests = (objectName, paramsTestOptions =[
+                    `ff`,
+                   {},
+                   {range:[,]},    
+                   {range:[`a`,1.]},
+                   {range:[`a`,`2`]},
+                   {range:[1,`2`]},
+                   {range:[0.,1.]},
+                   {range:[0,100],clamp:[0.5,0.51], length:`00`},
+                   {range:[0,100],clamp:[-0.2,0.51], length:10},
+                   {range:[0,100],clamp:[-0.2,0.51], length:10,clamps:[[0,1],[0.2,0.4],[0.8,0.87]]},
+                   {range:[0,100],clamp:[-0.2,0.51], length:10,ranges:[[0.,1.],[23, 60], [-7, 2]]},
+                   {range:[0,100],clamp:[-0.2,0.51], length:10,
+                   
+                    ranges:[[6,1.],[23, 60], [-7, 2]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0.8,0.87]]},
+                    
+                    {range:[0,100],clamp:[-0.2,0.51], length:20,
+                     ranges:[[0.,1.],[40, 60], [-7, -14],[102,200]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0,1]]},
+                     {range:[0,100],clamp:[-0.2,0.51], length:20,
+                    ranges:[[0.,1.],[40, 60], [-7, -14],[102,200]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0,1]],  arr:[10,1,{a:1},3,'23']},
+
+                    
+           ])=>{
+     paramsTestOptions.forEach((item,ndx)=>{
+        console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
+        console.log(`params:`, item);
+        Ebk.ObjectName.test(objectName,item);
+    });
+}
+
 
 
 Ebk.ObjectInstance = {};
@@ -1511,13 +1568,8 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
   
 
     isflowRight(flow =(x)=>{return 2*x }){
-      
-        if ((!( typeof flow ==='function'))){
-            return false;
-        } else {
-            return true;
-        }
-     }
+        return Ebk.isFunction(flow) ;
+    }
     
     
     #computeEntry(params ={step:1}){
@@ -1935,7 +1987,7 @@ Ebk.Rythm = class EbkRythm {
     #msg;
     constructor(params ={type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
 
-        let info =`  granularity and messy have to be defined. eg params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}`;
+        let info =`type, sample, flow, granularity and messy have to be defined. eg params ={type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}`;
         this.#msg = {};
         this.#msg.NOTCREAT = 'Object is not created ';
 
@@ -1946,7 +1998,8 @@ Ebk.Rythm = class EbkRythm {
             return null;
         } else {
 
-            if(!(Ebk.isInObject(`type`,params))){
+            if((!(Ebk.isInObject(`type`,params)))||(!(Ebk.isInObject(`sample`,params)))
+                ||(!(Ebk.isInObject(`flow`,params)))||(!(Ebk.isInObject(`granularity`,params)))||(!(Ebk.isInObject(`messy`,params)))){
                 console.error(info);
                 return  ;
 
@@ -1957,12 +2010,20 @@ Ebk.Rythm = class EbkRythm {
                     return  ;
                 } else {
 
-                    
+                   if((!Ebk.isMatrixOfNumbers(params.sample))||(!Ebk.isFunction(params.flow))
+                     ||(!Ebk.isNumber(params.granularity))||(!Ebk.isArrayOfNumbers(params.messy))
+                   
+                   ){
+                     console.error(info);
+                     return  ;
+                   } else {
                     this.#params = params;
                     this.#infos = {};
                     this.#infos.trajectory = new Ebk.Trajectory({path:this.#params.sample});
                     this.#infos.eRythm =  Ebk.ERythm.create(this.#params);
                     this.#isCreate = true;
+                   }
+                
                 }
 
             }
@@ -1971,11 +2032,6 @@ Ebk.Rythm = class EbkRythm {
 
 
 
-
-        // this.#params = params;
-        // this.#infos = {};
-        // this.#infos.trajectory = new Ebk.Trajectory({path:this.#params.sample});
-        // this.#infos.eRythm =  Ebk.ERythm.create(this.#params);
         
     }
 
@@ -2022,12 +2078,109 @@ Ebk.RythmTests = (paramsTestOptions =[
     {type:Ebk.ERythm.TYPE.WAVY, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1], step:0},
     {type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3},
     {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3},
-
+    {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3},
 ])=>{
 
 
 Ebk.ObjectInstance.tests(Ebk.Rythm,paramsTestOptions );
 
+}
+
+
+/////// Ebk.Sequence
+Ebk.Sequence = {
+
+}
+
+Ebk.Sequence.toggle = (params = {step:1})=>{
+    return Math.pow(-1, params.step);
+}
+
+Ebk.Sequence.toggleNext = (params = {step:1})=>{
+    return Ebk.Sequence.toggle({step:params.step+1});
+}
+
+Ebk.Sequence.binary = (params = {step:1})=>{
+    return Math.abs((Ebk.Sequence.toggle({step:params.step})-1)/-2);
+}
+
+Ebk.Sequence.binaryNext = (params = {step:1})=>{
+    return Ebk.Sequence.binary({step:params.step+1});
+}
+
+
+Ebk.Sequence.e_msmk = (params = {step:1,length:4})=>{
+    let row = () =>{
+        return Math.floor(params.step/params.length);
+    }
+ 
+    let switchStarter = () =>{
+        return params.length*Ebk.Sequence.binary({step:row()});
+    }
+
+    let switchSign = () =>{
+        return Ebk.Sequence.toggle({step:row()});
+    }
+
+    let stepModulo = () =>{
+        return params.step % params.length;
+
+    }
+
+    return  switchStarter ()+ switchSign()*stepModulo();
+}
+
+
+Ebk.Sequence.msmk = (params = {step:1,length:4,phase:2})=>{
+    return  Ebk.Sequence.e_msmk (params = {step:params.step+params.phase,length:params.length});
+}
+
+
+Ebk.Sequence.e_msmkCollection = (params = {step:1,length:4,cLength:15})=>{
+    let arr = [];
+    for(let i=0;i<params.cLength;i++){
+        arr.push(Ebk.Sequence.e_msmk({step:i, length:params.length}));
+    }
+    
+    return arr; 
+}    
+
+
+Ebk.Sequence.msmkCollection = (params = {step:1,phase:2,length:4,cLength:15})=>{
+    let arr = [];
+    for(let i=0;i<params.cLength;i++){
+        arr.push(Ebk.Sequence.msmk({step:i,phase: params.phase , length:params.length}));
+    }
+    
+    return arr; 
+} 
+
+Ebk.Sequence.e_mkmk = (params = {step:1,length:4})=>{
+    return  params.step % params.length;
+}
+
+Ebk.Sequence.mkmk = (params = {step:1,length:4,phase:2})=>{
+    return Ebk.Sequence.e_mkmk (params = {step:params.step+params.phase,length:params.length});
+}
+
+
+Ebk.Sequence.mkmkCollection = (params = {step:1,phase:2,length:4,cLength:15})=>{
+    let arr = [];
+    for(let i=0;i<params.cLength;i++){
+        arr.push(Ebk.Sequence.mkmk({step:i,phase: params.phase , length:params.length}));
+    }
+    
+    return arr; 
+} 
+
+
+Ebk.Sequence.tests = (params = [
+                            {step:0,length:4,phase:0,cLength:20},
+                            {step:1,length:4,phase:1,cLength:20},
+                            {step:2,length:4,phase:2,cLength:20},
+                            {step:3,length:8,phase:3,cLength:20},
+])=>{
+    Ebk.ObjectName.tests(Ebk.Sequence,params ); 
 }
 
 
