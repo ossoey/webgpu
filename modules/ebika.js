@@ -2163,26 +2163,74 @@ Ebk.Sequence.mkmk = (params = {step:1,length:4,phase:2})=>{
     return Ebk.Sequence.e_mkmk (params = {step:params.step+params.phase,length:params.length});
 }
 
-
 Ebk.Sequence.mkmkCollection = (params = {step:1,phase:2,length:4,cLength:15})=>{
     let arr = [];
     for(let i=0;i<params.cLength;i++){
         arr.push(Ebk.Sequence.mkmk({step:i,phase: params.phase , length:params.length}));
     }
-    
     return arr; 
 } 
 
+Ebk.Sequence.gridGetIndexFromRowCol = (params = {width:4,height:6,row:3,col:5})=>{
+    return  params.row*params.width + params.col;
+}
+
+Ebk.Sequence.gridGetIndexFromRowColCollection = (params = {width:4,height:6,row:3,col:5})=>{
+    
+    let arr = [];
+
+    for(let row=0; row<params.height; row++) {
+
+        let subArr = [];
+        for(let col=0; col<params.width;col++){
+            subArr.push([row,col,Ebk.Sequence.gridGetIndexFromRowCol({width:params.width, height: params.height, col:col, row: row})]);
+        }
+
+        arr.push(subArr);
+
+    }
+
+    return arr; 
+
+
+}
+
+Ebk.Sequence.gridGetColFromIndex = (params = {width:4,height:6,index:5})=>{
+    return Math.floor(params.index/params.width);
+}
+
+Ebk.Sequence.gridGetColFromIndexColCollection = (params = {width:4,height:6,row:3,col:5})=>{
+    
+    let arr = [];
+
+    for(let row=0; row<params.height; row++) {
+
+        let subArr = [];
+        for(let col=0; col<params.width;col++){
+            subArr.push([row,col,Ebk.Sequence.gridGetIndexFromRowCol({width:params.width, height: params.height, col:col, row: row})]);
+        }
+
+        arr.push(subArr);
+
+    }
+
+    return arr; 
+
+}
+
+
+Ebk.Sequence.gridGetWholeNumberSum = (params = {length:5})=>{
+    return  (params.length*(params.length+1))/2 ;
+}
 
 Ebk.Sequence.tests = (params = [
-                            {step:0,length:4,phase:0,cLength:20},
-                            {step:1,length:4,phase:1,cLength:20},
-                            {step:2,length:4,phase:2,cLength:20},
-                            {step:3,length:8,phase:3,cLength:20},
+                            {step:0,length:4,phase:0,cLength:20,width:6,height:4,row:3,col:5,index:5},
+                            {step:1,length:4,phase:1,cLength:20,width:6,height:4,row:3,col:5,index:8},
+                            {step:2,length:4,phase:2,cLength:20,width:6,height:4,row:3,col:5,index:16},
+                            {step:3,length:4,phase:3,cLength:20,width:6,height:4,row:3,col:5,index:19},
 ])=>{
     Ebk.ObjectName.tests(Ebk.Sequence,params ); 
 }
-
 
 
 export {Ebk}
