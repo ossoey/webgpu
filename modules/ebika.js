@@ -115,7 +115,7 @@ Ebk.ObjectName.test = (objectName,params ={range:[0.,1.]})=>{
 
     Object.keys(objectName).forEach(key =>{
         if((key !==`tests`)&&(key !==`test`)){
-          console.log(key, `:` ,objectName[key](params));
+          if (typeof objectName[key] === "function")  console.log(`-->` ,key, `:` ,objectName[key](params));
         }
 
     });
@@ -144,13 +144,16 @@ Ebk.ObjectName.tests = (objectName, paramsTestOptions =[
 
                     
            ])=>{
-     paramsTestOptions.forEach((item,ndx)=>{
-        console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
-        console.log(`params:`, item);
+         paramsTestOptions.forEach((item,ndx)=>{
+        console.log(` `);
+        console.log(` `);
+        console.log( `  ||** `,objectName.name,` **||  `,`   #---------------------TEST, iteration: #`+ndx+`-------------------------    `);
+        console.log(`      params:`, item);
+        console.log(` `);
+        console.log(` `);
         Ebk.ObjectName.test(objectName,item);
     });
 }
-
 
 
 Ebk.ObjectInstance = {};
@@ -167,7 +170,6 @@ Ebk.ObjectInstance.test = (className,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,
         
        });
   
-
 }
 
 Ebk.ObjectInstance.tests = (className, paramsTestOptions =[
@@ -193,6 +195,9 @@ Ebk.ObjectInstance.test(className, item);
 /////// Ebk.Rand 
 
 Ebk.Rand = {};
+
+Ebk.Rand.name = `Ebk.Rand`;
+
 
 Ebk.Rand.float = (params={range:[0.,1.]})=>{
     
@@ -501,71 +506,60 @@ Ebk.Rand.mixArr = (params={arr:[10,1,{a:1},3,'23']})=>{
    }
 }    
 
-Ebk.Rand.test = (params ={range:[0.,1.]})=>{
-
-    Object.keys(Ebk.Rand).forEach(key =>{
-        if((key !==`tests`)&&(key !==`test`)){
-          console.log(key, `:` ,Ebk.Rand[key](params));
-        }
-
-    });
-}
-
 Ebk.Rand.tests = (paramsTestOptions =[
-                    `ff`,
-                   {},
-                   {range:[,]},    
-                   {range:[`a`,1.]},
-                   {range:[`a`,`2`]},
-                   {range:[1,`2`]},
-                   {range:[0.,1.]},
-                   {range:[0,100],clamp:[0.5,0.51], length:`00`},
-                   {range:[0,100],clamp:[-0.2,0.51], length:10},
-                   {range:[0,100],clamp:[-0.2,0.51], length:10,clamps:[[0,1],[0.2,0.4],[0.8,0.87]]},
-                   {range:[0,100],clamp:[-0.2,0.51], length:10,ranges:[[0.,1.],[23, 60], [-7, 2]]},
-                   {range:[0,100],clamp:[-0.2,0.51], length:10,
-                   
-                    ranges:[[6,1.],[23, 60], [-7, 2]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0.8,0.87]]},
-                    
-                    {range:[0,100],clamp:[-0.2,0.51], length:20,
-                     ranges:[[0.,1.],[40, 60], [-7, -14],[102,200]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0,1]]},
-                     {range:[0,100],clamp:[-0.2,0.51], length:20,
-                    ranges:[[0.,1.],[40, 60], [-7, -14],[102,200]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0,1]],  arr:[10,1,{a:1},3,'23']},
+    `ff`,
+   {},
+   {range:[,]},    
+   {range:[`a`,1.]},
+   {range:[`a`,`2`]},
+   {range:[1,`2`]},
+   {range:[0.,1.]},
+   {range:[0,100],clamp:[0.5,0.51], length:`00`},
+   {range:[0,100],clamp:[-0.2,0.51], length:10},
+   {range:[0,100],clamp:[-0.2,0.51], length:10,clamps:[[0,1],[0.2,0.4],[0.8,0.87]]},
+   {range:[0,100],clamp:[-0.2,0.51], length:10,ranges:[[0.,1.],[23, 60], [-7, 2]]},
+   {range:[0,100],clamp:[-0.2,0.51], length:10,
+   
+    ranges:[[6,1.],[23, 60], [-7, 2]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0.8,0.87]]},
+    
+    {range:[0,100],clamp:[-0.2,0.51], length:20,
+     ranges:[[0.,1.],[40, 60], [-7, -14],[102,200]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0,1]]},
+     {range:[0,100],clamp:[-0.2,0.51], length:20,
+    ranges:[[0.,1.],[40, 60], [-7, -14],[102,200]],clamps:[[0,1],[0.2,0.4],[0.8,0.87],[0,1]],  arr:[10,1,{a:1},3,'23']},
 
-                    
-           ])=>{
-     paramsTestOptions.forEach((item,ndx)=>{
-        console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
-        console.log(`params:`, item);
-        Ebk.Rand.test(item);
-    });
+    
+])=>{
+Ebk.ObjectName.tests(Ebk.Rand,paramsTestOptions ); 
 }
+
 
 /////// Ebk.Matrix 
 
 Ebk.Matrix = {};
+Ebk.Matrix.name = `Ebk.Matrix`;
 
-Ebk.Matrix.arrLoadElementNtimes =(elt,times) => {
+Ebk.Matrix.arrLoadElementNtimes =(params = {elt:0,times:10}) => {
     let arr = [];
 
-     for(let i=0;i<times; i++){
-        arr.push(elt);
+     for(let i=0;i<params.times; i++){
+        arr.push(params.elt);
      }
     return      arr;
 }
 
-Ebk.Matrix.arrGetSubarray =(arr = [1,2,3,4,5,6,7,8,9], fromIndex = 2, toIndex = 5 ) => {
-    return      arr.slice(fromIndex, toIndex+1);
+Ebk.Matrix.arrGetSubarray =(params = {arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5} ) => {
+    return      params.arr.slice(params.fromIndex, params.toIndex+1);
 }
 
-Ebk.Matrix.arrGetSubarrayWithoutIndex =(arr = [1,2,3,4,5,6,7,8,9], withoutIndex = 2) => {
 
-    if (withoutIndex < 0 || withoutIndex >= arr.length) {  
-        return arr.slice();
+Ebk.Matrix.arrGetSubarrayWithoutIndex =(params = {arr : [1,2,3,4,5,6,7,8,9], withoutIndex : 2}) => {
+
+    if (params.withoutIndex < 0 || params.withoutIndex >= params.arr.length) {  
+        return params.arr.slice();
       }
       
       // Create a subarray before the index and after the index, then concatenate them
-      return arr.slice(0,withoutIndex).concat(arr.slice(withoutIndex + 1));
+      return params.arr.slice(0,params.withoutIndex).concat(params.arr.slice(params.withoutIndex + 1));
 
 }
 
@@ -602,7 +596,6 @@ Ebk.Matrix.vectAdd = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
 
     }
 }
-
 
 Ebk.Matrix.vectScale = (params ={v:[5,3,-8], scalar:0.5}) =>{
 
@@ -949,8 +942,8 @@ Ebk.Matrix.subHeadMatrix = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]], headNd
 
                         if (ndx_ !== params.headNdx) {
 
-                     
-                             result.push(Ebk.Matrix.arrGetSubarray(params.matrix[ndx_], 1,params.matrix[ndx_].length-1 ));
+         
+                             result.push(Ebk.Matrix.arrGetSubarray({arr:params.matrix[ndx_], fromIndex: 1,toIndex :params.matrix[ndx_].length-1} ));
                         }
 
                         ndx_ ++;
@@ -998,8 +991,9 @@ Ebk.Matrix.subMatrix = (params ={ matrix:[[3,1,5],[5,3,-9],[5,3,-9]], colNdx :1,
                     while (ndx_ < params.matrix.length){
 
                         if (ndx_ !== params.colNdx) {
+
                      
-                             result.push( Ebk.Matrix.arrGetSubarrayWithoutIndex (params.matrix[ndx_], params.rowNdx) );
+                             result.push( Ebk.Matrix.arrGetSubarrayWithoutIndex ({arr: params.matrix[ndx_],withoutIndex: params.rowNdx}) );
                         }
 
                         ndx_ ++;
@@ -1322,40 +1316,28 @@ Ebk.Matrix.testInverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,1
 
  }
 
-Ebk.Matrix.test = (params ={range:[0.,1.]})=>{
 
-    Object.keys(Ebk.Matrix).forEach(key =>{
-        if((key !==`tests`)&&(key !==`test`)&&(key !==`arrGetSubarray`)&&(key !==`arrGetSubarrayWithoutIndex`))   {
-          console.log(key, `:` ,Ebk.Matrix[key](params));
-        }
-
-    });
-}
-
-Ebk.Matrix.tests = (paramsTestOptions =[
+ Ebk.Matrix.tests = (paramsTestOptions =[
                   
-                   {},
-                   {v1:[3,1]},    
-                   {v2:[5,3]},
-                   {v1:[3,1,1],v2:[5,3]},
-                   {v1:[3,`1`],v2:[5,3]},
-                   {v1:[3,1],v2:[5,6]},
-                   {v1:[3,1,9,20],v2:[5,6,10,-1]},
-                   {v:[3,1,9,`20`],scalar:0.5},
-                   {v1:[2,1],v2:[-1,2]},
-                   {v1:[1,0],v2:[0,1]},
-                   { matrix:[[1,2,3],[1,0,2]],scalars:[1,-2], headNdx :0,}, 
-                   { matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2],  headNdx :0,
-                    matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]]
-                },
-                   {m2:[[1,3],[2,4]],m1:[[2,1],[0,2]]}
-           ])=>{
-     paramsTestOptions.forEach((item,ndx)=>{
-        console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
-        console.log(`params:`, item);
-        Ebk.Matrix.test(item);
-    });
+    {arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:0,times:10},
+    {v1:[3,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:3,times:2},    
+    {v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
+    {v1:[3,1,1],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
+    {v1:[3,`1`],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
+    {v1:[3,1],v2:[5,6],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
+    {v1:[3,1,9,20],v2:[5,6,10,-1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
+    {v:[3,1,9,`20`],scalar:0.5,arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
+    {v1:[2,1],v2:[-1,2],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
+    {v1:[1,0],v2:[0,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
+    { matrix:[[1,2,3],[1,0,2]],scalars:[1,-2], headNdx :0,arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10}, 
+    { matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2],  headNdx :0,
+     matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`y`,times:10
+ },
+    {m2:[[1,3],[2,4]],m1:[[2,1],[0,2]],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`i`,times:10}
+])=>{
+Ebk.ObjectName.tests( Ebk.Matrix,paramsTestOptions ); 
 }
+
 
 /////// Ebk.Trajectory
 
@@ -1363,7 +1345,7 @@ Ebk.Trajectory = class EbkTrajectory{
     #params;
     #infos;
     constructor(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}){
-
+        this.name = `Ebk.Trajectory`;
         this._update(  params);
     }
 
@@ -1532,7 +1514,7 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
     #params;
     #infos;
     constructor(params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}){
-
+        this.name = `Ebk.ERythm.Linear`;
         this._update(params);
     }
 
@@ -1729,7 +1711,7 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
     #params;
     #infos;
     constructor(params ={flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
-
+        this.name = `Ebk.ERythm.Wavy`;
         this._update(params);
     }
 
@@ -2092,6 +2074,9 @@ Ebk.Sequence = {
 
 }
 
+Ebk.Sequence.name = `Ebk.Sequence`;
+
+
 Ebk.Sequence.toggle = (params = {step:1})=>{
     return Math.pow(-1, params.step);
 }
@@ -2171,11 +2156,52 @@ Ebk.Sequence.mkmkCollection = (params = {step:1,phase:2,length:4,cLength:15})=>{
     return arr; 
 } 
 
-Ebk.Sequence.gridGetIndexFromRowCol = (params = {width:4,height:6,row:3,col:5})=>{
+Ebk.Sequence.quadraticEquation = (params = {a:1,b:-1,c:-2})=>{
+ 
+    let result = {};
+       result.delta =  Math.pow(params.b,2)-4*params.a*params.c; 
+    if (result.delta == 0) {
+
+        result.x1 = - params.b/2*params.a;
+        result.x2 = null;
+
+    } else if  (result.delta > 0){
+        result.x1 = (-params.b - Math.sqrt(result.delta))/(2*params.a);
+        result.x2 = (-params.b + Math.sqrt(result.delta))/(2*params.a);
+    } else {
+
+        result.x1 = null;
+        result.x2 = null;
+    }
+
+
+    return result;
+}
+
+Ebk.Sequence.gridGetWholeNumberSum = (params = {length:5})=>{
+    return  (params.length*(params.length+1))/2 ;
+}
+
+
+Ebk.Sequence.tests = (params = [
+                            {step:0,length:4,phase:0,cLength:20,width:6,height:4,row:3,col:5,index:5,a:2,b:9,c:-5},
+                            {step:1,length:4,phase:1,cLength:20,width:6,height:4,row:3,col:5,index:8,a:2,b:1,c:-3},
+                            {step:2,length:4,phase:2,cLength:20,width:6,height:4,row:3,col:5,index:16,a:3,b:-1,c:-2},
+                            {step:3,length:4,phase:3,cLength:20,width:6,height:4,row:3,col:5,index:19,a:1,b:-6,c:5},
+])=>{
+    Ebk.ObjectName.tests(Ebk.Sequence,params ); 
+}
+
+
+Ebk.Sequence.Grid = {}
+
+Ebk.Sequence.Grid.name = 'Ebk.Sequence.Grid';
+
+Ebk.Sequence.Grid.dataGetIndex = (params = {width:4,height:6,row:3,col:5})=>{
     return  params.row*params.width + params.col;
 }
 
-Ebk.Sequence.gridGetIndexFromRowColCollection = (params = {width:4,height:6,row:3,col:5})=>{
+Ebk.Sequence.Grid.dataGetIndexCollection = (params = {width:4,height:6,row:3,col:5})=>{
     
     let arr = [];
 
@@ -2183,7 +2209,7 @@ Ebk.Sequence.gridGetIndexFromRowColCollection = (params = {width:4,height:6,row:
 
         let subArr = [];
         for(let col=0; col<params.width;col++){
-            subArr.push([row,col,Ebk.Sequence.gridGetIndexFromRowCol({width:params.width, height: params.height, col:col, row: row})]);
+            subArr.push([row,col,Ebk.Sequence.Grid.dataGetIndex({width:params.width, height: params.height, col:col, row: row})]);
         }
 
         arr.push(subArr);
@@ -2191,47 +2217,86 @@ Ebk.Sequence.gridGetIndexFromRowColCollection = (params = {width:4,height:6,row:
     }
 
     return arr; 
-
-
 }
 
-Ebk.Sequence.gridGetRowFromIndex = (params = {width:4,height:6,index:5})=>{
+Ebk.Sequence.Grid.labelGetRow = (params = {width:4,height:6,index:5})=>{
     return Math.floor(params.index/params.width);
 }
 
-Ebk.Sequence.gridGeColFromIndex = (params = {width:4,height:6,index:5})=>{
-    return params.index - Ebk.Sequence.gridGetRowFromIndex(params)* params.width;
+Ebk.Sequence.Grid.labelGetCol = (params = {width:4,height:6,index:5})=>{
+    return params.index - Ebk.Sequence.Grid.labelGetRow(params)* params.width;
 }
 
-Ebk.Sequence.gridGetRowColFromIndex = (params = {width:4,height:6,index:5})=>{
-    return [Ebk.Sequence.gridGetRowFromIndex(params),Ebk.Sequence.gridGeColFromIndex(params)] ;
+Ebk.Sequence.Grid.labelGetRowCol = (params = {width:4,height:6,index:5})=>{
+    return [Ebk.Sequence.Grid.labelGetRow(params),Ebk.Sequence.Grid.labelGetCol(params)] ;
 }
 
-Ebk.Sequence.gridGetRowColFromIndexColCollection = (params = {width:4,height:6,row:3,col:5})=>{
+Ebk.Sequence.Grid.labelGetRowColCollection = (params = {width:4,height:6,row:3,col:5})=>{
     
     let arr = [];
 
     for(let ndx=0; ndx<params.height*params.width; ndx++) {
 
-        arr.push(Ebk.Sequence.gridGetRowColFromIndex({width:params.width, height: params.height,index:ndx }));
-
+        arr.push(Ebk.Sequence.Grid.labelGetRowCol({width:params.width, height: params.height,index:ndx }));
     }
 
     return arr; 
 }
 
-Ebk.Sequence.gridGetWholeNumberSum = (params = {length:5})=>{
+Ebk.Sequence.Grid.tests = (params = [
+    {step:0,length:4,phase:0,cLength:20,width:6,height:4,row:3,col:5,index:5},
+    {step:1,length:4,phase:1,cLength:20,width:6,height:4,row:3,col:5,index:8},
+    {step:2,length:4,phase:2,cLength:20,width:6,height:4,row:3,col:5,index:16},
+    {step:3,length:4,phase:3,cLength:20,width:6,height:4,row:3,col:5,index:19},
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.Grid,params ); 
+}
+
+
+Ebk.Sequence.GridWholeNumber = {}
+Ebk.Sequence.GridWholeNumber.name = `Ebk.Sequence.GridWholeNumberSum`;
+
+Ebk.Sequence.GridWholeNumber.dataGetSum = (params = {length:5})=>{
     return  (params.length*(params.length+1))/2 ;
 }
 
-Ebk.Sequence.tests = (params = [
-                            {step:0,length:4,phase:0,cLength:20,width:6,height:4,row:3,col:5,index:5},
-                            {step:1,length:4,phase:1,cLength:20,width:6,height:4,row:3,col:5,index:8},
-                            {step:2,length:4,phase:2,cLength:20,width:6,height:4,row:3,col:5,index:16},
-                            {step:3,length:4,phase:3,cLength:20,width:6,height:4,row:3,col:5,index:19},
-])=>{
-    Ebk.ObjectName.tests(Ebk.Sequence,params ); 
+Ebk.Sequence.GridWholeNumber.dataGetSumCollection = (params = {length:5,cLength:20})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+        arr.push(Ebk.Sequence.GridWholeNumber.dataGetSum({length:i}));
+    }
+
+    return  arr; 
 }
+
+Ebk.Sequence.GridWholeNumber.labelGetRow = (params = {data:5})=>{
+    let quadraResult = Ebk.Sequence.quadraticEquation({a: 1,b:1,c:(-2*params.dataEntry)});
+    return  Math.ceil(quadraResult.x2);
+}
+
+Ebk.Sequence.GridWholeNumber.dataGetSumCollection = (params = {length:5,cLength:20})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+        arr.push([{dataEntry:i,label:Ebk.Sequence.GridWholeNumber.labelGetRow({dataEntry:i})}]);
+    }
+
+    return  arr; 
+}
+
+Ebk.Sequence.GridWholeNumber.tests = (params = [
+    {step:0,length:4,phase:0,cLength:20,width:6,height:4,row:3,col:5,index:5,dataEntry:1},
+    {step:1,length:4,phase:1,cLength:20,width:6,height:4,row:3,col:5,index:8,dataEntry:2},
+    {step:2,length:4,phase:2,cLength:20,width:6,height:4,row:3,col:5,index:16,dataEntry:3},
+    {step:3,length:4,phase:3,cLength:20,width:6,height:4,row:3,col:5,index:19,dataEntry:4},
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.GridWholeNumber,params ); 
+}
+
+
 
 
 export {Ebk}

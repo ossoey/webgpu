@@ -1778,7 +1778,11 @@ let functions_entries = [
 
          // Ebk.RythmTests();
 
-         Ebk.Sequence.tests();
+        //  Ebk.Matrix.tests();
+        //  Ebk.Rand.tests();
+          Ebk.Sequence.tests();
+        //  Ebk.Sequence.Grid.tests();
+         Ebk.Sequence.GridWholeNumber.tests();
        
           obj.uiLoad();
 
