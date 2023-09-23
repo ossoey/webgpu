@@ -2195,29 +2195,30 @@ Ebk.Sequence.gridGetIndexFromRowColCollection = (params = {width:4,height:6,row:
 
 }
 
-Ebk.Sequence.gridGetColFromIndex = (params = {width:4,height:6,index:5})=>{
+Ebk.Sequence.gridGetRowFromIndex = (params = {width:4,height:6,index:5})=>{
     return Math.floor(params.index/params.width);
 }
 
-Ebk.Sequence.gridGetColFromIndexColCollection = (params = {width:4,height:6,row:3,col:5})=>{
+Ebk.Sequence.gridGeColFromIndex = (params = {width:4,height:6,index:5})=>{
+    return params.index - Ebk.Sequence.gridGetRowFromIndex(params)* params.width;
+}
+
+Ebk.Sequence.gridGetRowColFromIndex = (params = {width:4,height:6,index:5})=>{
+    return [Ebk.Sequence.gridGetRowFromIndex(params),Ebk.Sequence.gridGeColFromIndex(params)] ;
+}
+
+Ebk.Sequence.gridGetRowColFromIndexColCollection = (params = {width:4,height:6,row:3,col:5})=>{
     
     let arr = [];
 
-    for(let row=0; row<params.height; row++) {
+    for(let ndx=0; ndx<params.height*params.width; ndx++) {
 
-        let subArr = [];
-        for(let col=0; col<params.width;col++){
-            subArr.push([row,col,Ebk.Sequence.gridGetIndexFromRowCol({width:params.width, height: params.height, col:col, row: row})]);
-        }
-
-        arr.push(subArr);
+        arr.push(Ebk.Sequence.gridGetRowColFromIndex({width:params.width, height: params.height,index:ndx }));
 
     }
 
     return arr; 
-
 }
-
 
 Ebk.Sequence.gridGetWholeNumberSum = (params = {length:5})=>{
     return  (params.length*(params.length+1))/2 ;
