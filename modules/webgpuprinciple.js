@@ -1780,9 +1780,12 @@ let functions_entries = [
 
         //  Ebk.Matrix.tests();
         //  Ebk.Rand.tests();
-          Ebk.Sequence.tests();
-        //  Ebk.Sequence.Grid.tests();
-         Ebk.Sequence.GridWholeNumber.tests();
+        //  Ebk.Sequence.tests();
+          //Ebk.Sequence.Grid.tests();
+          //Ebk.Sequence.GridWholeNumber.tests();
+         // Ebk.Sequence.MSMK.tests();
+          Ebk.Sequence.MKMK.tests();
+        // Ebk.Sequence.GridWholeNumber.tests();
        
           obj.uiLoad();
 
