@@ -2094,68 +2094,6 @@ Ebk.Sequence.binaryNext = (params = {step:1})=>{
 }
 
 
-Ebk.Sequence.e_msmk = (params = {step:1,length:4})=>{
-    let row = () =>{
-        return Math.floor(params.step/params.length);
-    }
- 
-    let switchStarter = () =>{
-        return params.length*Ebk.Sequence.binary({step:row()});
-    }
-
-    let switchSign = () =>{
-        return Ebk.Sequence.toggle({step:row()});
-    }
-
-    let stepModulo = () =>{
-        return params.step % params.length;
-
-    }
-
-    return  switchStarter ()+ switchSign()*stepModulo();
-}
-
-
-Ebk.Sequence.msmk = (params = {step:1,length:4,phase:2})=>{
-    return  Ebk.Sequence.e_msmk (params = {step:params.step+params.phase,length:params.length});
-}
-
-
-Ebk.Sequence.e_msmkCollection = (params = {step:1,length:4,cLength:15})=>{
-    let arr = [];
-    for(let i=0;i<params.cLength;i++){
-        arr.push(Ebk.Sequence.e_msmk({step:i, length:params.length}));
-    }
-    
-    return arr; 
-}    
-
-
-Ebk.Sequence.msmkCollection = (params = {step:1,phase:2,length:4,cLength:15})=>{
-    let arr = [];
-    for(let i=0;i<params.cLength;i++){
-        arr.push(Ebk.Sequence.msmk({step:i,phase: params.phase , length:params.length}));
-    }
-    
-    return arr; 
-} 
-
-Ebk.Sequence.e_mkmk = (params = {step:1,length:4})=>{
-    return  params.step % params.length;
-}
-
-Ebk.Sequence.mkmk = (params = {step:1,length:4,phase:2})=>{
-    return Ebk.Sequence.e_mkmk (params = {step:params.step+params.phase,length:params.length});
-}
-
-Ebk.Sequence.mkmkCollection = (params = {step:1,phase:2,length:4,cLength:15})=>{
-    let arr = [];
-    for(let i=0;i<params.cLength;i++){
-        arr.push(Ebk.Sequence.mkmk({step:i,phase: params.phase , length:params.length}));
-    }
-    return arr; 
-} 
-
 Ebk.Sequence.quadraticEquation = (params = {a:1,b:-1,c:-2})=>{
  
     let result = {};
@@ -2176,10 +2114,6 @@ Ebk.Sequence.quadraticEquation = (params = {a:1,b:-1,c:-2})=>{
 
 
     return result;
-}
-
-Ebk.Sequence.gridGetWholeNumberSum = (params = {length:5})=>{
-    return  (params.length*(params.length+1))/2 ;
 }
 
 
@@ -2243,6 +2177,15 @@ Ebk.Sequence.Grid.labelGetRowColCollection = (params = {width:4,height:6,row:3,c
     return arr; 
 }
 
+Ebk.Sequence.Grid.getData = (params = {width:4,height:6,row:3,col:5})=>{
+    return  Ebk.Sequence.Grid.dataGetIndex(params);
+}
+
+Ebk.Sequence.Grid.getLabel= (params = {width:4,height:6,index:5})=>{
+    return  Ebk.Sequence.Grid.labelGetRowCol(params);
+}
+
+
 Ebk.Sequence.Grid.tests = (params = [
     {step:0,length:4,phase:0,cLength:20,width:6,height:4,row:3,col:5,index:5},
     {step:1,length:4,phase:1,cLength:20,width:6,height:4,row:3,col:5,index:8},
@@ -2252,52 +2195,191 @@ Ebk.Sequence.Grid.tests = (params = [
 Ebk.ObjectName.tests(Ebk.Sequence.Grid,params ); 
 }
 
-
 Ebk.Sequence.GridWholeNumber = {}
+
 Ebk.Sequence.GridWholeNumber.name = `Ebk.Sequence.GridWholeNumberSum`;
 
-Ebk.Sequence.GridWholeNumber.dataGetSum = (params = {length:5})=>{
-    return  (params.length*(params.length+1))/2 ;
+Ebk.Sequence.GridWholeNumber.dataGetSum = (params = {step:5})=>{
+    return  (params.step*(params.step+1))/2 ;
 }
 
-Ebk.Sequence.GridWholeNumber.dataGetSumCollection = (params = {length:5,cLength:20})=>{
+Ebk.Sequence.GridWholeNumber.dataGetSumCollection = (params = {step:5,cLength:20})=>{
     
     let arr = [];
 
     for(let i = 0;i< params.cLength;i++){
-        arr.push(Ebk.Sequence.GridWholeNumber.dataGetSum({length:i}));
+        arr.push(Ebk.Sequence.GridWholeNumber.dataGetSum({step:i}));
     }
 
     return  arr; 
 }
 
-Ebk.Sequence.GridWholeNumber.labelGetRow = (params = {data:5})=>{
-    let quadraResult = Ebk.Sequence.quadraticEquation({a: 1,b:1,c:(-2*params.dataEntry)});
+Ebk.Sequence.GridWholeNumber.labelGetRow = (params = {dataRef:5})=>{
+    let quadraResult = Ebk.Sequence.quadraticEquation({a: 1,b:1,c:(-2*params.dataRef)});
     return  Math.ceil(quadraResult.x2);
 }
 
-Ebk.Sequence.GridWholeNumber.dataGetSumCollection = (params = {length:5,cLength:20})=>{
+Ebk.Sequence.GridWholeNumber.labelGetRowCollection = (params = {cLength:20})=>{
     
     let arr = [];
 
     for(let i = 0;i< params.cLength;i++){
-        arr.push([{dataEntry:i,label:Ebk.Sequence.GridWholeNumber.labelGetRow({dataEntry:i})}]);
+        arr.push([{dataRef:i,label:Ebk.Sequence.GridWholeNumber.labelGetRow({dataRef:i})}]);
     }
 
     return  arr; 
 }
 
+Ebk.Sequence.GridWholeNumber.getData = (params = {step:5})=>{
+    return  Ebk.Sequence.GridWholeNumber.dataGetSum(params);
+}
+
+Ebk.Sequence.GridWholeNumber.getLabel= (params = {dataRef:5})=>{
+    return  Ebk.Sequence.GridWholeNumber.labelGetRow(params);
+}
+
 Ebk.Sequence.GridWholeNumber.tests = (params = [
-    {step:0,length:4,phase:0,cLength:20,width:6,height:4,row:3,col:5,index:5,dataEntry:1},
-    {step:1,length:4,phase:1,cLength:20,width:6,height:4,row:3,col:5,index:8,dataEntry:2},
-    {step:2,length:4,phase:2,cLength:20,width:6,height:4,row:3,col:5,index:16,dataEntry:3},
-    {step:3,length:4,phase:3,cLength:20,width:6,height:4,row:3,col:5,index:19,dataEntry:4},
+    {step:0,cLength:20,dataRef:1},
+    {step:1,cLength:20,dataRef:2},
+    {step:2,cLength:20,dataRef:3},
+    {step:3,cLength:20,dataRef:4},
+
+
+    
 ])=>{
 Ebk.ObjectName.tests(Ebk.Sequence.GridWholeNumber,params ); 
 }
 
 
+Ebk.Sequence.MSMK = {}
+
+Ebk.Sequence.MSMK.name = `Ebk.Sequence.MSMK`;
 
 
+Ebk.Sequence.MSMK.labelGetRow = (params = {step:1,length:4})=>{
+    return Math.floor(params.step/params.length);
+}
+
+Ebk.Sequence.MSMK.getDataElt = (params = {step:1,length:4})=>{
+    let row = () =>{
+        return Math.floor(params.step/params.length);
+    }
+ 
+    let switchStarter = () =>{
+        return params.length*Ebk.Sequence.binary({step:row()});
+    }
+
+    let switchSign = () =>{
+        return Ebk.Sequence.toggle({step:row()});
+    }
+
+    let stepModulo = () =>{
+        return params.step % params.length;
+
+    }
+
+    return  switchStarter ()+ switchSign()*stepModulo();
+}
+
+Ebk.Sequence.MSMK.getDataCollection  = (params = {step:1,phase:2,length:4,cLength:15})=>{
+    let arr = [];
+    for(let i=0;i<params.cLength;i++){
+        arr.push(Ebk.Sequence.MSMK.getData ({step:i,phase: params.phase , length:params.length}));
+    }
+    
+    return arr; 
+} 
+
+Ebk.Sequence.MSMK.getLabelCollection  = (params = {length:4,cLength:15})=>{
+    let arr = [];
+    for(let i=0;i<params.cLength;i++){
+        arr.push(Ebk.Sequence.MSMK.getLabel({dataRef:i,length: params.length }));
+    }
+    
+    return arr; 
+} 
+
+
+Ebk.Sequence.MSMK.getData = (params = {step:1,length:4,phase:2})=>{
+    return Ebk.Sequence.MSMK.getDataElt (params = {step:params.step+params.phase,length:params.length});
+}
+
+
+Ebk.Sequence.MSMK.getLabel = (params = {dataRef:5, length:4})=>{
+    return  Math.floor(params.dataRef/params.length);
+}
+
+
+
+Ebk.Sequence.MSMK.tests = (params = [
+    {step:0,length:4,phase:0,cLength:20,dataRef:1},
+    {step:1,length:4,phase:1,cLength:20,dataRef:2},
+    {step:2,length:4,phase:2,cLength:20,dataRef:3},
+    {step:3,length:4,phase:1,cLength:20,dataRef:4},
+
+
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.MSMK,params ); 
+}
+
+
+
+Ebk.Sequence.MKMK = {}
+
+Ebk.Sequence.MKMK.name = `Ebk.Sequence.MKMK`;
+
+
+Ebk.Sequence.MKMK.labelGetRow = (params = {step:1,length:4})=>{
+    return Math.floor(params.step/params.length);
+}
+
+Ebk.Sequence.MKMK.getDataElt = (params = {step:1,length:4})=>{
+ 
+   return  params.step % params.length;
+}
+
+Ebk.Sequence.MKMK.getDataCollection  = (params = {step:1,phase:2,length:4,cLength:15})=>{
+    let arr = [];
+    for(let i=0;i<params.cLength;i++){
+        arr.push(Ebk.Sequence.MKMK.getData ({step:i,phase: params.phase , length:params.length}));
+    }
+    
+    return arr; 
+} 
+
+Ebk.Sequence.MKMK.getLabelCollection  = (params = {length:4,cLength:15})=>{
+    let arr = [];
+    for(let i=0;i<params.cLength;i++){
+        arr.push(Ebk.Sequence.MKMK.getLabel({dataRef:i,length: params.length }));
+    }
+    
+    return arr; 
+} 
+
+
+Ebk.Sequence.MKMK.getData = (params = {step:1,length:4,phase:2})=>{
+    return Ebk.Sequence.MKMK.getDataElt (params = {step:params.step+params.phase,length:params.length});
+}
+
+
+Ebk.Sequence.MKMK.getLabel = (params = {dataRef:5, length:4})=>{
+    return  Math.floor(params.dataRef/params.length);
+}
+
+
+
+Ebk.Sequence.MKMK.tests = (params = [
+    {step:0,length:4,phase:0,cLength:20,dataRef:1},
+    {step:1,length:4,phase:1,cLength:20,dataRef:2},
+    {step:2,length:4,phase:2,cLength:20,dataRef:3},
+    {step:3,length:4,phase:1,cLength:20,dataRef:4},
+
+
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.MKMK,params ); 
+}
+
+
+ 
 export {Ebk}
 export default Ebk;
