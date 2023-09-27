@@ -2251,6 +2251,109 @@ Ebk.ObjectName.tests(Ebk.Sequence.GridWholeNumber,params );
 }
 
 
+Ebk.Sequence.GridEvenNmber = {}
+
+Ebk.Sequence.GridEvenNmber.name = `Ebk.Sequence.GridEvenNmber`;
+
+
+Ebk.Sequence.GridEvenNmber.getData = (params = {step:5})=>{
+    return  2*Ebk.Sequence.GridWholeNumber.getData(params);
+}
+
+Ebk.Sequence.GridEvenNmber.getLabel= (params = {dataRef:5})=>{
+    let quadraResult = Ebk.Sequence.quadraticEquation({a: 1,b:1,c:(-params.dataRef)});
+    return  Math.ceil(quadraResult.x2);
+}
+
+Ebk.Sequence.GridEvenNmber.getDataCollection = (params = {step:5,cLength:20})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+        arr.push(Ebk.Sequence.GridEvenNmber.getData({step:i}));
+    }
+
+    return  arr; 
+}
+
+
+Ebk.Sequence.GridEvenNmber.getLabelCollection = (params = {cLength:20})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+        arr.push([{dataRef:i,label:Ebk.Sequence.GridEvenNmber.getLabel({dataRef:i})}]);
+    }
+
+    return  arr; 
+}
+
+
+Ebk.Sequence.GridEvenNmber.tests = (params = [
+    {step:0,cLength:20,dataRef:1},
+    {step:1,cLength:20,dataRef:2},
+    {step:2,cLength:20,dataRef:3},
+    {step:3,cLength:20,dataRef:4},
+
+
+    
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.GridEvenNmber,params ); 
+}
+
+
+
+Ebk.Sequence.GridOddNmber = {}
+
+Ebk.Sequence.GridOddNmber.name = `Ebk.Sequence.GridOddNmber`;
+
+
+Ebk.Sequence.GridOddNmber.getData = (params = {step:5})=>{
+    return  2*Ebk.Sequence.GridWholeNumber.getData(params)+1;
+}
+
+Ebk.Sequence.GridOddNmber.getLabel= (params = {dataRef:5})=>{
+    let quadraResult = Ebk.Sequence.quadraticEquation({a: 1,b:1,c:(1-params.dataRef)});
+    return  Math.ceil(quadraResult.x2);
+}
+
+Ebk.Sequence.GridOddNmber.getDataCollection = (params = {step:5,cLength:20})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+        arr.push(Ebk.Sequence.GridOddNmber.getData({step:i}));
+    }
+
+    return  arr; 
+}
+
+
+Ebk.Sequence.GridOddNmber.getLabelCollection = (params = {cLength:20})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+        arr.push([{dataRef:i,label:Ebk.Sequence.GridOddNmber.getLabel({dataRef:i})}]);
+    }
+
+    return  arr; 
+}
+
+
+Ebk.Sequence.GridOddNmber.tests = (params = [
+    {step:0,cLength:20,dataRef:1},
+    {step:1,cLength:20,dataRef:2},
+    {step:2,cLength:20,dataRef:3},
+    {step:3,cLength:20,dataRef:4},
+
+
+    
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.GridOddNmber,params ); 
+}
+
+
 Ebk.Sequence.MSMK = {}
 
 Ebk.Sequence.MSMK.name = `Ebk.Sequence.MSMK`;
