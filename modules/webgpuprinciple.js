@@ -1787,9 +1787,14 @@ let functions_entries = [
          Ebk.Sequence.GridWholeNumber.tests();
          Ebk.Sequence.GridEvenNmber.tests();
          Ebk.Sequence.GridOddNmber.tests();
+     
+
           //Ebk.Sequence.MKMK.tests();
         // Ebk.Sequence.GridWholeNumber.tests();
        
+        Ebk.Sequence.GridWaveFadeInSum.tests();
+
+        Ebk.Sequence.GridWaveFadeIn.tests();
           obj.uiLoad();
 
          

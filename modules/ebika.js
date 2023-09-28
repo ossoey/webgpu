@@ -2328,7 +2328,6 @@ Ebk.Sequence.GridOddNmber.getDataCollection = (params = {step:5,cLength:20})=>{
     return  arr; 
 }
 
-
 Ebk.Sequence.GridOddNmber.getLabelCollection = (params = {cLength:20})=>{
     
     let arr = [];
@@ -2339,7 +2338,6 @@ Ebk.Sequence.GridOddNmber.getLabelCollection = (params = {cLength:20})=>{
 
     return  arr; 
 }
-
 
 Ebk.Sequence.GridOddNmber.tests = (params = [
     {step:0,cLength:20,dataRef:1},
@@ -2352,6 +2350,108 @@ Ebk.Sequence.GridOddNmber.tests = (params = [
 ])=>{
 Ebk.ObjectName.tests(Ebk.Sequence.GridOddNmber,params ); 
 }
+
+
+Ebk.Sequence.GridWaveFadeInSum = {}
+
+Ebk.Sequence.GridWaveFadeInSum.name = `Ebk.Sequence.GridWaveFadeInSum`;
+
+
+Ebk.Sequence.GridWaveFadeInSum.getData = (params = {step:2,length:6})=>{
+    return   (2*(params.step + 1)*params.length-(params.step+1)) - Ebk.Sequence.GridEvenNmber.getData({step:params.step});
+}
+
+Ebk.Sequence.GridWaveFadeInSum.getLabel= (params = {dataRef:5,length:6})=>{
+    let quadraResult = Ebk.Sequence.quadraticEquation({a: -1,b:-2*(1-params.length),c:( 2*params.length-1-params.dataRef)});
+    return  Math.abs(Math.ceil(quadraResult.x2));
+}
+
+Ebk.Sequence.GridWaveFadeInSum.getMaxData = (params = {length:6})=>{
+    return   Ebk.Sequence.GridWaveFadeInSum.getData({step:params.length,length:params.length});
+}
+
+Ebk.Sequence.GridWaveFadeInSum.getMaxLabel = (params = {length:6})=>{
+    return    Ebk.Sequence.GridWaveFadeInSum.getLabel({dataRef:Ebk.Sequence.GridWaveFadeInSum.getMaxData ({length:params.length}),length:params.length});
+}
+
+Ebk.Sequence.GridWaveFadeInSum.getDataCollection = (params = {step:5,length:6,cLength:20})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+        arr.push(Ebk.Sequence.GridWaveFadeInSum.getData({step:i, length: params.length }));
+    }
+
+    return  arr; 
+}
+
+Ebk.Sequence.GridWaveFadeInSum.getLabelCollection = (params = {cLength:20,length:6})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+        arr.push([{dataRef:i,label:Ebk.Sequence.GridWaveFadeInSum.getLabel({dataRef:i, length: params.length })}]);
+    }
+
+    return  arr; 
+}
+Ebk.Sequence.GridWaveFadeInSum.tests = (params = [
+    {step:0,length:6,cLength:20,dataRef:1},
+    {step:1,length:6,cLength:20,dataRef:2},
+    {step:2,length:6,cLength:20,dataRef:3},
+    {step:3,length:6,cLength:40,dataRef:4},
+
+    
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.GridWaveFadeInSum,params ); 
+}
+
+
+Ebk.Sequence.GridWaveFadeIn = {}
+
+Ebk.Sequence.GridWaveFadeIn.name = `Ebk.Sequence.GridWaveFadeIn`;
+
+Ebk.Sequence.GridWaveFadeIn.getData = (params = {step:2,length:6})=>{
+    return    2*(params.length - 1)   - 2* Ebk.Sequence.GridWaveFadeInSum.getLabel({dataRef:params.step ,length:params.length}) + 1;
+}
+
+Ebk.Sequence.GridWaveFadeIn.getLabel= (params = {dataRef:5,length:6})=>{
+    return  Ebk.Sequence.GridWaveFadeInSum.getLabel(params);
+}
+
+Ebk.Sequence.GridWaveFadeIn.getDataCollection = (params = {step:5,length:6,cLength:20})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+        arr.push(Ebk.Sequence.GridWaveFadeIn.getData({step:i, length: params.length }));
+    }
+
+    return  arr; 
+}
+
+Ebk.Sequence.GridWaveFadeIn.getLabelCollection = (params = {cLength:20,length:6})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+        arr.push([{dataRef:i,label:Ebk.Sequence.GridWaveFadeIn.getLabel({dataRef:i, length: params.length })}]);
+    }
+
+    return  arr; 
+}
+
+Ebk.Sequence.GridWaveFadeIn.tests = (params = [
+    {step:0,length:6,cLength:20,dataRef:1},
+    {step:1,length:6,cLength:20,dataRef:2},
+    {step:2,length:6,cLength:20,dataRef:3},
+    {step:3,length:6,cLength:40,dataRef:4},
+
+    
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.GridWaveFadeIn,params ); 
+}
+
 
 
 Ebk.Sequence.MSMK = {}
