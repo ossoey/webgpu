@@ -2361,17 +2361,23 @@ Ebk.Sequence.GridWaveFadeInSum.getData = (params = {step:2,length:6})=>{
     return   (2*(params.step + 1)*params.length-(params.step+1)) - Ebk.Sequence.GridEvenNmber.getData({step:params.step});
 }
 
-Ebk.Sequence.GridWaveFadeInSum.getLabel= (params = {dataRef:5,length:6})=>{
+Ebk.Sequence.GridWaveFadeInSum.getLabelElt= (params = {dataRef:5,length:6})=>{
     let quadraResult = Ebk.Sequence.quadraticEquation({a: -1,b:-2*(1-params.length),c:( 2*params.length-1-params.dataRef)});
     return  Math.abs(Math.ceil(quadraResult.x2));
 }
 
+Ebk.Sequence.GridWaveFadeInSum.getLabel= (params = {dataRef:5,length:6})=>{
+ 
+    return  Ebk.Sequence.GridWaveFadeInSum.getLabelElt( {dataRef:params.dataRef + 1,length:params.length});
+}
+
+
 Ebk.Sequence.GridWaveFadeInSum.getMaxData = (params = {length:6})=>{
-    return   Ebk.Sequence.GridWaveFadeInSum.getData({step:params.length,length:params.length});
+    return   Ebk.Sequence.GridWaveFadeInSum.getData({step:params.length,length:params.length})-1;
 }
 
 Ebk.Sequence.GridWaveFadeInSum.getMaxLabel = (params = {length:6})=>{
-    return    Ebk.Sequence.GridWaveFadeInSum.getLabel({dataRef:Ebk.Sequence.GridWaveFadeInSum.getMaxData ({length:params.length}),length:params.length});
+    return    Ebk.Sequence.GridWaveFadeInSum.getLabel({dataRef:Ebk.Sequence.GridWaveFadeInSum.getMaxData ({length:params.length})-1,length:params.length});
 }
 
 Ebk.Sequence.GridWaveFadeInSum.getDataCollection = (params = {step:5,length:6,cLength:20})=>{
@@ -2396,10 +2402,10 @@ Ebk.Sequence.GridWaveFadeInSum.getLabelCollection = (params = {cLength:20,length
     return  arr; 
 }
 Ebk.Sequence.GridWaveFadeInSum.tests = (params = [
-    {step:0,length:6,cLength:20,dataRef:1},
-    {step:1,length:6,cLength:20,dataRef:2},
-    {step:2,length:6,cLength:20,dataRef:3},
-    {step:3,length:6,cLength:40,dataRef:4},
+    {step:0,length:6,cLength:50,dataRef:1},
+    {step:1,length:6,cLength:50,dataRef:2},
+    {step:2,length:6,cLength:50,dataRef:3},
+    {step:3,length:6,cLength:50,dataRef:4},
 
     
 ])=>{
@@ -2513,7 +2519,6 @@ Ebk.Sequence.MSMK.getLabel = (params = {dataRef:5, length:4})=>{
 }
 
 
-
 Ebk.Sequence.MSMK.tests = (params = [
     {step:0,length:4,phase:0,cLength:20,dataRef:1},
     {step:1,length:4,phase:1,cLength:20,dataRef:2},
@@ -2524,7 +2529,6 @@ Ebk.Sequence.MSMK.tests = (params = [
 ])=>{
 Ebk.ObjectName.tests(Ebk.Sequence.MSMK,params ); 
 }
-
 
 
 Ebk.Sequence.MKMK = {}
@@ -2570,7 +2574,6 @@ Ebk.Sequence.MKMK.getLabel = (params = {dataRef:5, length:4})=>{
 }
 
 
-
 Ebk.Sequence.MKMK.tests = (params = [
     {step:0,length:4,phase:0,cLength:20,dataRef:1},
     {step:1,length:4,phase:1,cLength:20,dataRef:2},
@@ -2583,6 +2586,61 @@ Ebk.ObjectName.tests(Ebk.Sequence.MKMK,params );
 }
 
 
+Ebk.Sequence.MSMKFadeIn = {}
+
+Ebk.Sequence.MSMKFadeIn.name = `Ebk.Sequence.MSMKFadeIn`;
+
+Ebk.Sequence.MSMKFadeIn.getData = (params = {step:2,length:6})=>{
+   
+    let initialIndex = () =>{
+        return  params.step -  Ebk.Sequence.GridWaveFadeInSum.getData({step:
+            Ebk.Sequence.GridWaveFadeInSum.getLabel({dataRef:params.step,length:params.length})-1,length:params.length});
+    }
+
+    let labelLength = () =>{
+        return   ((Ebk.Sequence.GridWaveFadeIn.getData({step:params.step ,length:params.length})+1)/2)-1;
+    }
+
+    return  Ebk.Sequence.MSMK.getData({step:initialIndex(),length:labelLength(),phase:0});
+}
+ 
+Ebk.Sequence.MSMKFadeIn.getLabel= (params = {dataRef:5,length:6})=>{
+ 
+    return Ebk.Sequence.GridWaveFadeInSum.getLabel(params);
+    
+}
+
+Ebk.Sequence.MSMKFadeIn.getDataCollection = (params = {step:5,length:6,cLength:20})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+      arr.push(Ebk.Sequence.MSMKFadeIn.getData({step:i, length: params.length }));
+    }
+
+    return  arr; 
+}
+
+Ebk.Sequence.MSMKFadeIn.getLabelCollection = (params = {cLength:20,length:6})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+         arr.push([{dataRef:i,label:Ebk.Sequence.MSMKFadeIn.getLabel({dataRef:i, length: params.length })}]);
+    }
+
+    return  arr; 
+}
+Ebk.Sequence.MSMKFadeIn.tests = (params = [
+    {step:0,length:9,cLength:50,dataRef:1},
+    {step:1,length:9,cLength:50,dataRef:2},
+    {step:2,length:9,cLength:50,dataRef:3},
+    {step:3,length:9,cLength:50,dataRef:4},
+
+    
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.MSMKFadeIn,params ); 
+}
  
 export {Ebk}
 export default Ebk;
