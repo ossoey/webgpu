@@ -6,6 +6,8 @@
  
 const Ebk = {};
 
+Ebk.name = "Ebika";
+
 Ebk.isNumber = (value) =>{
     if  ( (typeof value === 'number' && !isNaN(value))) return true
     else return false;
@@ -164,6 +166,7 @@ Ebk.ObjectInstance.test = (className,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,
        let classInstance = new className(params);
        let allFunctions = Ebk.getPublicMethodOfClass(classInstance);
    
+       console.log( `  ||** `,classInstance.name,` **||  `,`   ---------------------------------------------    `);
        allFunctions.forEach(func =>{
      
         if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params));
@@ -1686,9 +1689,6 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
     }
 
 
-    
-    
-
 };
 
 Ebk.ERythm.LinearTests = (paramsTestOptions =[
@@ -1890,8 +1890,6 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
 
 
     
-    
-
 };
 
 
@@ -1999,6 +1997,7 @@ Ebk.Rythm = class EbkRythm {
                      console.error(info);
                      return  ;
                    } else {
+                    this.name = `Ebk.Rythm`;
                     this.#params = params;
                     this.#infos = {};
                     this.#infos.trajectory = new Ebk.Trajectory({path:this.#params.sample});
@@ -2011,9 +2010,6 @@ Ebk.Rythm = class EbkRythm {
             }
 
         }
-
-
-
         
     }
 
@@ -2126,7 +2122,7 @@ Ebk.Sequence.tests = (params = [
     Ebk.ObjectName.tests(Ebk.Sequence,params ); 
 }
 
-
+/////// Ebk.Sequence.Grid
 Ebk.Sequence.Grid = {}
 
 Ebk.Sequence.Grid.name = 'Ebk.Sequence.Grid';
@@ -2195,6 +2191,8 @@ Ebk.Sequence.Grid.tests = (params = [
 Ebk.ObjectName.tests(Ebk.Sequence.Grid,params ); 
 }
 
+/////// Ebk.Sequence.GridWholeNumber
+
 Ebk.Sequence.GridWholeNumber = {}
 
 Ebk.Sequence.GridWholeNumber.name = `Ebk.Sequence.GridWholeNumberSum`;
@@ -2251,6 +2249,7 @@ Ebk.ObjectName.tests(Ebk.Sequence.GridWholeNumber,params );
 }
 
 
+/////// Ebk.Sequence.GridEvenNmber
 Ebk.Sequence.GridEvenNmber = {}
 
 Ebk.Sequence.GridEvenNmber.name = `Ebk.Sequence.GridEvenNmber`;
@@ -2302,7 +2301,7 @@ Ebk.ObjectName.tests(Ebk.Sequence.GridEvenNmber,params );
 }
 
 
-
+///////Ebk.Sequence.GridOddNmber
 Ebk.Sequence.GridOddNmber = {}
 
 Ebk.Sequence.GridOddNmber.name = `Ebk.Sequence.GridOddNmber`;
@@ -2351,7 +2350,7 @@ Ebk.Sequence.GridOddNmber.tests = (params = [
 Ebk.ObjectName.tests(Ebk.Sequence.GridOddNmber,params ); 
 }
 
-
+///////Ebk.Sequence.GridWaveFadeInSum
 Ebk.Sequence.GridWaveFadeInSum = {}
 
 Ebk.Sequence.GridWaveFadeInSum.name = `Ebk.Sequence.GridWaveFadeInSum`;
@@ -2412,7 +2411,7 @@ Ebk.Sequence.GridWaveFadeInSum.tests = (params = [
 Ebk.ObjectName.tests(Ebk.Sequence.GridWaveFadeInSum,params ); 
 }
 
-
+///////Ebk.Sequence.GridWaveFadeIn
 Ebk.Sequence.GridWaveFadeIn = {}
 
 Ebk.Sequence.GridWaveFadeIn.name = `Ebk.Sequence.GridWaveFadeIn`;
@@ -2459,7 +2458,7 @@ Ebk.ObjectName.tests(Ebk.Sequence.GridWaveFadeIn,params );
 }
 
 
-
+///////Ebk.Sequence.MSMK
 Ebk.Sequence.MSMK = {}
 
 Ebk.Sequence.MSMK.name = `Ebk.Sequence.MSMK`;
@@ -2530,7 +2529,7 @@ Ebk.Sequence.MSMK.tests = (params = [
 Ebk.ObjectName.tests(Ebk.Sequence.MSMK,params ); 
 }
 
-
+///////Ebk.Sequence.MKMK
 Ebk.Sequence.MKMK = {}
 
 Ebk.Sequence.MKMK.name = `Ebk.Sequence.MKMK`;
@@ -2585,6 +2584,8 @@ Ebk.Sequence.MKMK.tests = (params = [
 Ebk.ObjectName.tests(Ebk.Sequence.MKMK,params ); 
 }
 
+
+///////Ebk.Sequence.MSMKFadeIn
 
 Ebk.Sequence.MSMKFadeIn = {}
 
@@ -2642,7 +2643,7 @@ Ebk.ObjectName.tests(Ebk.Sequence.MSMKFadeIn,params );
 }
 
 
-
+///////Ebk.Sequence.MSMKFadeOut
 Ebk.Sequence.MSMKFadeOut = {}
 
 Ebk.Sequence.MSMKFadeOut.name = `Ebk.Sequence.MSMKFadeOut`;
@@ -2704,5 +2705,79 @@ Ebk.Sequence.MSMKFadeOut.tests = (params = [
 Ebk.ObjectName.tests(Ebk.Sequence.MSMKFadeOut,params ); 
 }
  
+Ebk.Sequence.Options = [Ebk.Sequence.MKMK,Ebk.Sequence.MSMK,Ebk.Sequence.MSMKFadeIn,Ebk.Sequence.MSMKFadeOut];
+
+Ebk.Sequence.TYPE = {};
+
+Ebk.Sequence.TYPE.MKMK = 0;
+Ebk.Sequence.TYPE.MDMK = 1;
+Ebk.Sequence.TYPE.MSMKFADEIN = 2;
+Ebk.Sequence.TYPE.MSMKFADEOUT = 3;
+
+
+
+
+
+/////// Ebk.Navigation
+Ebk.Navigation = class EbkNavigation {
+    #params;
+    #infos;
+    #isCreate;
+    #msg;
+    #name;
+    constructor(params ={sequence:{type:Ebk.Sequence.TYPE.MKMK,length:6, phase:0},
+                rythm: {type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3}}){
+
+        let info =`type, sample, flow, granularity and messy have to be defined. eg params ={type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}`;
+        this.#msg = {};
+        this.#msg.NOTCREAT = 'Object is not created ';
+        this.name = `Ebk.Navigation`;
+        this.#isCreate = false;
+
+        this.#params = params;
+        this.#infos = {};
+        this.#infos.rythm = new Ebk.Rythm(params.rythm);     
+        this.#infos.sequence =  Ebk.Sequence.Options[params.sequence.type];
+        this.#isCreate = true;
+
+       
+        
+    }
+
+
+    _update(params ={ }){
+        return [this.#infos.rythm, this.#infos.sequence];
+    }
+
+    locate(params ={}){
+
+ 
+    }
+
+    locateCollection(){
+
+
+    }
+
+}  
+
+
+Ebk.NavigationTests = (paramsTestOptions =[
+    
+                 {sequence:{type:Ebk.Sequence.TYPE.MKMK,length:6, phase:0},
+                rythm: {type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3}},
+
+
+ 
+])=>{
+
+
+Ebk.ObjectInstance.tests(Ebk.Navigation,paramsTestOptions );
+
+}
+
+
+
+
 export {Ebk}
 export default Ebk;
