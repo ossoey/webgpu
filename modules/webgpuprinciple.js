@@ -1787,7 +1787,7 @@ let functions_entries = [
         // Ebk.Sequence.GridWholeNumber.tests();
         // Ebk.Sequence.GridEvenNmber.tests();
         // Ebk.Sequence.GridOddNmber.tests();
-      
+        Ebk.NavigationTests();
 
           //Ebk.Sequence.MKMK.tests();
         // Ebk.Sequence.GridWholeNumber.tests();
@@ -1798,7 +1798,9 @@ let functions_entries = [
 
       //  Ebk.Sequence.MSMKFadeIn.tests();
 
-        Ebk.Sequence.MSMKFadeOut.tests();
+       // Ebk.Sequence.MSMKFadeOut.tests();
+     //  Ebk.NavigationTests();
+
         obj.uiLoad();
 
          
