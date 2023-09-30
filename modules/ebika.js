@@ -2637,9 +2637,71 @@ Ebk.Sequence.MSMKFadeIn.tests = (params = [
     {step:2,length:9,cLength:50,dataRef:3},
     {step:3,length:9,cLength:50,dataRef:4},
 
-    
 ])=>{
 Ebk.ObjectName.tests(Ebk.Sequence.MSMKFadeIn,params ); 
+}
+
+
+
+Ebk.Sequence.MSMKFadeOut = {}
+
+Ebk.Sequence.MSMKFadeOut.name = `Ebk.Sequence.MSMKFadeOut`;
+
+Ebk.Sequence.MSMKFadeOut.getData = (params = {step:2,length:6})=>{
+   
+    let initialIndex = () =>{
+        return  params.step -  Ebk.Sequence.GridWaveFadeInSum.getData({step:
+            Ebk.Sequence.GridWaveFadeInSum.getLabel({dataRef:params.step,length:params.length})-1,length:params.length});
+    }
+
+
+    let label = () =>{
+        return Ebk.Sequence.MSMKFadeOut.getLabel({dataRef:params.step,length: params.length});
+    }
+
+    let labelLength = () =>{
+        return   ((Ebk.Sequence.GridWaveFadeIn.getData({step:params.step ,length:params.length})+1)/2)-1;
+    }
+
+    return Ebk.Sequence.MSMK.getData({step:initialIndex(),length:labelLength(), phase:0})+label();
+}
+ 
+Ebk.Sequence.MSMKFadeOut.getLabel= (params = {dataRef:5,length:6})=>{
+ 
+    return Ebk.Sequence.GridWaveFadeInSum.getLabel(params);
+    
+}
+
+Ebk.Sequence.MSMKFadeOut.getDataCollection = (params = {step:5,length:6,cLength:20})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+      arr.push(Ebk.Sequence.MSMKFadeOut.getData({step:i, length: params.length }));
+    }
+
+    return  arr; 
+}
+
+Ebk.Sequence.MSMKFadeOut.getLabelCollection = (params = {cLength:20,length:6})=>{
+    
+    let arr = [];
+
+    for(let i = 0;i< params.cLength;i++){
+         arr.push([{dataRef:i,label:Ebk.Sequence.MSMKFadeOut.getLabel({dataRef:i, length: params.length })}]);
+    }
+
+    return  arr; 
+}
+
+Ebk.Sequence.MSMKFadeOut.tests = (params = [
+    {step:0,length:6,cLength:50,dataRef:1},
+    {step:1,length:6,cLength:50,dataRef:2},
+    {step:2,length:6,cLength:50,dataRef:3},
+    {step:3,length:6,cLength:100,dataRef:4},
+
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.MSMKFadeOut,params ); 
 }
  
 export {Ebk}
