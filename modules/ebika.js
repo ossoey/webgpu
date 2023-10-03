@@ -169,7 +169,8 @@ Ebk.ObjectInstance.test = (className,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,
        console.log( `  ||** `,classInstance.name,` **||  `,`   ---------------------------------------------    `);
        allFunctions.forEach(func =>{
      
-        if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params));
+        if(!(func===  "_update"))
+           if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params));
         
        });
   
@@ -193,6 +194,52 @@ console.log(`params:`, item);
 Ebk.ObjectInstance.test(className, item);
 });
 }
+
+
+Ebk.ObjectInstance.testCreateAndUpdate = (className,params ={creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3}, 
+                                                             udpdate:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-0.3} } )=>{
+ 
+    let classInstance = new className(params.creation);
+    let allFunctions = Ebk.getPublicMethodOfClass(classInstance);
+
+    console.log( `  ||** `,classInstance.name,` **||  `,` CREATION  ---------------------------------------------    `);
+    allFunctions.forEach(func =>{
+  
+     if(!(func===  "_update"))
+        if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params.creation));
+     
+    });
+
+
+    classInstance._update(params.update);
+    console.log( `  ||** `,classInstance.name,` **||  `,` UPDATED  ---------------------------------------------    `);
+    allFunctions.forEach(func =>{
+  
+     if(!(func===  "_update"))
+        if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params.updates));
+     
+    });
+
+}
+
+
+Ebk.ObjectInstance.testsCreateAndUpdate = (className, paramsTestOptions =[
+                  
+    {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3}, 
+    udpdate:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-0.3} } ,
+
+    {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:1.3}, 
+    udpdate:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3} } ,
+ 
+
+])=>{
+paramsTestOptions.forEach((item,ndx)=>{
+console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
+console.log(`params:`, item);
+Ebk.ObjectInstance.testCreateAndUpdate(className, item);
+});
+}
+
 
 
 /////// Ebk.Rand 
@@ -2003,6 +2050,7 @@ Ebk.Rythm = class EbkRythm {
                     this.#infos.trajectory = new Ebk.Trajectory({path:this.#params.sample});
                     this.#infos.eRythm =  Ebk.ERythm.create(this.#params);
                     this.#isCreate = true;
+                    
                    }
                 
                 }
@@ -2016,8 +2064,9 @@ Ebk.Rythm = class EbkRythm {
 
     _update(params ={flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
         let info =`type, granularity and messy have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10,messy:[-1,1]}`;
+        this.#params = Object.assign(this.#params, params);
+        this.#infos.eRythm._update();
 
- 
     }
 
     locate(params ={step:5}){
@@ -2651,6 +2700,7 @@ Ebk.Sequence.MSMKFadeOut.name = `Ebk.Sequence.MSMKFadeOut`;
 Ebk.Sequence.MSMKFadeOut.getData = (params = {step:2,length:6})=>{
    
     let initialIndex = () =>{
+
         return  params.step -  Ebk.Sequence.GridWaveFadeInSum.getData({step:
             Ebk.Sequence.GridWaveFadeInSum.getLabel({dataRef:params.step,length:params.length})-1,length:params.length});
     }
@@ -2724,9 +2774,11 @@ Ebk.Navigation = class EbkNavigation {
     #infos;
     #isCreate;
     #msg;
-    #name;
-    constructor(params ={sequence:{type:Ebk.Sequence.TYPE.MKMK,length:6, phase:0},
-                rythm: {type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3}}){
+ 
+    constructor(params ={sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 , /*length*/ 
+                         type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
+                           flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3
+           }){
 
         let info =`type, sample, flow, granularity and messy have to be defined. eg params ={type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}`;
         this.#msg = {};
@@ -2734,10 +2786,13 @@ Ebk.Navigation = class EbkNavigation {
         this.name = `Ebk.Navigation`;
         this.#isCreate = false;
 
-        this.#params = params;
+        this.#params = {};
+
+        this.#params = Object.assign(this.#params,params);
         this.#infos = {};
-        this.#infos.rythm = new Ebk.Rythm(params.rythm);     
-        this.#infos.sequence =  Ebk.Sequence.Options[params.sequence.type];
+        this.#infos.rythm = new Ebk.Rythm(params);     
+        this.#infos.sequence =  Ebk.Sequence.Options[params.sequenceType];
+        this.#params.length = this.#params.sample.length;
         this.#isCreate = true;
 
        
@@ -2746,12 +2801,12 @@ Ebk.Navigation = class EbkNavigation {
 
 
     _update(params ={ }){
-        return [this.#infos.rythm, this.#infos.sequence];
+        
     }
 
-    locate(params ={}){
+    locate(params ={step:3}){
 
- 
+        return    [this.#infos.rythm.locate({step: params.step}), this.#infos.sequence.getData( {step:params.step,length:this.#params.length,phase:0}) ];
     }
 
     locateCollection(){
@@ -2762,17 +2817,25 @@ Ebk.Navigation = class EbkNavigation {
 }  
 
 
+
 Ebk.NavigationTests = (paramsTestOptions =[
     
-                 {sequence:{type:Ebk.Sequence.TYPE.MKMK,length:6, phase:0},
-                rythm: {type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3}},
+    {creation:   {sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 , length:6,
+            type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
+            flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3
+           },   
 
+      udpdate:  {sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 , length:6,
+            type:Ebk.ERythm.TYPE.LINEAR,sample:[[3,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
+            flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3
+           },    
+    }       
 
  
 ])=>{
 
 
-Ebk.ObjectInstance.tests(Ebk.Navigation,paramsTestOptions );
+    Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.Navigation,paramsTestOptions );
 
 }
 
