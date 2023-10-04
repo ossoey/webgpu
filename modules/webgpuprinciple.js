@@ -1784,10 +1784,12 @@ let functions_entries = [
           //Ebk.Sequence.Grid.tests();
           //Ebk.Sequence.GridWholeNumber.tests();
          // Ebk.Sequence.MSMK.tests();
+        // Ebk.Sequence.MSMS.tests();
         // Ebk.Sequence.GridWholeNumber.tests();
         // Ebk.Sequence.GridEvenNmber.tests();
         // Ebk.Sequence.GridOddNmber.tests();
         Ebk.NavigationTests();
+        
 
           //Ebk.Sequence.MKMK.tests();
         // Ebk.Sequence.GridWholeNumber.tests();
