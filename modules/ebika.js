@@ -169,7 +169,7 @@ Ebk.ObjectInstance.test = (className,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,
        console.log( `  ||** `,classInstance.name,` **||  `,`   ---------------------------------------------    `);
        allFunctions.forEach(func =>{
      
-        if(!(func===  "_update"))
+        if((!(func===  "_update")) &&(!(func===  "pause"))) 
            if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params));
         
        });
@@ -197,15 +197,21 @@ Ebk.ObjectInstance.test(className, item);
 
 
 Ebk.ObjectInstance.testCreateAndUpdate = (className,params ={creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3}, 
-                                                             update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-0.3} } )=>{
+                                                             update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-0.3},
+                                                            exceptions:["_update", "pause", "inc", "dec" ] } )=>{
  
-    let classInstance = new className(params.creation);
+    
+ 
+    
+                                                                let classInstance = new className(params.creation);
     let allFunctions = Ebk.getPublicMethodOfClass(classInstance);
+
+
 
     console.log( `  ||** `,classInstance.name,` **||  `,` CREATION  ---------------------------------------------    `);
     allFunctions.forEach(func =>{
   
-     if(!(func===  "_update"))
+     if( !params.exceptions.includes(func)   ) 
         if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params.creation));
      
     });
@@ -215,7 +221,7 @@ Ebk.ObjectInstance.testCreateAndUpdate = (className,params ={creation:{path:[[1,
     console.log( `  ||** `,classInstance.name,` **||  `,` UPDATED  ---------------------------------------------    `);
     allFunctions.forEach(func =>{
   
-     if(!(func===  "_update"))
+     if( !params.exceptions.includes(func)   ) 
         if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params.update));
      
     });
@@ -2084,7 +2090,6 @@ Ebk.Rythm = class EbkRythm {
         this.#infos.trajectory._update({path:this.#params.sample});
         this.#infos.eRythm._update(this.#params);
 
-        console.log("XXXXXXXXX",params,)
 
     }
 
@@ -2905,6 +2910,8 @@ Ebk.Navigation = class EbkNavigation {
     pause(){
 
         this.#infos.pause = !this.#infos.pause
+
+        console.log(`fffff`,this.#infos.pause)
     }
 
     move(){
@@ -2919,12 +2926,21 @@ Ebk.Navigation = class EbkNavigation {
 
     }
 
-    locate(params ={step:3}){
+    locate(){
         let seqStep =   this.#infos.sequence.getData( {step:this.#infos.step,length:this.#params.length,phase:0})
         return  this.#infos.rythm.locate({step: seqStep})
     }
 
-    locateCollection(){
+    testMoveAndLocate(params={clength:23}){
+        let arr = [];
+        for(let i = 0; i < params.cLength; i++){
+
+            this.move();
+            console.log(this.#infos.step)
+            //arr.push([this.#infos.step]);
+        }
+
+        return arr; 
 
     }
 
@@ -2935,13 +2951,14 @@ Ebk.NavigationTests = (paramsTestOptions =[
     
     {creation:   {sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 ,  
             type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
-            flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3, cLength:20,incDec:1
+            flow:(x)=>{return 2*x; }, granularity:5,messy:[-1,1], step:5, cLength:20,incDec:1
            },   
 
       update:  {sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 ,  
             type:Ebk.ERythm.TYPE.LINEAR,sample:[[3,2,3],[-2,2,3],[5,1,6],[25,30,10],[1,3,11]],                     
-            flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:5, cLength:20,incDec:1
-           },    
+            flow:(x)=>{return 2*x; }, granularity:5,messy:[-1,1], step:5, cLength:20,incDec:1
+           },   
+       exceptions:["_update", "pause", "inc", "dec" , "move" ]    
     }       
 
  
