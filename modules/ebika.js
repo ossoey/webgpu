@@ -197,7 +197,7 @@ Ebk.ObjectInstance.test(className, item);
 
 
 Ebk.ObjectInstance.testCreateAndUpdate = (className,params ={creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3}, 
-                                                             udpdate:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-0.3} } )=>{
+                                                             update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-0.3} } )=>{
  
     let classInstance = new className(params.creation);
     let allFunctions = Ebk.getPublicMethodOfClass(classInstance);
@@ -216,7 +216,7 @@ Ebk.ObjectInstance.testCreateAndUpdate = (className,params ={creation:{path:[[1,
     allFunctions.forEach(func =>{
   
      if(!(func===  "_update"))
-        if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params.updates));
+        if (!(func===  "constructor"))console.log(func, `:`,  classInstance[func](params.update));
      
     });
 
@@ -229,7 +229,7 @@ Ebk.ObjectInstance.testsCreateAndUpdate = (className, paramsTestOptions =[
     udpdate:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-0.3} } ,
 
     {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:1.3}, 
-    udpdate:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3} } ,
+    update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3} } ,
  
 
 ])=>{
@@ -1396,7 +1396,9 @@ Ebk.Trajectory = class EbkTrajectory{
     #infos;
     constructor(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}){
         this.name = `Ebk.Trajectory`;
-        this._update(  params);
+        this.#params = Object.assign({},params);
+        this.#computeInfos();
+        //this._update(  params);
     }
 
     _update(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]]}){
@@ -1416,9 +1418,9 @@ Ebk.Trajectory = class EbkTrajectory{
                     console.error(info);
                     return null;
                 } else {
-                    this.#params = params;
-                    this.#computeInfos();
-                    
+                    //this.#params = params;
+                    this.#params = Object.assign(this.#params,params);
+                    this.#computeInfos();                    
                 }
              } 
         }
@@ -1565,11 +1567,17 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
     #infos;
     constructor(params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}){
         this.name = `Ebk.ERythm.Linear`;
-        this._update(params);
+        //this._update(params);
+
+        this.#params = Object.assign({},params);
+        //this.#params = params;
+        this.#infos = {};
+        this.#infos.domain = [1,10];
+        this.#infos.codomain = [this.#params.flow(this.#infos.domain[0]),this.#params.flow(this.#infos.domain[1])];
+        return true;
     }
 
     
-
     _update(params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}){
         let info =`  granularity and messy have to be defined. eg params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}`;
 
@@ -1586,10 +1594,12 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
                     console.error(info);
                     return null;
                 } else {
-                    this.#params = params;
-                    this.#infos = {};
-                    this.#infos.domain = [1,10];
-                    this.#infos.codomain = [this.#params.flow(this.#infos.domain[0]),this.#params.flow(this.#infos.domain[1])];
+                   // this.#params = params;
+                    this.#params = Object.assign(this.#params,params);
+
+                    //this.#infos = {};
+                    //this.#infos.domain = [1,10];
+                    //this.#infos.codomain = [this.#params.flow(this.#infos.domain[0]),this.#params.flow(this.#infos.domain[1])];
                     return true;
                 }
 
@@ -1759,11 +1769,15 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
     #infos;
     constructor(params ={flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
         this.name = `Ebk.ERythm.Wavy`;
-        this._update(params);
+        this.#params = Object.assign({},params);
+        this.#infos = {};
+        this.#infos.domain = [0,2*Math.PI];
+        this.#infos.codomain = [1,-1];
+        return true;
+        //this._update(params);
     }
 
     
-
     _update(params ={flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
         let info =`flow, granularity and messy have to be defined. eg params ={flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}`;
 
@@ -1780,10 +1794,12 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
                     console.error(info);
                     return null;
                 } else {
-                    this.#params = params;
-                    this.#infos = {};
-                    this.#infos.domain = [0,2*Math.PI];
-                    this.#infos.codomain = [1,-1];
+                    this.#params = Object.assign(this.#params,params);
+                    
+                    //this.#params = params;
+                    //this.#infos = {};
+                    //this.#infos.domain = [0,2*Math.PI];
+                   // this.#infos.codomain = [1,-1];
                     return true;
                 }
 
@@ -1835,7 +1851,6 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
     }
 
    
-
     locate(params ={step:1}){
 
         let info =`step has to be defined . eg {step: 1}`;
@@ -1935,8 +1950,6 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
         return arr;
     }
 
-
-    
 };
 
 
@@ -2045,7 +2058,9 @@ Ebk.Rythm = class EbkRythm {
                      return  ;
                    } else {
                     this.name = `Ebk.Rythm`;
-                    this.#params = params;
+                    //this.#params = params;
+
+                    this.#params =  Object.assign({},params);
                     this.#infos = {};
                     this.#infos.trajectory = new Ebk.Trajectory({path:this.#params.sample});
                     this.#infos.eRythm =  Ebk.ERythm.create(this.#params);
@@ -2064,8 +2079,12 @@ Ebk.Rythm = class EbkRythm {
 
     _update(params ={flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
         let info =`type, granularity and messy have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10,messy:[-1,1]}`;
-        this.#params = Object.assign(this.#params, params);
-        this.#infos.eRythm._update();
+
+        this.#params =  Object.assign(this.#params ,params);
+        this.#infos.trajectory._update({path:this.#params.sample});
+        this.#infos.eRythm._update(this.#params);
+
+        console.log("XXXXXXXXX",params,)
 
     }
 
@@ -2634,6 +2653,62 @@ Ebk.ObjectName.tests(Ebk.Sequence.MKMK,params );
 }
 
 
+///////Ebk.Sequence.MSMS
+Ebk.Sequence.MSMS = {}
+
+Ebk.Sequence.MSMS.name = `Ebk.Sequence.MSMS`;
+
+
+Ebk.Sequence.MSMS.labelGetRow = (params = {step:1,length:4})=>{
+    return Math.floor(params.step/params.length);
+}
+
+Ebk.Sequence.MSMS.getDataElt = (params = {step:1,length:4})=>{
+ 
+   return (params.length-1) -  params.step % params.length;
+}
+
+Ebk.Sequence.MSMS.getDataCollection  = (params = {step:1,phase:2,length:4,cLength:15})=>{
+    let arr = [];
+    for(let i=0;i<params.cLength;i++){
+        arr.push(Ebk.Sequence.MSMS.getData ({step:i,phase: params.phase , length:params.length}));
+    }
+    
+    return arr; 
+} 
+
+Ebk.Sequence.MSMS.getLabelCollection  = (params = {length:4,cLength:15})=>{
+    let arr = [];
+    for(let i=0;i<params.cLength;i++){
+        arr.push(Ebk.Sequence.MSMS.getLabel({dataRef:i,length: params.length }));
+    }
+    
+    return arr; 
+} 
+
+
+Ebk.Sequence.MSMS.getData = (params = {step:1,length:4,phase:2})=>{
+    return Ebk.Sequence.MSMS.getDataElt (params = {step:params.step+params.phase,length:params.length});
+}
+
+
+Ebk.Sequence.MSMS.getLabel = (params = {dataRef:5, length:4})=>{
+    return  Math.floor(params.dataRef/params.length);
+}
+
+
+Ebk.Sequence.MSMS.tests = (params = [
+    {step:0,length:4,phase:0,cLength:20,dataRef:1},
+    {step:1,length:4,phase:1,cLength:20,dataRef:2},
+    {step:2,length:4,phase:2,cLength:20,dataRef:3},
+    {step:3,length:4,phase:1,cLength:20,dataRef:4},
+
+
+])=>{
+Ebk.ObjectName.tests(Ebk.Sequence.MSMS,params ); 
+}
+
+
 ///////Ebk.Sequence.MSMKFadeIn
 
 Ebk.Sequence.MSMKFadeIn = {}
@@ -2755,14 +2830,15 @@ Ebk.Sequence.MSMKFadeOut.tests = (params = [
 Ebk.ObjectName.tests(Ebk.Sequence.MSMKFadeOut,params ); 
 }
  
-Ebk.Sequence.Options = [Ebk.Sequence.MKMK,Ebk.Sequence.MSMK,Ebk.Sequence.MSMKFadeIn,Ebk.Sequence.MSMKFadeOut];
+Ebk.Sequence.Options = [Ebk.Sequence.MKMK,Ebk.Sequence.MSMS,Ebk.Sequence.MSMK,Ebk.Sequence.MSMKFadeIn,Ebk.Sequence.MSMKFadeOut];
 
 Ebk.Sequence.TYPE = {};
 
 Ebk.Sequence.TYPE.MKMK = 0;
-Ebk.Sequence.TYPE.MDMK = 1;
-Ebk.Sequence.TYPE.MSMKFADEIN = 2;
-Ebk.Sequence.TYPE.MSMKFADEOUT = 3;
+Ebk.Sequence.TYPE.MSMS = 1;
+Ebk.Sequence.TYPE.MSMK = 2;
+Ebk.Sequence.TYPE.MSMKFADEIN = 3;
+Ebk.Sequence.TYPE.MSMKFADEOUT = 4;
 
 
 
@@ -2777,7 +2853,8 @@ Ebk.Navigation = class EbkNavigation {
  
     constructor(params ={sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 , /*length*/ 
                          type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
-                           flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3
+                           flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:0,
+                           incDec:1
            }){
 
         let info =`type, sample, flow, granularity and messy have to be defined. eg params ={type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}`;
@@ -2786,48 +2863,84 @@ Ebk.Navigation = class EbkNavigation {
         this.name = `Ebk.Navigation`;
         this.#isCreate = false;
 
-        this.#params = {};
+      //  this.#params = {};
 
-        this.#params = Object.assign(this.#params,params);
+        this.#params = Object.assign({},params);
         this.#infos = {};
-        this.#infos.rythm = new Ebk.Rythm(params);     
-        this.#infos.sequence =  Ebk.Sequence.Options[params.sequenceType];
+        this.#infos.rythm = new Ebk.Rythm(this.#params);     
+        this.#infos.sequence =  Ebk.Sequence.Options[this.#params.sequenceType];
         this.#params.length = this.#params.sample.length;
+        this.#infos.step = this.#params.step;
+        this.#infos.pause = false;
+        this.#infos.incFlag = true;
         this.#isCreate = true;
-
-       
         
     }
 
 
-    _update(params ={ }){
+    _update(params ={sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 , /*length*/ 
+                type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
+                flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3,
+                incDec:1
+     }){
         
+        this.#params = Object.assign(this.#params,params);
+        this.#infos.rythm._update(this.#params);
+        this.#infos.sequence =  Ebk.Sequence.Options[this.#params.sequenceType];
+        this.#infos.step = this.#params.step;
+        this.#params.length = this.#params.sample.length;
+ 
+    }
+
+    inc(params = {incDec:2}){
+        this.#params.incDec = params.incDec;
+        this.#infos.incFlag = true;
+    }
+
+    dec(params = {incDec:2}){
+        this.#params.incDec = params.incDec;
+        this.#infos.incFlag = false;
+    }
+
+    pause(){
+
+        this.#infos.pause = !this.#infos.pause
+    }
+
+    move(){
+       if (! this.#infos.pause) {
+            if (this.#infos.incFlag ){
+                this.#infos.step += this.#params.incDec;
+            } else {
+
+                this.#infos.step -= this.#params.incDec;
+            }
+       }
+
     }
 
     locate(params ={step:3}){
-
-        return    [this.#infos.rythm.locate({step: params.step}), this.#infos.sequence.getData( {step:params.step,length:this.#params.length,phase:0}) ];
+        let seqStep =   this.#infos.sequence.getData( {step:this.#infos.step,length:this.#params.length,phase:0})
+        return  this.#infos.rythm.locate({step: seqStep})
     }
 
     locateCollection(){
-
 
     }
 
 }  
 
 
-
 Ebk.NavigationTests = (paramsTestOptions =[
     
-    {creation:   {sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 , length:6,
+    {creation:   {sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 ,  
             type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
-            flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3
+            flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3, cLength:20,incDec:1
            },   
 
-      udpdate:  {sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 , length:6,
-            type:Ebk.ERythm.TYPE.LINEAR,sample:[[3,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
-            flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3
+      update:  {sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 ,  
+            type:Ebk.ERythm.TYPE.LINEAR,sample:[[3,2,3],[-2,2,3],[5,1,6],[25,30,10],[1,3,11]],                     
+            flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:5, cLength:20,incDec:1
            },    
     }       
 
