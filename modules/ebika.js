@@ -1432,6 +1432,11 @@ Ebk.Trajectory = class EbkTrajectory{
         }
     }
 
+
+    getParams(){
+        return Object.assign({},this.#params);
+    }
+
     #computeDistances(){
         this.#infos = {};
         this.#infos.distances = [];
@@ -1614,6 +1619,9 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
         }
     }
   
+    getParams(){
+        return Object.assign({},this.#params);
+    }
 
     isflowRight(flow =(x)=>{return 2*x }){
         return Ebk.isFunction(flow) ;
@@ -1824,6 +1832,9 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
         }
      }
     
+    getParams(){
+      return Object.assign({},this.#params);
+    }
     
     #computeEntry(params ={step:1}){
         
@@ -2092,6 +2103,16 @@ Ebk.Rythm = class EbkRythm {
 
 
     }
+
+    getParams(){
+        return Object.assign({},this.#params);
+    }
+
+    getInfos(){
+        return Object.assign({},this.#infos);
+    }
+      
+      
 
     locate(params ={step:5}){
 
@@ -2874,7 +2895,7 @@ Ebk.Navigation = class EbkNavigation {
         this.#infos = {};
         this.#infos.rythm = new Ebk.Rythm(this.#params);     
         this.#infos.sequence =  Ebk.Sequence.Options[this.#params.sequenceType];
-        this.#params.length = this.#params.sample.length;
+        this.#params.length = this.#params.granularity+1;
         this.#infos.step = this.#params.step;
         this.#infos.pause = false;
         this.#infos.incFlag = true;
@@ -2893,8 +2914,16 @@ Ebk.Navigation = class EbkNavigation {
         this.#infos.rythm._update(this.#params);
         this.#infos.sequence =  Ebk.Sequence.Options[this.#params.sequenceType];
         this.#infos.step = this.#params.step;
-        this.#params.length = this.#params.sample.length;
+        this.#params.length = this.#params.granularity+1;
+
+       // console.log(this.#infos.rythm.getParams(),   this.#infos.rythm.getInfos().trajectory, this.#infos.rythm.getInfos().eRythm) 
+
  
+     
+    }
+
+    getParams(){
+        return Object.assign({},this.#params);
     }
 
     inc(params = {incDec:2}){
@@ -2908,11 +2937,13 @@ Ebk.Navigation = class EbkNavigation {
     }
 
     pause(){
-
-        this.#infos.pause = !this.#infos.pause
-
-        console.log(`fffff`,this.#infos.pause)
+        this.#infos.pause = true;
     }
+
+    resume(){
+        this.#infos.pause = false;
+    }
+
 
     move(){
        if (! this.#infos.pause) {
@@ -2931,13 +2962,27 @@ Ebk.Navigation = class EbkNavigation {
         return  this.#infos.rythm.locate({step: seqStep})
     }
 
-    testMoveAndLocate(params={clength:23}){
+    locateCollection(params={clength:23}){
         let arr = [];
         for(let i = 0; i < params.cLength; i++){
 
             this.move();
-            console.log(this.#infos.step)
-            //arr.push([this.#infos.step]);
+
+            arr.push(this.locate());
+        }
+
+        return arr; 
+
+    }
+
+    locateTestCollection(params={clength:23}){
+        let arr = [];
+        for(let i = 0; i < params.cLength; i++){
+
+            this.move();
+           // if (i==7) this.pause();
+          //  if(i==15) this.resume();
+            arr.push(this.locate());
         }
 
         return arr; 
@@ -2951,16 +2996,16 @@ Ebk.NavigationTests = (paramsTestOptions =[
     
     {creation:   {sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 ,  
             type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
-            flow:(x)=>{return 2*x; }, granularity:5,messy:[-1,1], step:5, cLength:20,incDec:1
+            flow:(x)=>{return 2*x; }, granularity:10,messy:[0,0], step:-1, cLength:22,incDec:1
            },   
 
       update:  {sequenceType:Ebk.Sequence.TYPE.MKMK, phase: 0 ,  
-            type:Ebk.ERythm.TYPE.LINEAR,sample:[[3,2,3],[-2,2,3],[5,1,6],[25,30,10],[1,3,11]],                     
-            flow:(x)=>{return 2*x; }, granularity:5,messy:[-1,1], step:5, cLength:20,incDec:1
+            type:Ebk.ERythm.TYPE.LINEAR,sample:[[3,2,3],[-2,2,3],[22,2,3]],                     
+            flow:(x)=>{return 2*x; }, granularity:15,messy:[0,0], step:-1, cLength:22,incDec:1
            },   
-       exceptions:["_update", "pause", "inc", "dec" , "move" ]    
+       exceptions:["_update", "pause", "inc", "dec" , "move" , "resume" ]    
     }       
-
+   //[[3,2,3],[-2,2,3],[-25,1,6],[25,30,10],[1,3,11]]
  
 ])=>{
 
