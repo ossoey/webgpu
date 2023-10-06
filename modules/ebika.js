@@ -238,12 +238,14 @@ Ebk.ObjectInstance.testsCreateAndUpdate = (className, paramsTestOptions =[
     update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3} } ,
  
 
-])=>{
-paramsTestOptions.forEach((item,ndx)=>{
-console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
-console.log(`params:`, item);
-Ebk.ObjectInstance.testCreateAndUpdate(className, item);
-});
+],exceptions = ["_update", "pause", "inc", "dec" ] )=>{
+
+    paramsTestOptions.forEach((item,ndx)=>{
+    console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
+    console.log(`params:`, item);
+    item.exceptions = exceptions;
+    Ebk.ObjectInstance.testCreateAndUpdate(className, item);
+   });   
 }
 
 
@@ -1496,7 +1498,7 @@ Ebk.Trajectory = class EbkTrajectory{
  
      }
  
-     locate(params ={target:0.3}){
+    locate(params ={target:0.3}){
 
         let info =`target has to be defined . eg {target: 0.4}`;
 
@@ -1534,38 +1536,46 @@ Ebk.Trajectory = class EbkTrajectory{
         }
     
     }
-
+    
     _updateAndLocate(params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3}){
         this._update(params);
         return this.locate(params);
     }
 
+
+    locateCollection(params ={targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}){ 
+
+        this.positions = [] ;
+
+          params.targets.forEach(item =>{
+            this.positions.push(this.locate({target: item}));
+          });
+           
+        return this.positions;
+
+    }
     
 };
 
-Ebk.TrajectoryTests = {};
+ 
 
-Ebk.TrajectoryTests.test = (params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
-   
-    Ebk.ObjectInstance.test( Ebk.Trajectory,params);
-}
-
-Ebk.TrajectoryTests.tests = (paramsTestOptions =[
+Ebk.TrajectoryTests = (paramsTestOptions =[
                   
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:-0.3},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:10.58},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.11},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.2},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.85},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.92},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.98},
-                   {path:[[1,2,3],[-2,2,3],[5,1,6],[0,1,10]],target:0.62},
-                
-           ])=>{
+    {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
+    update:{path:[[1,2,3,5],[12,-2,2,3],[19,5,1,6],[8,1,600,-11]],target:-0.3,targets:[0,0.1,0.2,0.9,1] }} ,
 
-  
-    Ebk.ObjectInstance.tests(Ebk.Trajectory,paramsTestOptions );
+    {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
+    update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]} } ,
+ 
+],exceptions = ["_update", "getParams" ])=>{
+
+   Ebk.ObjectInstance.testsCreateAndUpdate (Ebk.Trajectory, paramsTestOptions,exceptions );
+ 
 }
+
+
+
+
 
 
 /////// Ebk.ERythm 
