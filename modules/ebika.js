@@ -1772,20 +1772,36 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
 
 };
 
-Ebk.ERythm.LinearTests = (paramsTestOptions =[
+// Ebk.ERythm.LinearTests = (paramsTestOptions =[
     
-                {flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]},
-                {flow:(x)=>{return 3*x; }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
-                {flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1],messy:[0,1]},
-                {flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1],messy:[-1,-1]},
-                {flow:(x)=>{return  Math.pow(2,1/(x+1))  }, granularity:13,step:3,sample:[-1,1],messy:[-1,-1]},
+//                 {flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]},
+//                 {flow:(x)=>{return 3*x; }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
+//                 {flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1],messy:[0,1]},
+//                 {flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1],messy:[-1,-1]},
+//                 {flow:(x)=>{return  Math.pow(2,1/(x+1))  }, granularity:13,step:3,sample:[-1,1],messy:[-1,-1]},
                 
-           ])=>{
+//            ])=>{
 
   
-    Ebk.ObjectInstance.tests(Ebk.ERythm.Linear,paramsTestOptions );
+//     Ebk.ObjectInstance.tests(Ebk.ERythm.Linear,paramsTestOptions );
+ 
+// }
+
+
+Ebk.ERythm.LinearTests = (paramsTestOptions =[
+                  
+    {creation:{flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+    update: {flow:(x)=>{return 3*x; }, granularity:5,step:3,sample:[100,200],messy:[0,0]}} ,
+
+    {creation:{flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1],messy:[0,1]}, 
+    update:{flow:(x)=>{return  Math.pow(2,1/(x+1))  }, granularity:13,step:3,sample:[-1,1],messy:[-1,-1]} } ,
+ 
+],exceptions = ["_update", "getParams" ])=>{
+
+   Ebk.ObjectInstance.testsCreateAndUpdate (Ebk.ERythm.Linear, paramsTestOptions,exceptions );
  
 }
+
 
 /////// Ebk.ERythm.Wavy
 Ebk.ERythm.Wavy = class EbkERythmWavy {

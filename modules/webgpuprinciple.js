@@ -1744,17 +1744,27 @@ let functions_entries = [
         obj.func = async () =>{
 
        
-       
-          Ebk.TrajectoryTests ( [
+
+          // Ebk.TrajectoryTests ( [
                   
-            {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
-            update:{path:[[1,2,3,5,9,10],[3,5,12,-2,2,3],[19,5,1,26,-52,6],[8,1,600,12,-2,-11]],target:-0.3,targets:[0,0.1,0.2,0.9,1] }} ,
+          //   {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
+          //   update:{path:[[1,2,3,5,9,10],[3,5,12,-2,2,3],[19,5,1,26,-52,6],[8,1,600,12,-2,-11]],target:-0.3,targets:[0,0.1,0.2,0.9,1] }} ,
         
-            {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
-            update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]} } ,
+          //   {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
+          //   update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]} } ,
          
-        ],  ["_update", "getParams" ]);
+          //  ],  ["_update", "getParams" ]);
           
+          
+           Ebk.ERythm.LinearTests ([
+                  
+            {creation:{flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+            update: {flow:(x)=>{return 3*x; }, granularity:5,step:3,sample:[100,200],messy:[0,0]}} ,
+        
+            {creation:{flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1],messy:[0,1]}, 
+            update:{flow:(x)=>{return  Math.pow(2,1/(x+1))  }, granularity:13,step:3,sample:[-1,1],messy:[-1,-1]} } ,
+         
+           ],["_update", "getParams" ])
 
 
         obj.uiLoad();
