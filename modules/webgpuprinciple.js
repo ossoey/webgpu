@@ -1743,65 +1743,19 @@ let functions_entries = [
  
         obj.func = async () =>{
 
-        //  Ebk.Rand.tests();
-
-    //       Ebk.Matrix.tests([{ matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2], headNdx :0,
-    //       matrices:[ [[-3,-3,3],[0,-2,3],[0,-4,1]], [[-2,-3,2],[0,2,3],[-2,4,-4]]]
-    //      },
-
-    //      { matrix:[[2,-1],[1,-3]],scalars:[-1,1,-1/2],  headNdx :0,
-    //       matrices:[ [[1,2],[1,2]],[[2,1],[1,2]],[[1,3],[2,1]],[[1,0],[0,1]]  ]
-    //      }
-    //      ,
-
-    //      { matrix:[[3,-3,0,0,0],[0,0,-1,0,-1],[0,-2,0,0,2],[3,0,0,3,0],[0,0,-3,3,1] ],scalars:[-1,1,-1/2],  headNdx :0, colNdx :1,rowNdx:2,
-    //       matrices:[ [[1,2],[1,2]],[[2,1],[1,2]],[[1,3],[2,1]],[[1,0],[0,1]]  ]
-    //      }
-    
-    
-    
-    // ]);
-
-
-       // Ebk.TrajectoryTests.tests();
-
-      //  Ebk.ERythm.WavyTests([
-      //     {flow:(x)=>{return   Math.sin( x); }, granularity:10,step:3,sample:[1,100],messy:[0,0]},
-      //     {flow:(x)=>{return   Math.cos(x);}, granularity:10,step:3,sample:[1,100],messy:[0,0]},
-      //     {flow:(x)=>{return   Math.sin(x);}, granularity:10,step:3,sample:[1,100],messy:[0.8,0.89]},
-      //     {flow:(x)=>{return   Math.tan(x);}, granularity:10,step:3,sample:[1,100],messy:[0.8,0.89]},
-      //    ]);
-        
-       //  Ebk.ERythm.WavyTests
-
-       //Ebk.ERythm.createTests();
-
-         // Ebk.RythmTests();
-
-        //  Ebk.Matrix.tests();
-        //  Ebk.Rand.tests();
-        //  Ebk.Sequence.tests();
-          //Ebk.Sequence.Grid.tests();
-          //Ebk.Sequence.GridWholeNumber.tests();
-         // Ebk.Sequence.MSMK.tests();
-        // Ebk.Sequence.MSMS.tests();
-        // Ebk.Sequence.GridWholeNumber.tests();
-        // Ebk.Sequence.GridEvenNmber.tests();
-        // Ebk.Sequence.GridOddNmber.tests();
-        Ebk.NavigationTests();
-        
-
-          //Ebk.Sequence.MKMK.tests();
-        // Ebk.Sequence.GridWholeNumber.tests();
        
-         //Ebk.Sequence.GridWaveFadeInSum.tests();
+       
+          Ebk.TrajectoryTests ( [
+                  
+            {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
+            update:{path:[[1,2,3,5,9,10],[3,5,12,-2,2,3],[19,5,1,26,-52,6],[8,1,600,12,-2,-11]],target:-0.3,targets:[0,0.1,0.2,0.9,1] }} ,
+        
+            {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
+            update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]} } ,
+         
+        ],  ["_update", "getParams" ]);
+          
 
-        //Ebk.Sequence.GridWaveFadeIn.tests();
-
-      //  Ebk.Sequence.MSMKFadeIn.tests();
-
-       // Ebk.Sequence.MSMKFadeOut.tests();
-     //  Ebk.NavigationTests();
 
         obj.uiLoad();
 
