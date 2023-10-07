@@ -1768,18 +1768,30 @@ let functions_entries = [
 
 
 
-          Ebk.ERythm.WavyTests([
+          // Ebk.ERythm.WavyTests([
                   
-            {creation:{flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
-            update: {flow:(x)=>{return Math.sin(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]}} ,
+          //   {creation:{flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+          //   update: {flow:(x)=>{return Math.sin(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]}} ,
         
-            {creation: {flow:(x)=>{return Math.cos(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
-            update: {flow:(x)=>{return Math.cos(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]} } ,
-            ,
-            {creation: {flow:(x)=>{return Math.tan(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
-            update: {flow:(x)=>{return Math.tan(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]} }
-          ], ["_update", "getParams" ]);
+          //   {creation: {flow:(x)=>{return Math.cos(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+          //   update: {flow:(x)=>{return Math.cos(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]} } ,
+          //   ,
+          //   {creation: {flow:(x)=>{return Math.tan(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+          //   update: {flow:(x)=>{return Math.tan(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]} }
+          // ], ["_update", "getParams" ]);
 
+
+
+          Ebk.ERythm.CreationTests  ( [
+                  
+            {creation:{type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+            update: {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.cos(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]}} ,
+        
+            {creation: {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+            update: {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return Math.pow(3,x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]} } ,
+        
+         
+            ],["_update", "getParams" ]);
 
         obj.uiLoad();
 

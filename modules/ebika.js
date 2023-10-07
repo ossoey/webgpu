@@ -1981,20 +1981,6 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
 };
 
 
-// Ebk.ERythm.WavyTests = (paramsTestOptions =[
-    
-//                 {flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]},
-//                 {flow:(x)=>{return Math.sin(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
-
-                
-//            ])=>{
-
-  
-//     Ebk.ObjectInstance.tests(Ebk.ERythm.Wavy,paramsTestOptions );
- 
-// }
-
-
 Ebk.ERythm.WavyTests  = (paramsTestOptions =[
                   
     {creation:{flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
@@ -2030,8 +2016,6 @@ Ebk.ERythm.create =  (params={ type: Ebk.ERythm.TYPE.LINEAR  ,flow:(x)=>{return 
         return new Ebk.ERythm.Wavy(params);
     }
 
-
-
 }
 
 Ebk.ERythm.createTests =(paramsTestOptions =[
@@ -2065,6 +2049,60 @@ Ebk.ERythm.createTests =(paramsTestOptions =[
       });
    
 }
+
+
+
+/////// Ebk.ERythm.Creation
+Ebk.ERythm.Creation = class EbkERythmCreation {
+    #params;
+    #infos;
+    constructor(params ={type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
+        this.name = `Ebk.ERythm.Creation`;
+        this.#params = Object.assign({},params);
+        
+        this.#infos = {};
+
+        this.#infos.obj = (params.type === Ebk.ERythm.TYPE.LINEAR)? new Ebk.ERythm.Linear( this.#params) : new Ebk.ERythm.Wavy(this.#params);
+
+    }
+    
+    _update(params ={flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1]}){
+
+        this.#params = Object.assign(this.#params,params);
+        this.#infos.obj._update(this.#params);
+    }
+
+    getParams(){
+        return Object.assign({},this.#params);
+    }
+      
+    locate(params ={step:1}){
+       return this.#infos.obj.locate(params);
+    }
+
+    locateCollection(){
+        return this.#infos.obj.locateCollection();
+    }
+
+}
+
+
+Ebk.ERythm.CreationTests  = (paramsTestOptions =[
+                  
+    {creation:{type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+    update: {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.cos(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]}} ,
+
+    {creation: {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+    update: {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return Math.pow(3,x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]} } ,
+
+ 
+],exceptions = ["_update", "getParams" ])=>{
+
+   Ebk.ObjectInstance.testsCreateAndUpdate (Ebk.ERythm.Creation, paramsTestOptions,exceptions );
+ 
+}
+
+
 
 /////// Ebk.Rythm 
 Ebk.Rythm = class EbkRythm {
