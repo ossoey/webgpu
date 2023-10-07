@@ -1795,26 +1795,42 @@ let functions_entries = [
         //  ], ["_update", "getParams" ]);
 
 
-        Ebk.RythmTests   ( [
+      //   Ebk.RythmTests   ( [
                   
-          {creation: {type:Ebk.ERythm.TYPE.WAVY, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1], step:0}, 
-          update: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3} } ,
+      //     {creation: {type:Ebk.ERythm.TYPE.WAVY, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1], step:0}, 
+      //     update: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3} } ,
       
-          {creation: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3}, 
-          update: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3} } ,
+      //     {creation: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3}, 
+      //     update: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3} } ,
       
-          {creation: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[15,1,1,1],[-9,0,2,2],[1039,3,-18,3],[0, 4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3}, 
-          update: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[15,1],[-9,0],[1039,3],[0, 4],[-1,3],[5,1]], flow:(x)=>{return 2*x; }, granularity:20,messy:[-1,1], step:3} } ,
+      //     {creation: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[15,1,1,1],[-9,0,2,2],[1039,3,-18,3],[0, 4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3}, 
+      //     update: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[15,1],[-9,0],[1039,3],[0, 4],[-1,3],[5,1]], flow:(x)=>{return 2*x; }, granularity:20,messy:[-1,1], step:3} } ,
        
-          {creation: {type:Ebk.ERythm.TYPE.WAVY, sample:[[15,1,1,1],[-9,0,2,2],[1039,3,-18,3],[0, 4,4,8]], flow:(x)=>{return  Math.cos(x); }, granularity:10,messy:[0,0], step:3}, 
-          update: {type:Ebk.ERythm.TYPE.WAVY, sample:[[15,1],[-9,0],[1039,3],[0, 4],[-1,3],[5,1]], flow:(x)=>{return Math.tan(x); }, granularity:30,messy:[0.5,0.6], step:3} } ,
+      //     {creation: {type:Ebk.ERythm.TYPE.WAVY, sample:[[15,1,1,1],[-9,0,2,2],[1039,3,-18,3],[0, 4,4,8]], flow:(x)=>{return  Math.cos(x); }, granularity:10,messy:[0,0], step:3}, 
+      //     update: {type:Ebk.ERythm.TYPE.WAVY, sample:[[15,1],[-9,0],[1039,3],[0, 4],[-1,3],[5,1]], flow:(x)=>{return Math.tan(x); }, granularity:30,messy:[0.5,0.6], step:3} } ,
 
 
-      ], ["_update" , "getInfos"  ])
+      // ], ["_update" , "getInfos"  ])
 
+
+      Ebk.Sequence.CreationTests ( [
+                  
+        {creation:{step: 0, dataRef: 2,length :3 , cLength:10, type: Ebk.Sequence.TYPE.MKMK }, 
+        update: {step: 0, dataRef: 2,length :4 , cLength:20, type: Ebk.Sequence.TYPE.MKMK }} ,
+    
+        {creation:{step: 0, dataRef: 2,length :5 , cLength:11, type: Ebk.Sequence.TYPE.MSMS}, 
+        update: {step: 0, dataRef: 2,length :6 , cLength:13, type: Ebk.Sequence.TYPE.MSMS }} ,
+    
+        {creation:{step: 0, dataRef: 2,length :7 , cLength:16, type: Ebk.Sequence.TYPE.MSMK}, 
+        update: {step: 0, dataRef: 2,length :8 , cLength:17, type: Ebk.Sequence.TYPE.MSMK }} ,
+    
+        {creation:{step: 0, dataRef: 2,length :9 , cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEIN}, 
+        update: {step: 0, dataRef: 2,length :10 , cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEOUT }} ,
+     
+     ], ["_update", "getParams" ]);
  
  
-
+  
          obj.uiLoad();
 
          

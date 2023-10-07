@@ -2005,7 +2005,6 @@ Ebk.ERythm.TYPE.LINEAR = `LINEAR`;
 Ebk.ERythm.TYPE.WAVY = `WAVY`;
 
 
-
 /////// Ebk.ERythm.Creation
 Ebk.ERythm.Creation = class EbkERythmCreation {
     #params;
@@ -2233,9 +2232,7 @@ Ebk.RythmTests  = (paramsTestOptions =[
 }
 
 /////// Ebk.Sequence
-Ebk.Sequence = {
-
-}
+Ebk.Sequence = {}
 
 Ebk.Sequence.name = `Ebk.Sequence`;
 
@@ -2933,11 +2930,92 @@ Ebk.Sequence.Options = [Ebk.Sequence.MKMK,Ebk.Sequence.MSMS,Ebk.Sequence.MSMK,Eb
 
 Ebk.Sequence.TYPE = {};
 
+// Valeur numériques pour les besoins de tableux
 Ebk.Sequence.TYPE.MKMK = 0;
 Ebk.Sequence.TYPE.MSMS = 1;
 Ebk.Sequence.TYPE.MSMK = 2;
 Ebk.Sequence.TYPE.MSMKFADEIN = 3;
 Ebk.Sequence.TYPE.MSMKFADEOUT = 4;
+
+
+
+
+
+
+///////Ebk.Sequence.Creation
+Ebk.Sequence.Creation = class EbkSequenceCreation {
+    #params;
+    #infos;
+    constructor(params ={length :6 , phase :0,cLength:8, type: Ebk.Sequence.TYPE.MKMK }){
+       
+        this.name = `Ebk.Sequence.Creation`;
+
+        this.#params = Object.assign({},params);
+        
+        this.#infos = {};
+             
+        this.#infos.obj = [];
+  
+        Ebk.Sequence.Options.forEach(item =>{
+            this.#infos.obj.push(item);
+        });
+
+        this.#infos.current =  this.#infos.obj[this.#params.type];
+
+    }
+    
+    _update(params ={length :6 , cLength:8, phase : 0, type: Ebk.Sequence.TYPE.MKMK }){
+
+       this.#params = Object.assign(this.#params,params);
+       this.#infos.current =  this.#infos.obj[this.#params.type];
+              
+    }
+
+    getParams(){
+        return Object.assign({},this.#params);
+    }
+
+    locate(params = {step:2}){
+        return this.#infos.current.getData({step:params.step, length:this.#params.length, phase : this.#params.phase})  // .getData({step:2,length:5});
+    }
+
+    locateLabel(params = {dataRef:2 }){
+        return this.#infos.current.getLabel({dataRef:params.dataRef,length:this.#params.length});
+    }
+    
+    locateCollection  (){
+    
+        return this.#infos.current.getDataCollection(this.#params);
+    }
+    
+    locateLabelCollection (){
+        
+        return this.#infos.current.getLabelCollection(this.#params);
+ 
+    }
+    
+}
+
+
+Ebk.Sequence.CreationTests  = (paramsTestOptions =[
+                  
+    {creation:{step: 0, dataRef: 2,length :3 , cLength:10, type: Ebk.Sequence.TYPE.MKMK }, 
+    update: {step: 0, dataRef: 2,length :4 , cLength:20, type: Ebk.Sequence.TYPE.MKMK }} ,
+
+    {creation:{step: 0, dataRef: 2,length :5 , cLength:11, type: Ebk.Sequence.TYPE.MSMS}, 
+    update: {step: 0, dataRef: 2,length :6 , cLength:13, type: Ebk.Sequence.TYPE.MSMS }} ,
+
+    {creation:{step: 0, dataRef: 2,length :7 , cLength:16, type: Ebk.Sequence.TYPE.MSMK}, 
+    update: {step: 0, dataRef: 2,length :8 , cLength:17, type: Ebk.Sequence.TYPE.MSMK }} ,
+
+    {creation:{step: 0, dataRef: 2,length :9 , cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEIN}, 
+    update: {step: 0, dataRef: 2,length :10 , cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEOUT }} ,
+ 
+],exceptions = ["_update", "getParams" ])=>{
+
+   Ebk.ObjectInstance.testsCreateAndUpdate (Ebk.Sequence.Creation, paramsTestOptions,exceptions );
+ 
+}
 
 
 
@@ -2962,7 +3040,12 @@ Ebk.Navigation = class EbkNavigation {
         this.name = `Ebk.Navigation`;
         this.#isCreate = false;
 
-      //  this.#params = {};
+        this.#params = {};
+
+        this.#params.rythm =  Object.assign({},{type : params.type, sample : params.sample, granularity : params.granularity, messi : params.messy  });
+        this.#params.sequence = // Object.assign({},{sequenceType : Ebk.Sequence.TYPE.MKMK  });
+        this.#params.incDec = params.incDec;
+
 
         this.#params = Object.assign({},params);
         this.#infos = {};
