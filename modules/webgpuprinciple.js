@@ -1755,16 +1755,30 @@ let functions_entries = [
          
           //  ],  ["_update", "getParams" ]);
           
-          
-           Ebk.ERythm.LinearTests ([
+
+          //  Ebk.ERythm.LinearTests ([
                   
-            {creation:{flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
-            update: {flow:(x)=>{return 3*x; }, granularity:5,step:3,sample:[100,200],messy:[0,0]}} ,
+          //   {creation:{flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+          //   update: {flow:(x)=>{return 3*x; }, granularity:5,step:3,sample:[100,200],messy:[0,0]}} ,
         
-            {creation:{flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1],messy:[0,1]}, 
-            update:{flow:(x)=>{return  Math.pow(2,1/(x+1))  }, granularity:13,step:3,sample:[-1,1],messy:[-1,-1]} } ,
+          //   {creation:{flow:(x)=>{return  Math.pow(2,x)  }, granularity:13,step:3,sample:[-1,1],messy:[0,1]}, 
+          //   update:{flow:(x)=>{return  Math.pow(2,1/(x+1))  }, granularity:13,step:3,sample:[-1,1],messy:[-1,-1]} } ,
          
-           ],["_update", "getParams" ])
+          //  ],["_update", "getParams" ])
+
+
+
+          Ebk.ERythm.WavyTests([
+                  
+            {creation:{flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+            update: {flow:(x)=>{return Math.sin(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]}} ,
+        
+            {creation: {flow:(x)=>{return Math.cos(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+            update: {flow:(x)=>{return Math.cos(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]} } ,
+            ,
+            {creation: {flow:(x)=>{return Math.tan(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+            update: {flow:(x)=>{return Math.tan(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]} }
+          ], ["_update", "getParams" ]);
 
 
         obj.uiLoad();
