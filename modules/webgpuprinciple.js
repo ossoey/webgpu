@@ -1782,16 +1782,29 @@ let functions_entries = [
 
 
 
-          Ebk.ERythm.CreationTests  ( [
+          // Ebk.ERythm.CreationTests  ( [
                   
-            {creation:{type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
-            update: {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.cos(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]}} ,
+          //   {creation:{type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+          //   update: {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.cos(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]}} ,
         
-            {creation: {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
-            update: {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return Math.pow(3,x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]} } ,
+          //   {creation: {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]}, 
+          //   update: {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return Math.pow(3,x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]} } ,
         
          
-            ],["_update", "getParams" ]);
+          //   ],["_update", "getParams" ]);
+
+
+        Ebk.RythmTests ([
+                  
+              {creation: {type:Ebk.ERythm.TYPE.WAVY, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1], step:0}, 
+              update:  {type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return x; }, granularity:10,messy:[0,0], step:0}} ,
+          
+              {creation: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3}, 
+              update: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3} } ,
+          
+           
+          ],  ["_update", "getParams", "getInfos" ])
+
 
         obj.uiLoad();
 
