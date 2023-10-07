@@ -1618,9 +1618,9 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
                    // this.#params = params;
                     this.#params = Object.assign(this.#params,params);
 
-                    //this.#infos = {};
-                    //this.#infos.domain = [1,10];
-                    //this.#infos.codomain = [this.#params.flow(this.#infos.domain[0]),this.#params.flow(this.#infos.domain[1])];
+                    this.#infos = {};
+                    this.#infos.domain = [1,10];
+                    this.#infos.codomain = [this.#params.flow(this.#infos.domain[0]),this.#params.flow(this.#infos.domain[1])];
                     return true;
                 }
 
@@ -1821,10 +1821,10 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
                 } else {
                     this.#params = Object.assign(this.#params,params);
                     
-                    //this.#params = params;
-                    //this.#infos = {};
-                    //this.#infos.domain = [0,2*Math.PI];
-                   // this.#infos.codomain = [1,-1];
+                    this.#params = params;
+                    this.#infos = {};
+                    this.#infos.domain = [0,2*Math.PI];
+                    this.#infos.codomain = [1,-1];
                     return true;
                 }
 
@@ -2004,51 +2004,51 @@ Ebk.ERythm.TYPE = {};
 Ebk.ERythm.TYPE.LINEAR = `LINEAR`;
 Ebk.ERythm.TYPE.WAVY = `WAVY`;
 
-/////// ERythm.create
-Ebk.ERythm.create =  (params={ type: Ebk.ERythm.TYPE.LINEAR  ,flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]})=>{
+// /////// ERythm.create
+// Ebk.ERythm.create =  (params={ type: Ebk.ERythm.TYPE.LINEAR  ,flow:(x)=>{return 2*x; }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]})=>{
 
-    if (params.type ===  Ebk.ERythm.TYPE.LINEAR){
+//     if (params.type ===  Ebk.ERythm.TYPE.LINEAR){
 
-        return new Ebk.ERythm.Linear(params);
+//         return new Ebk.ERythm.Linear(params);
 
-    } else   if (params.type ===  Ebk.ERythm.TYPE.WAVY){
+//     } else   if (params.type ===  Ebk.ERythm.TYPE.WAVY){
 
-        return new Ebk.ERythm.Wavy(params);
-    }
+//         return new Ebk.ERythm.Wavy(params);
+//     }
 
-}
+// }
 
-Ebk.ERythm.createTests =(paramsTestOptions =[
+// Ebk.ERythm.createTests =(paramsTestOptions =[
     
-    {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]},
-    {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
-    {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return Math.pow(3,x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
-    {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.tan(x); }, granularity:10,step:3,sample:[5,25],messy:[0,0]},
+//     {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,step:1,sample:[-20,10],messy:[-1,1]},
+//     {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.sin(x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
+//     {type:Ebk.ERythm.TYPE.LINEAR,flow:(x)=>{return Math.pow(3,x); }, granularity:10,step:3,sample:[100,200],messy:[0,0]},
+//     {type:Ebk.ERythm.TYPE.WAVY,flow:(x)=>{return Math.tan(x); }, granularity:10,step:3,sample:[5,25],messy:[0,0]},
     
-])=>{
+// ])=>{
 
  
 
-    let test = (instance ,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
+//     let test = (instance ,params ={path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3})=>{
 
-        let allFunctions = Ebk.getPublicMethodOfClass(instance);
+//         let allFunctions = Ebk.getPublicMethodOfClass(instance);
        
-        allFunctions.forEach(func =>{
+//         allFunctions.forEach(func =>{
          
-            if (!(func===  "constructor"))console.log(func, `:`,  instance[func](params));
+//             if (!(func===  "constructor"))console.log(func, `:`,  instance[func](params));
             
-        });
+//         });
     
-    }
+//     }
 
-     paramsTestOptions.forEach((item,ndx)=>{
-        let inst = Ebk.ERythm.create(item);
-        console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
-        console.log(`ClassName:`,  inst.constructor.name,`Params`,item,);
-         test(inst, item);
-      });
+//      paramsTestOptions.forEach((item,ndx)=>{
+//         let inst = Ebk.ERythm.create(item);
+//         console.log(`<------------------------TEST: #`+ndx+`--------------------------->`);
+//         console.log(`ClassName:`,  inst.constructor.name,`Params`,item,);
+//          test(inst, item);
+//       });
    
-}
+// }
 
 
 
@@ -2148,7 +2148,8 @@ Ebk.Rythm = class EbkRythm {
                     this.#params =  Object.assign({},params);
                     this.#infos = {};
                     this.#infos.trajectory = new Ebk.Trajectory({path:this.#params.sample});
-                    this.#infos.eRythm =  Ebk.ERythm.create(this.#params);
+                    console.log(this.#params)
+                    this.#infos.eRythm = new Ebk.ERythm.Creation(this.#params);    
                     this.#isCreate = true;
                     
                    }
@@ -2166,6 +2167,7 @@ Ebk.Rythm = class EbkRythm {
         let info =`type, granularity and messy have to be defined. eg {type:{domain:[1,5], motion:(x)=>{return 2*x;}}, granularity:10,messy:[-1,1]}`;
 
         this.#params =  Object.assign(this.#params ,params);
+        console.log(this.#params)
         this.#infos.trajectory._update({path:this.#params.sample});
         this.#infos.eRythm._update(this.#params);
 
@@ -2181,12 +2183,13 @@ Ebk.Rythm = class EbkRythm {
     }
       
       
-
     locate(params ={step:5}){
 
         if (this.#isCreate) {
-             let ratio =  this.#infos.eRythm.locate({step:params.step })
-             return  this.#infos.trajectory.locate({target: ratio  });
+             //console.log(this.#params, this.#infos.eRythm.getParams(), params)
+            
+             let ratio =  this.#infos.eRythm.locate({step:params.step})
+             return ratio //this.#infos.trajectory.locate({target: ratio  });
         } else {
             return this.#msg.NOTCREAT;
         }
@@ -2198,7 +2201,7 @@ Ebk.Rythm = class EbkRythm {
         if (this.#isCreate) {
             let arr = [];
             for(let i=0;i<=this.#params.granularity;i++){
-                arr.push( this.locate({step:i}));
+                arr.push( this.locate({step:i}));  //this.locate({step:i})
             }
     
             return arr;
@@ -2213,19 +2216,20 @@ Ebk.Rythm = class EbkRythm {
 }  
 
 
-Ebk.RythmTests = (paramsTestOptions =[
-    
-    {type:Ebk.ERythm.TYPE.WAVY, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1], step:0},
-    {type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3},
-    {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3},
-    {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3},
-])=>{
+Ebk.RythmTests  = (paramsTestOptions =[
+                  
+    {creation: {type:Ebk.ERythm.TYPE.WAVY, sample:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]], flow:(x)=>{return Math.sin(x); }, granularity:10,messy:[-1,1], step:0}, 
+    update:  {type:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]], flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1], step:3}} ,
 
+    {creation: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3}, 
+    update: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[1,1,1],[0,2,2],[3,-1,3],[4,4,8]], flow:(x)=>{return  Math.pow(5,x); }, granularity:20,messy:[-1,1], step:3} } ,
 
-Ebk.ObjectInstance.tests(Ebk.Rythm,paramsTestOptions );
+ 
+],exceptions = ["_update", "getParams", "getInfos"  ])=>{
 
+   Ebk.ObjectInstance.testsCreateAndUpdate (Ebk.Rythm, paramsTestOptions,exceptions );
+ 
 }
-
 
 /////// Ebk.Sequence
 Ebk.Sequence = {
