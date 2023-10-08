@@ -2847,7 +2847,7 @@ Ebk.Sequence.MSMKFadeIn.getLabelCollection = (params = {cLength:20,length:6})=>{
     let arr = [];
 
     for(let i = 0;i< params.cLength;i++){
-         arr.push([{dataRef:i,label:Ebk.Sequence.MSMKFadeIn.getLabel({dataRef:i, length: params.length })}]);
+         arr.push( Ebk.Sequence.MSMKFadeIn.getLabel({dataRef:i, length: params.length }));
     }
 
     return  arr; 
@@ -2910,7 +2910,7 @@ Ebk.Sequence.MSMKFadeOut.getLabelCollection = (params = {cLength:20,length:6})=>
     let arr = [];
 
     for(let i = 0;i< params.cLength;i++){
-         arr.push([{dataRef:i,label:Ebk.Sequence.MSMKFadeOut.getLabel({dataRef:i, length: params.length })}]);
+         arr.push( Ebk.Sequence.MSMKFadeOut.getLabel({dataRef:i, length: params.length }));
     }
 
     return  arr; 
@@ -2999,17 +2999,17 @@ Ebk.Sequence.Creation = class EbkSequenceCreation {
 
 Ebk.Sequence.CreationTests  = (paramsTestOptions =[
                   
-    {creation:{step: 0, dataRef: 2,length :3 , cLength:10, type: Ebk.Sequence.TYPE.MKMK }, 
-    update: {step: 0, dataRef: 2,length :4 , cLength:20, type: Ebk.Sequence.TYPE.MKMK }} ,
+    {creation:{step: 0, dataRef: 2,length :3 , cLength:40, phase : 0, type: Ebk.Sequence.TYPE.MKMK }, 
+    update: {step: 0, dataRef: 2,length :4 , cLength:20, phase : 0, type: Ebk.Sequence.TYPE.MKMK }} ,
 
-    {creation:{step: 0, dataRef: 2,length :5 , cLength:11, type: Ebk.Sequence.TYPE.MSMS}, 
-    update: {step: 0, dataRef: 2,length :6 , cLength:13, type: Ebk.Sequence.TYPE.MSMS }} ,
+    {creation:{step: 0, dataRef: 2,length :5 , cLength:11, phase : 0, type: Ebk.Sequence.TYPE.MSMS}, 
+    update: {step: 0, dataRef: 2,length :6 , cLength:13, phase : 0, type: Ebk.Sequence.TYPE.MSMS }} ,
 
-    {creation:{step: 0, dataRef: 2,length :7 , cLength:16, type: Ebk.Sequence.TYPE.MSMK}, 
-    update: {step: 0, dataRef: 2,length :8 , cLength:17, type: Ebk.Sequence.TYPE.MSMK }} ,
+    {creation:{step: 0, dataRef: 2,length :7 , cLength:16, phase : 0, type: Ebk.Sequence.TYPE.MSMK}, 
+    update: {step: 0, dataRef: 2,length :8 , cLength:17, phase : 0, type: Ebk.Sequence.TYPE.MSMK }} ,
 
-    {creation:{step: 0, dataRef: 2,length :9 , cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEIN}, 
-    update: {step: 0, dataRef: 2,length :10 , cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEOUT }} ,
+    {creation:{step: 0, dataRef: 2,length :9 , cLength:40, phase : 0, type: Ebk.Sequence.TYPE.MSMKFADEIN}, 
+    update: {step: 0, dataRef: 2,length :10 , cLength:40, phase : 0, type: Ebk.Sequence.TYPE.MSMKFADEOUT }} ,
  
 ],exceptions = ["_update", "getParams" ])=>{
 
