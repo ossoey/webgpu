@@ -1815,17 +1815,17 @@ let functions_entries = [
 
       Ebk.Sequence.CreationTests ( [
                   
-        {creation:{step: 0, dataRef: 2,length :3 , cLength:10, type: Ebk.Sequence.TYPE.MKMK }, 
-        update: {step: 0, dataRef: 2,length :4 , cLength:20, type: Ebk.Sequence.TYPE.MKMK }} ,
+        {creation:{step: 0, dataRef: 2,length :3 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MKMK }, 
+        update: {step: 0, dataRef: 2,length :4 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MKMK }} ,
     
-        {creation:{step: 0, dataRef: 2,length :5 , cLength:11, type: Ebk.Sequence.TYPE.MSMS}, 
-        update: {step: 0, dataRef: 2,length :6 , cLength:13, type: Ebk.Sequence.TYPE.MSMS }} ,
+        {creation:{step: 0, dataRef: 2,length :5 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMS}, 
+        update: {step: 0, dataRef: 2,length :6 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMS }} ,
     
-        {creation:{step: 0, dataRef: 2,length :7 , cLength:16, type: Ebk.Sequence.TYPE.MSMK}, 
-        update: {step: 0, dataRef: 2,length :8 , cLength:17, type: Ebk.Sequence.TYPE.MSMK }} ,
+        {creation:{step: 0, dataRef: 2,length :7 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMK}, 
+        update: {step: 0, dataRef: 2,length :8 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMK }} ,
     
-        {creation:{step: 0, dataRef: 2,length :9 , cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEIN}, 
-        update: {step: 0, dataRef: 2,length :10 , cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEOUT }} ,
+        {creation:{step: 0, dataRef: 2,length :6 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEIN}, 
+        update: {step: 0, dataRef: 2,length :6 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEOUT }} ,
      
      ], ["_update", "getParams" ]);
  
