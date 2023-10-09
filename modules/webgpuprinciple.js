@@ -1813,23 +1813,57 @@ let functions_entries = [
       // ], ["_update" , "getInfos"  ])
 
 
-      Ebk.Sequence.CreationTests ( [
+    //   Ebk.Sequence.CreationTests ( [
                   
-        {creation:{step: 0, dataRef: 2,length :3 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MKMK }, 
-        update: {step: 0, dataRef: 2,length :4 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MKMK }} ,
+    //     {creation:{step: 0, dataRef: 2,length :3 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MKMK }, 
+    //     update: {step: 0, dataRef: 2,length :4 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MKMK }} ,
     
-        {creation:{step: 0, dataRef: 2,length :5 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMS}, 
-        update: {step: 0, dataRef: 2,length :6 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMS }} ,
+    //     {creation:{step: 0, dataRef: 2,length :5 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMS}, 
+    //     update: {step: 0, dataRef: 2,length :6 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMS }} ,
     
-        {creation:{step: 0, dataRef: 2,length :7 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMK}, 
-        update: {step: 0, dataRef: 2,length :8 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMK }} ,
+    //     {creation:{step: 0, dataRef: 2,length :7 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMK}, 
+    //     update: {step: 0, dataRef: 2,length :8 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMK }} ,
     
-        {creation:{step: 0, dataRef: 2,length :6 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEIN}, 
-        update: {step: 0, dataRef: 2,length :6 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEOUT }} ,
+    //     {creation:{step: 0, dataRef: 2,length :6 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEIN}, 
+    //     update: {step: 0, dataRef: 2,length :6 , phase : 0, cLength:40, type: Ebk.Sequence.TYPE.MSMKFADEOUT }} ,
      
-     ], ["_update", "getParams" ]);
+    //  ], ["_update", "getParams" ]);
  
  
+
+    Ebk.NavigationTests ([
+    
+      {creation:   {sequenceType:Ebk.Sequence.TYPE.MKMK ,  
+              rythmType:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
+              flow:(x)=>{return 2*x; }, granularity:7,messy:[0,0], step:-2, cLength:22,incDec:1
+             },   
+  
+        update:  {sequenceType:Ebk.Sequence.TYPE.MSMK,  
+          rythmType:Ebk.ERythm.TYPE.WAVY,sample:[[1,2],[-2,2],[5,1],[25,30]],                     
+              flow:(x)=>{return Math.cos(x)}, granularity:8,messy:[0,0], step:-2, cLength:20,incDec:1
+             },    
+             
+        exceptions:["_update", "pause", "inc", "dec" , "move" , "resume" ]  
+          
+      }  ,
+      
+      {creation:   {sequenceType:Ebk.Sequence.TYPE.MSMKFADEIN ,  
+        rythmType:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10], [5,1,6]],                     
+        flow:(x)=>{return 2*x; }, granularity:8,messy:[0,0], step:-2, cLength:29,incDec:1
+       },   
+
+      update:  {sequenceType:Ebk.Sequence.TYPE.MSMK,  
+      rythmType:Ebk.ERythm.TYPE.WAVY,sample:[[1,2],[-2,2],[5,1],[25,30], [-2,2] ],                     
+        flow:(x)=>{return Math.cos(x)}, granularity:8,messy:[0,0], step:-1, cLength:40,incDec:1
+       },    
+       
+     exceptions:["_update", "pause", "inc", "dec" , "move" , "resume" ]  
+    
+}  
+     
+   
+  ]);
+
   
          obj.uiLoad();
 
