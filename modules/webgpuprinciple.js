@@ -1831,39 +1831,60 @@ let functions_entries = [
  
  
 
-    Ebk.NavigationTests ([
-    
-      {creation:   {sequenceType:Ebk.Sequence.TYPE.MKMK ,  
-              rythmType:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
-              flow:(x)=>{return 2*x; }, granularity:7,messy:[0,0], step:-2, cLength:22,incDec:1
-             },   
-  
-        update:  {sequenceType:Ebk.Sequence.TYPE.MSMK,  
-          rythmType:Ebk.ERythm.TYPE.WAVY,sample:[[1,2],[-2,2],[5,1],[25,30]],                     
-              flow:(x)=>{return Math.cos(x)}, granularity:8,messy:[0,0], step:-2, cLength:20,incDec:1
-             },    
-             
-        exceptions:["_update", "pause", "inc", "dec" , "move" , "resume" ]  
-          
-      }  ,
+    //     Ebk.NavigationTests ([
+        
+    //       {creation:   {sequenceType:Ebk.Sequence.TYPE.MKMK ,  
+    //               rythmType:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10]],                     
+    //               flow:(x)=>{return 2*x; }, granularity:7,messy:[0,0], step:-2, cLength:22,incDec:1
+    //              },   
       
-      {creation:   {sequenceType:Ebk.Sequence.TYPE.MSMKFADEIN ,  
-        rythmType:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10], [5,1,6]],                     
-        flow:(x)=>{return 2*x; }, granularity:8,messy:[0,0], step:-2, cLength:29,incDec:1
-       },   
+    //         update:  {sequenceType:Ebk.Sequence.TYPE.MSMK,  
+    //           rythmType:Ebk.ERythm.TYPE.WAVY,sample:[[1,2],[-2,2],[5,1],[25,30]],                     
+    //               flow:(x)=>{return Math.cos(x)}, granularity:8,messy:[0,0], step:-2, cLength:20,incDec:1
+    //              },    
+                
+    //         exceptions:["_update", "pause", "inc", "dec" , "move" , "resume" ]  
+              
+    //       }  ,
+          
+    //       {creation:   {sequenceType:Ebk.Sequence.TYPE.MSMKFADEIN ,  
+    //         rythmType:Ebk.ERythm.TYPE.LINEAR,sample:[[1,2,3],[-2,2,3],[5,1,6],[25,30,10], [5,1,6]],                     
+    //         flow:(x)=>{return 2*x; }, granularity:8,messy:[0,0], step:-2, cLength:29,incDec:1
+    //        },   
 
-      update:  {sequenceType:Ebk.Sequence.TYPE.MSMK,  
-      rythmType:Ebk.ERythm.TYPE.WAVY,sample:[[1,2],[-2,2],[5,1],[25,30], [-2,2] ],                     
-        flow:(x)=>{return Math.cos(x)}, granularity:8,messy:[0,0], step:-1, cLength:40,incDec:1
-       },    
-       
-     exceptions:["_update", "pause", "inc", "dec" , "move" , "resume" ]  
+    //       update:  {sequenceType:Ebk.Sequence.TYPE.MSMK,  
+    //       rythmType:Ebk.ERythm.TYPE.WAVY,sample:[[1,2],[-2,2],[5,1],[25,30], [-2,2] ],                     
+    //         flow:(x)=>{return Math.cos(x)}, granularity:8,messy:[0,0], step:-1, cLength:40,incDec:1
+    //        },    
+          
+    //      exceptions:["_update", "pause", "inc", "dec" , "move" , "resume" ]  
+        
+    // }  
+        
+      
+    //   ]);
+
+
+    Ebk.GeoMatrixTests([
     
-}  
+      {creation:  { 
+          position : [1,1,1], 
+          granularity : 8, 
+          rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return 2*x }, messy : [0,0]} ,
+                        {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return Math.pow(1.003,x) }, messy : [0,0]} 
+      ] , indices : [0,0]  },   
+  
+        update:  { 
+          position : [1,1,1], 
+          granularity : 8, 
+          rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return 2*x }, messy : [0,0]} ,
+                        {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return Math.pow(1.003,x) }, messy : [0,0]} 
+      ] , indices : [1,2]  } ,   
+      
+         exceptions:["_update" ]    
+      }       
      
-   
-  ]);
-
+   ])
   
          obj.uiLoad();
 
