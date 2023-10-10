@@ -3207,6 +3207,191 @@ Ebk.NavigationTests = (paramsTestOptions =[
 }
 
 
+/////// Ebk.GeoMatrix
+Ebk.GeoMatrix = class EbkGeoMatrix {
+    #params;
+    #process;
+    #isCreate;
+    
+ 
+    constructor(params = { 
+        position : [0,0,0], 
+        granularity : 8, 
+        rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{ 2*x }, messy : [0,0]} ,
+                      {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{ Math.pow(1.003,x) }, messy : [0,0]} 
+    ] }){
+
+    
+        this.name = `Ebk.GeoMatrix`;
+
+        this.#isCreate = false;
+
+        this.#params = {};
+        this.#params.rythMatrix = [];
+        this.#params.position  = params.position;
+        this.#params.granularity  = params.granularity;
+
+        params.rythMatrix.forEach(item => {
+
+            let paramRythm = Object.assign({},item);
+            paramRythm.sample = [params.position, item.vector];
+            paramRythm.granularity =  params.granularity;
+            this.#params.rythMatrix.push(paramRythm);
+
+        });
+
+        console.log(this.#params)
+        
+        this.#process = {};
+        this.#process.rythMatrix = [];
+
+        params.rythMatrix.forEach((item,ndx) => {
+
+            this.#process.rythMatrix.push( new  Ebk.Rythm(this.#params.rythMatrix[ndx]));
+
+        });
+
+
+        this.#isCreate = true;
+        
+    }
+    
+    _update(params = { 
+        position : [0,0,0], 
+        granularity : 8, 
+        rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return 2*x }, messy : [0,0]} ,
+                      {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return Math.pow(1.003,x) }, messy : [0,0]} 
+    ] }){
+        
+    
+        this.#params.position  = params.position;
+        this.#params.granularity  = params.granularity;
+
+        params.rythMatrix.forEach((item, ndx) => {
+
+            this.#params.rythMatrix[ndx] = Object.assign( this.#params.rythMatrix[ndx],item);
+            this.#params.rythMatrix[ndx].sample = [params.position, item.vector];
+            this.#params.rythMatrix[ndx].granularity =  params.granularity;
+            
+        });
+
+        params.rythMatrix.forEach((item,ndx) => {
+
+            this.#process.rythMatrix[ndx]._update(this.#params.rythMatrix[ndx]);
+
+        });
+
+   
+    }
+
+    getParams(){
+        return Object.assign({},this.#params);
+    }
+
+    locate(params = { indices : [0,0]}){
+
+       console.log( this.#process.rythMatrix[0].getParams(), this.#process.rythMatrix[0].locate({step:0}));
+
+        let result = [];
+
+        params.indices.forEach((item, ndx) => {
+ 
+            let comp =  this.#process.rythMatrix[ndx].locate({step : item});
+            result.push(comp);
+         
+        
+            
+            
+        });
+
+        return  result;
+
+    }
+
+    rotate() {
+
+    }
+
+    scale() {
+        
+    }
+
+    shear() {
+        
+    }
+
+
+}  
+
+Ebk.GeoMatrixTests = (paramsTestOptions =[
+    
+    {creation:  { 
+        position : [1,1,1], 
+        granularity : 8, 
+        rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return 2*x }, messy : [0,0]} ,
+                      {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{ return Math.pow(1.003,x) }, messy : [0,0]} 
+    ] , indices : [0,0,0]  },   
+
+      update:  { 
+        position : [1,1,1], 
+        granularity : 8, 
+        rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return return2*x }, messy : [0,0]} ,
+                      {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return Math.pow(1.003,x) }, messy : [0,0]} 
+    ] , indices : [0,0,0]  } ,   
+
+       exceptions:["_update" ]    
+    }       
+   
+])=>{
+
+    Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.GeoMatrix,paramsTestOptions );
+
+}
+
+
+/////// Ebk.Navigation
+Ebk.ClassModel = class EbkClassModel {
+    #params;
+    #process;
+    #isCreate;
+    
+ 
+    constructor(params ={ 
+           }){
+
+    
+        this.name = `Ebk.Sequence.Creation`;
+
+        this.#isCreate = false;
+
+        this.#params = {};
+        this.#process = {};
+
+        this.#params =  Object.assign({},  params );
+  
+        
+        this.#isCreate = true;
+        
+    }
+    
+    _update(params ={ 
+
+     }){
+        
+    
+        this.#params =  Object.assign(this.#params,  params );
+   
+    }
+
+
+    getParams(){
+        return Object.assign({},this.#params);
+    }
+
+
+
+}  
+
 
 
 export {Ebk}
