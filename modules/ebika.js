@@ -2523,7 +2523,6 @@ Ebk.Sequence.GridOddNmber.tests = (params = [
     {step:2,cLength:20,dataRef:3},
     {step:3,cLength:20,dataRef:4},
 
-
     
 ])=>{
 Ebk.ObjectName.tests(Ebk.Sequence.GridOddNmber,params ); 
@@ -3230,6 +3229,7 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
         this.#params.rythMatrix = [];
         this.#params.position  = params.position;
         this.#params.granularity  = params.granularity;
+        this.#params.dim = params.rythMatrix.length;;
 
         params.rythMatrix.forEach(item => {
 
@@ -3240,8 +3240,7 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
 
         });
 
-        console.log(this.#params)
-        
+ 
         this.#process = {};
         this.#process.rythMatrix = [];
 
@@ -3266,6 +3265,7 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
     
         this.#params.position  = params.position;
         this.#params.granularity  = params.granularity;
+        this.#params.dim = params.rythMatrix.length;
 
         params.rythMatrix.forEach((item, ndx) => {
 
@@ -3290,23 +3290,31 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
 
     locate(params = { indices : [0,0]}){
 
-       console.log( this.#process.rythMatrix[0].getParams(), this.#process.rythMatrix[0].locate({step:0}));
+        let result = [];
+ 
+            for( let i = 0; i<this.#params.dim; i++) {
+                let comp =  this.#process.rythMatrix[i].locate({step : params.indices[i]});
+                result.push(comp);
+            }
+
+ 
+        return  result;
+    }
+
+    locateCollection(){
 
         let result = [];
-
-        params.indices.forEach((item, ndx) => {
  
-            let comp =  this.#process.rythMatrix[ndx].locate({step : item});
-            result.push(comp);
-         
-        
-            
-            
-        });
+            for( let i = 0; i<=this.#params.granularity; i++) {
+                for( let j = 0; j<=this.#params.granularity; j++) {
+                   result.push(  this.locate( { indices : [i,j]}));
+                }
+            }
 
         return  result;
-
     }
+
+
 
     rotate() {
 

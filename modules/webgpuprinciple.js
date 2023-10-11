@@ -1868,15 +1868,15 @@ let functions_entries = [
     Ebk.GeoMatrixTests([
     
       {creation:  { 
-          position : [1,1,1], 
-          granularity : 8, 
+          position : [0,0,0], 
+          granularity : 3, 
           rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return 2*x }, messy : [0,0]} ,
                         {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return Math.pow(1.003,x) }, messy : [0,0]} 
-      ] , indices : [0,0]  },   
+      ] , indices : [1,1]  },   
   
         update:  { 
-          position : [1,1,1], 
-          granularity : 8, 
+          position : [0,0,0], 
+          granularity : 3, 
           rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return 2*x }, messy : [0,0]} ,
                         {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return Math.pow(1.003,x) }, messy : [0,0]} 
       ] , indices : [1,2]  } ,   
