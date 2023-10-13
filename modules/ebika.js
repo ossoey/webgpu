@@ -670,6 +670,19 @@ Ebk.Matrix.vectAdd = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
     }
 }
 
+Ebk.Matrix.vectorsAdd = (params ={vectors:[[3,1,4],[5,3,-8]]}) =>{
+    
+    let result = Ebk.Matrix.arrLoadElementNtimes(  {elt:0,times:params.vectors[0].length});
+
+    params.vectors.forEach(item =>{
+        result = Ebk.Matrix.vectAdd({v1:item,v2: result});
+    })
+
+    return result; 
+ 
+}
+
+
 Ebk.Matrix.vectScale = (params ={v:[5,3,-8], scalar:0.5}) =>{
 
     let vectorsInfo = `v(array) and scalar(number) have to be define , eg {v:[5,3,-8], scalar:0.5} `;
@@ -1392,8 +1405,8 @@ Ebk.Matrix.testInverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,1
 
  Ebk.Matrix.tests = (paramsTestOptions =[
                   
-    {arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:0,times:10},
-    {v1:[3,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:3,times:2},    
+    {arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:0,times:10,vectors:[[3,1,4],[5,3,-8]]},
+    {v1:[3,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:3,times:2,vectors:[[3,1,4],[5,3,-8]]},    
     {v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
     {v1:[3,1,1],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
     {v1:[3,`1`],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
@@ -1406,7 +1419,7 @@ Ebk.Matrix.testInverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,1
     { matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2],  headNdx :0,
      matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`y`,times:10
  },
-    {m2:[[1,3],[2,4]],m1:[[2,1],[0,2]],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`i`,times:10}
+    {m2:[[1,3],[2,4]],m1:[[2,1],[0,2]],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`i`,times:10,vectors:[[3,1,4],[5,3,-8]]}
 ])=>{
 Ebk.ObjectName.tests( Ebk.Matrix,paramsTestOptions ); 
 }
@@ -3230,12 +3243,13 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
         this.#params.position  = params.position;
         this.#params.granularity  = params.granularity;
         this.#params.dim = params.rythMatrix.length;;
-
+        this.#params.basis = [];
         params.rythMatrix.forEach(item => {
 
             let paramRythm = Object.assign({},item);
             paramRythm.sample = [params.position, item.vector];
             paramRythm.granularity =  params.granularity;
+            this.#params.basis.push(Ebk.Matrix.vector({v1: this.#params.position, v2: item.vector}));
             this.#params.rythMatrix.push(paramRythm);
 
         });
@@ -3297,21 +3311,30 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
                 result.push(comp);
             }
 
- 
-        return  result;
+
+        return   Ebk.Matrix.vectorsAdd({vectors:result}); // Ebk.Matrix. .linearCombination({ matrix:this.#params.basis,scalars:result}) ;
     }
 
-    locateCollection(){
-
+    #locateCollection2D(){
         let result = [];
  
+        this.#params.rythMatrix
             for( let i = 0; i<=this.#params.granularity; i++) {
                 for( let j = 0; j<=this.#params.granularity; j++) {
                    result.push(  this.locate( { indices : [i,j]}));
                 }
             }
 
-        return  result;
+        return;    
+    }
+
+    locateCollection(){
+       if (this.#params.rythMatrix.length == 2) {
+              return this.#locateCollection2D();
+            
+        } 
+        
+     
     }
 
 
