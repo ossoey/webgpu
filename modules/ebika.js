@@ -636,6 +636,41 @@ Ebk.Matrix.arrGetSubarrayWithoutIndex =(params = {arr : [1,2,3,4,5,6,7,8,9], wit
 
 }
 
+
+Ebk.Matrix.arrLoadElementNtimes =(params = {elt:0,times:10}) => {
+    let arr = [];
+
+     for(let i=0;i<params.times; i++){
+        arr.push(params.elt);
+     }
+    return      arr;
+}
+
+
+Ebk.Matrix.arrfillExept =(params = {withoutIndex}) => {
+    let arr = [];
+
+     for(let i=0;i<params.times; i++){
+        arr.push(params.elt);
+     }
+    return      arr;
+}
+
+
+Ebk.Matrix.identity = (params = {dim: 3}) => {
+    let matrix = [];
+
+     for(let i=0;i<params.dim; i++){
+
+        matrix.push( Ebk.Matrix.arrLoadElementNtimes({elt:0,times:params.dim}) );  
+        matrix[i][i] = 1;
+     }
+
+
+    return matrix;
+}
+
+
 Ebk.Matrix.vectAdd = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
 
     let vectorsInfo = `v1 and v2 have to be define as array with the same type of numbers and same length, eg v1:[3,1,4],v2:[5,3,-8] `;
@@ -1399,28 +1434,39 @@ Ebk.Matrix.testInverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,1
  
    return obj.det(matrix);
  
-
  }
+
+
+ Ebk.Matrix.translation = (params = {position:  [3,5,1]}) => {
+    let matrix = [];
+
+        matrix = Ebk.Matrix.identity({dim: params.position.length+1});
+        matrix[matrix.length-1] = params.position;
+        matrix[matrix.length-1].push(1);
+     
+    return matrix;
+}
+
 
 
  Ebk.Matrix.tests = (paramsTestOptions =[
                   
-    {arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:0,times:10,vectors:[[3,1,4],[5,3,-8]]},
-    {v1:[3,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:3,times:2,vectors:[[3,1,4],[5,3,-8]]},    
-    {v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
-    {v1:[3,1,1],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
-    {v1:[3,`1`],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
-    {v1:[3,1],v2:[5,6],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
-    {v1:[3,1,9,20],v2:[5,6,10,-1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
-    {v:[3,1,9,`20`],scalar:0.5,arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
-    {v1:[2,1],v2:[-1,2],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
-    {v1:[1,0],v2:[0,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10},
-    { matrix:[[1,2,3],[1,0,2]],scalars:[1,-2], headNdx :0,arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10}, 
-    { matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2],  headNdx :0,
-     matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`y`,times:10
- },
-    {m2:[[1,3],[2,4]],m1:[[2,1],[0,2]],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`i`,times:10,vectors:[[3,1,4],[5,3,-8]]}
-])=>{
+    {position: [3,1,9], arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:0,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
+    {position: [3,1,9],v1:[3,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:3,times:2, vectors:[[3,1,4],[5,3,-8]],dim: 3},    
+    {position: [3,1,9],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
+    {position: [3,1,9],v1:[3,1,1],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
+    {position: [3,1,9],v1:[3,`1`],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
+    {position: [3,1,9],v1:[3,1],v2:[5,6],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
+    {position: [3,1,9],v1:[3,1,9,20],v2:[5,6,10,-1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
+    {position: [3,1,9],v:[3,1,9,`20`],scalar:0.5,arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
+    {position: [3,1,9],v1:[2,1],v2:[-1,2],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
+    {position: [3,1,9],v1:[1,0],v2:[0,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]], dim: 3},
+    {position: [3,1,9], matrix:[[1,2,3],[1,0,2]],scalars:[1,-2], headNdx :0,arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]], dim: 3}, 
+    {position: [3,1,9], matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2],  headNdx :0,
+     matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`y`,times:10 , vectors:[[3,1,4],[5,3,-8]] , dim: 3
+  },
+    {position: [3,1,9],m2:[[1,3],[2,4]],m1:[[2,1],[0,2]],arr : [1,2,3,4,5,6,7,8,9], vectors:[[3,1,4],[5,3,-8]], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:[],times:10, dim: 7}
+  ])=>{
 Ebk.ObjectName.tests( Ebk.Matrix,paramsTestOptions ); 
 }
 
@@ -3227,112 +3273,58 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
     
  
     constructor(params = { 
-        position : [0,0,0], 
-        granularity : 8, 
-        rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{ 2*x }, messy : [0,0]} ,
-                      {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{ Math.pow(1.003,x) }, messy : [0,0]} 
-    ] }){
+        origin : [0,0], 
+        matrix: [[4,2,0], [3,6,0]]
+      
+     }){
 
-    
+        
         this.name = `Ebk.GeoMatrix`;
 
         this.#isCreate = false;
 
-        this.#params = {};
-        this.#params.rythMatrix = [];
-        this.#params.position  = params.position;
-        this.#params.granularity  = params.granularity;
-        this.#params.dim = params.rythMatrix.length;;
-        this.#params.basis = [];
-        params.rythMatrix.forEach(item => {
+        this.#params =   Object.assign({},params);
 
-            let paramRythm = Object.assign({},item);
-            paramRythm.sample = [params.position, item.vector];
-            paramRythm.granularity =  params.granularity;
-            this.#params.basis.push(Ebk.Matrix.vector({v1: this.#params.position, v2: item.vector}));
-            this.#params.rythMatrix.push(paramRythm);
-
-        });
-
- 
         this.#process = {};
-        this.#process.rythMatrix = [];
 
-        params.rythMatrix.forEach((item,ndx) => {
+        // this.#process.matrixOperation = Ebk.Matrix.multMatrices({
+        //     matrices: [Ebk.Matrix.translation({position:this.#params.origin})  ,this.#params.matrix]
+        // });
 
-            this.#process.rythMatrix.push( new  Ebk.Rythm(this.#params.rythMatrix[ndx]));
-
-        });
-
+        console.log(`gggg`, this.#params.origin, this.#params.matrix, Ebk.Matrix.translation({position:this.#params.origin}))  ;
 
         this.#isCreate = true;
         
     }
     
     _update(params = { 
-        position : [0,0,0], 
-        granularity : 8, 
-        rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return 2*x }, messy : [0,0]} ,
-                      {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return Math.pow(1.003,x) }, messy : [0,0]} 
-    ] }){
+        origin : [0,0], 
+        matrix: [[4,2,0], [3,6,0]]
+      
+     }){
         
-    
-        this.#params.position  = params.position;
-        this.#params.granularity  = params.granularity;
-        this.#params.dim = params.rythMatrix.length;
+        this.#params =   Object.assign(this.#params,params);
 
-        params.rythMatrix.forEach((item, ndx) => {
-
-            this.#params.rythMatrix[ndx] = Object.assign( this.#params.rythMatrix[ndx],item);
-            this.#params.rythMatrix[ndx].sample = [params.position, item.vector];
-            this.#params.rythMatrix[ndx].granularity =  params.granularity;
-            
+        this.#process.matrixOperation = Ebk.Matrix.multMatrices({
+            matrices: [Ebk.Matrix.translation({position:this.#params.origin})  ,this.#params.matrix]
         });
 
-        params.rythMatrix.forEach((item,ndx) => {
-
-            this.#process.rythMatrix[ndx]._update(this.#params.rythMatrix[ndx]);
-
-        });
-
-   
     }
 
     getParams(){
         return Object.assign({},this.#params);
     }
 
-    locate(params = { indices : [0,0]}){
+    locate(params = { scalars : [0,0,0]}){
 
-        let result = [];
- 
-            for( let i = 0; i<this.#params.dim; i++) {
-                let comp =  this.#process.rythMatrix[i].locate({step : params.indices[i]});
-                result.push(comp);
-            }
+        console.log(`ddddd`,params.scalars,  this.#process.matrixOperation )
 
-
-        return   Ebk.Matrix.vectorsAdd({vectors:result}); // Ebk.Matrix. .linearCombination({ matrix:this.#params.basis,scalars:result}) ;
+        return     Ebk.Matrix.linearCombination({matrix: this.#process.matrixOperation, scalars: params.scalars});  
     }
 
-    #locateCollection2D(){
-        let result = [];
  
-        this.#params.rythMatrix
-            for( let i = 0; i<=this.#params.granularity; i++) {
-                for( let j = 0; j<=this.#params.granularity; j++) {
-                   result.push(  this.locate( { indices : [i,j]}));
-                }
-            }
-
-        return;    
-    }
-
     locateCollection(){
-       if (this.#params.rythMatrix.length == 2) {
-              return this.#locateCollection2D();
-            
-        } 
+ 
         
      
     }
@@ -3357,18 +3349,12 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
 Ebk.GeoMatrixTests = (paramsTestOptions =[
     
     {creation:  { 
-        position : [1,1,1], 
-        granularity : 8, 
-        rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return 2*x }, messy : [0,0]} ,
-                      {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{ return Math.pow(1.003,x) }, messy : [0,0]} 
-    ] , indices : [0,0,0]  },   
+        origin : [0,0], 
+        matrix: [[4,2,0], [3,6,0]] },   
 
       update:  { 
-        position : [1,1,1], 
-        granularity : 8, 
-        rythMatrix : [{vector: [1,3,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return return2*x }, messy : [0,0]} ,
-                      {vector: [4,2,0], type: Ebk.ERythm.TYPE.LINEAR, flow : (x) =>{return Math.pow(1.003,x) }, messy : [0,0]} 
-    ] , indices : [0,0,0]  } ,   
+        origin : [0,0], 
+        matrix: [[4,2,0], [3,6,0]]  } ,   
 
        exceptions:["_update" ]    
     }       
