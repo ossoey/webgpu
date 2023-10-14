@@ -52,9 +52,9 @@ Ebk.isMatrixOfNumbers = (value) =>{
         while ((ndx < value.length)&&(isAllNumbers)) {
 
             isAllNumbers = Ebk.isArrayOfNumbers(value[ndx]);
-            if((value[ndx].length !==value[ndx].length)){
-                isAllNumbers = false;
-            }
+            // if((value[ndx].length !==value[ndx].length)){
+            //     isAllNumbers = false;
+            // }
             
             ndx++;
         }
@@ -647,29 +647,77 @@ Ebk.Matrix.arrLoadElementNtimes =(params = {elt:0,times:10}) => {
 }
 
 
-Ebk.Matrix.arrfillExept =(params = {withoutIndex}) => {
-    let arr = [];
-
-     for(let i=0;i<params.times; i++){
-        arr.push(params.elt);
-     }
-    return      arr;
-}
-
 
 Ebk.Matrix.identity = (params = {dim: 3}) => {
-    let matrix = [];
 
-     for(let i=0;i<params.dim; i++){
+    let arrInfo = `Attribut dim has to be defined in params this way, dim: 3`;
 
-        matrix.push( Ebk.Matrix.arrLoadElementNtimes({elt:0,times:params.dim}) );  
-        matrix[i][i] = 1;
-     }
+    if (!(Ebk.isObject(params))||(!Ebk.isNumber(params.dim))){
+ 
+        console.error(arrInfo);
+        return null; 
+ 
+    } else{
 
+        let matrix = [];
 
-    return matrix;
+        for(let i=0;i<params.dim; i++){
+   
+           matrix.push( Ebk.Matrix.arrLoadElementNtimes({elt:0,times:params.dim}) );  
+           matrix[i][i] = 1;
+        }
+   
+       return matrix;
+    }
+    
+
 }
 
+Ebk.Matrix.vectToHigherDim = (params = {v:[3,1,4]}) => {
+
+    let arrInfo = `Attribut v has to be defined in params this way, v:[3,1,4]`;
+
+    if (!(Ebk.isObject(params))||(!Ebk.isArrayOfNumbers(params.v))){
+ 
+        console.error(arrInfo);
+        return null; 
+ 
+    } else {
+        let vect =  params.v;
+        vect.push(0)
+        return vect ;
+    }
+
+
+}
+
+Ebk.Matrix.matrixToHigherDim = (params = {matrix:[[3,1],[5,3]]}) => {
+
+
+    let arrInfo = `Attribut matrix has to be defined in params this way, matrix:[[3,1],[5,3]]`;
+
+    if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.matrix))){
+ 
+        console.error(arrInfo);
+        return null; 
+ 
+    } else {
+        let matrix =  params.matrix;
+
+        matrix.forEach(itm =>{
+            itm.push(0);
+        });
+    
+        matrix.push(Ebk.Matrix.arrLoadElementNtimes({elt:0,times: matrix[0].length}))
+    
+        matrix[ matrix.length-1][ matrix.length-1] = 1;
+    
+        return  matrix;
+    }
+
+
+
+}
 
 Ebk.Matrix.vectAdd = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
 
@@ -3270,44 +3318,72 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
     #params;
     #process;
     #isCreate;
-    
+    #dataError;
  
     constructor(params = { 
         origin : [0,0], 
-        matrix: [[4,2,0], [3,6,0]]
+        matrix: [[4,2 ], [3,6 ]]
       
      }){
 
-        
-        this.name = `Ebk.GeoMatrix`;
 
+        this.#dataError = `Attribut matrix, origin have to be defined in params this way, {   origin : [0,0],   matrix: [[4,2,0], [3,6,0]]  }`;
+          
         this.#isCreate = false;
+        this.name = `Ebk.GeoMatrix`;
+        if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.origin))){
+     
+            console.error(this.#dataError);
+            return null; 
+     
+        } else { 
+     
+            this.#params =   Object.assign({},params);
+     
+          
 
-        this.#params =   Object.assign({},params);
+            this.#params.matrix = Ebk.Matrix.matrixToHigherDim({matrix:this.#params.matrix});
 
-        this.#process = {};
+            this.#process = {};
+            this.#process.translation = Ebk.Matrix.translation({position:this.#params.origin});
+            this.#process.matrixOperation = Ebk.Matrix.multMatrices({
+                matrices: [this.#process.translation ,this.#params.matrix]
+            });
 
-        // this.#process.matrixOperation = Ebk.Matrix.multMatrices({
-        //     matrices: [Ebk.Matrix.translation({position:this.#params.origin})  ,this.#params.matrix]
-        // });
-
-        console.log(`gggg`, this.#params.origin, this.#params.matrix, Ebk.Matrix.translation({position:this.#params.origin}))  ;
-
-        this.#isCreate = true;
+            this.#process.dimOperation = this.#params.matrix.length;
         
+            this.#isCreate = true;
+
+        }
+
     }
     
     _update(params = { 
         origin : [0,0], 
-        matrix: [[4,2,0], [3,6,0]]
+        matrix: [[4,2], [3,6]]
       
      }){
         
-        this.#params =   Object.assign(this.#params,params);
 
-        this.#process.matrixOperation = Ebk.Matrix.multMatrices({
-            matrices: [Ebk.Matrix.translation({position:this.#params.origin})  ,this.#params.matrix]
-        });
+        if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.origin))){
+     
+            console.error(this.#dataError);
+            return null; 
+     
+        } else { 
+     
+            this.#params =   Object.assign(this.#params,params);
+   
+            //if (this.#params.matrix.length<this.#process.dimOperation)
+                this.#params.matrix = Ebk.Matrix.matrixToHigherDim({matrix:this.#params.matrix});
+
+    
+            this.#process.translation = Ebk.Matrix.translation({position:this.#params.origin});
+            this.#process.matrixOperation = Ebk.Matrix.multMatrices({
+                matrices: [this.#process.translation ,this.#params.matrix]
+            });
+    
+        }
 
     }
 
@@ -3315,21 +3391,38 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
         return Object.assign({},this.#params);
     }
 
-    locate(params = { scalars : [0,0,0]}){
+    locate(params = { scalars : [0,0]}){
 
-        console.log(`ddddd`,params.scalars,  this.#process.matrixOperation )
-
-        return     Ebk.Matrix.linearCombination({matrix: this.#process.matrixOperation, scalars: params.scalars});  
+        if (!(Ebk.isObject(params))||(!Ebk.isArrayOfNumbers(params.scalars))){
+     
+            console.error(`Attribut scalars has to be defined in params this way, {   scalars : [0,0,0]  }`);
+            return null; 
+     
+        } else { 
+            return     Ebk.Matrix.linearCombination({matrix: this.#process.matrixOperation, scalars: Ebk.Matrix.vectToHigherDim({v:params.scalars}) });  
+        }    
+        
     }
 
+    locateCollection(params = { scalarsMatrix : [[3,1],[5,3], [0,0],[1,2]]   }){
  
-    locateCollection(){
- 
-        
+        if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.scalarsMatrix))){
+     
+            console.error(`Attribut scalarsMatrix has to be defined in params this way, {   scalarsMatrix : [[3,1],[5,3], [0,0],[1,2]]  }`);
+            return null; 
+     
+        } else { 
+
+            let arr = [];
+
+            params.scalarsMatrix.forEach(itm => {
+                arr.push(this.locate(params = { scalars : itm}));
+            });
+
+            return  arr; 
+        }    
      
     }
-
-
 
     rotate() {
 
@@ -3350,15 +3443,20 @@ Ebk.GeoMatrixTests = (paramsTestOptions =[
     
     {creation:  { 
         origin : [0,0], 
-        matrix: [[4,2,0], [3,6,0]] },   
+        matrix: [[4,2], [3,6]] ,
+        scalars: [0,0],
+        scalarsMatrix : [[3,1],[5,3], [0,0],[1,2]]
+    },   
 
       update:  { 
         origin : [0,0], 
-        matrix: [[4,2,0], [3,6,0]]  } ,   
+        matrix: [[4,2], [3,6]] ,
+        scalars: [0,0],
+        scalarsMatrix : [[3,1],[5,3], [0,0],[1,2]]
+    } ,   
 
        exceptions:["_update" ]    
-    }       
-   
+    }   
 ])=>{
 
     Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.GeoMatrix,paramsTestOptions );
