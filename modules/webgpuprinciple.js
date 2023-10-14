@@ -1889,9 +1889,9 @@ let functions_entries = [
    
 //  Ebk.Matrix.tests ([
                   
-//   {position: [3,1,9], arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:0,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
-//   {position: [3,1,9],v1:[3,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:3,times:2, vectors:[[3,1,4],[5,3,-8]],dim: 3},    
-//   {position: [3,1,9],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
+//   {position: [3,1,9], arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:0,times:10, vectors:[[3,1,4],[5,3,-8]] },
+//   {position: [3,1,9],v1:[3,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:3,times:2, vectors:[[3,1,4],[5,3,-8]],dim: 4},    
+//   {position: [3,1,9],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 5},
 //   {position: [3,1,9],v1:[3,1,1],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
 //   {position: [3,1,9],v1:[3,`1`],v2:[5,3],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
 //   {position: [3,1,9],v1:[3,1],v2:[5,6],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]],dim: 3},
@@ -1901,23 +1901,48 @@ let functions_entries = [
 //   {position: [3,1,9],v1:[1,0],v2:[0,1],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]], dim: 3},
 //   {position: [3,1,9], matrix:[[1,2,3],[1,0,2]],scalars:[1,-2], headNdx :0,arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`B`,times:10, vectors:[[3,1,4],[5,3,-8]], dim: 3}, 
 //   {position: [3,1,9], matrix:[[1,2,3],[3,5,1],[0,0,8]],scalars:[-1,1,-1/2],  headNdx :0,
-//    matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`y`,times:10 , vectors:[[3,1,4],[5,3,-8]] , dim: 3
+//   v:[3,1,42], matrix:[[3,1],[5,3]] , matrices:[ [[3,1],[5,3]], [[3,1],[5,3]], [[5,14],[1,7]]],arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:`y`,times:10 , vectors:[[3,1,4],[5,3,-8]] , dim: 3
 // },
 //   {position: [3,1,9],m2:[[1,3],[2,4]],m1:[[2,1],[0,2]],arr : [1,2,3,4,5,6,7,8,9], vectors:[[3,1,4],[5,3,-8]], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:[],times:10, dim: 7}
 // ])
 
-Ebk.GeoMatrixTests  ( [
+Ebk.GeoMatrixTests ( [
     
-  {creation:  { 
-      origin : [0,0], 
-      matrix: [[4,2,0], [3,6,0]], scalars: [0.5, 0.4, 0] },   
+    {creation:  { 
+      origin : [-1,10], 
+      matrix: [[4,2], [3,6]] ,
+      scalars: [0,0],
+      scalarsMatrix : [[3,1],[5,3], [0,0],[1,2]]
+  },   
 
     update:  { 
-      origin : [0,0 ], 
-      matrix: [[4,2,0], [3,6,0]], scalars: [0.5, 0.4, 0]  } ,   
+      origin : [51,3,0], 
+      matrix: [[4,2,5], [3,6,8], [3,6,8]] ,
+      scalars: [0,0,0],
+      scalarsMatrix : [[3,1,-1],[5,3,9], [0,0,32],[1,2,-8]]
+  } ,   
 
-     exceptions:["_update" ]    
-  }       
+  
+    exceptions:["_update" ]    
+  }    ,
+
+  {creation:  { 
+    origin : [1,1], 
+    matrix: [[3,1], [2,4]] ,
+    scalars: [0.4,0.9],
+    scalarsMatrix : [[0.4,0.9],[5,3], [0,0],[1,2]]
+},   
+
+  update:  { 
+    origin : [51,3,0], 
+    matrix: [[4,2,5], [3,6,8], [3,6,8]] ,
+    scalars: [0,0,0],
+    scalarsMatrix : [[3,1,-1],[5,3,9], [0,0,32],[1,2,-8]]
+} ,   
+
+
+  exceptions:["_update" ]    
+} 
  
 ])
   
