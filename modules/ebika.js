@@ -684,7 +684,7 @@ Ebk.Matrix.vectToHigherDim = (params = {v:[3,1,4]}) => {
  
     } else {
         let vect =  params.v;
-        vect.push(0)
+        vect.push(1)
         return vect ;
     }
 
@@ -3341,17 +3341,17 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
             this.#params =   Object.assign({},params);
      
           
-
-            this.#params.matrix = Ebk.Matrix.matrixToHigherDim({matrix:this.#params.matrix});
-
             this.#process = {};
-            this.#process.translation = Ebk.Matrix.translation({position:this.#params.origin});
-            this.#process.matrixOperation = Ebk.Matrix.multMatrices({
-                matrices: [this.#process.translation ,this.#params.matrix]
-            });
+            this.#processMatrixOperation();
 
-            this.#process.dimOperation = this.#params.matrix.length;
-        
+            //   this.#params.matrix = Ebk.Matrix.matrixToHigherDim({matrix:this.#params.matrix});
+            // this.#process.translation = Ebk.Matrix.translation({position:this.#params.origin});
+ 
+            // this.#process.matrixOperation = Ebk.Matrix.multMatrices({
+            //     matrices: [this.#process.translation ,this.#params.matrix]
+            // });
+
+    
             this.#isCreate = true;
 
         }
@@ -3374,16 +3374,37 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
      
             this.#params =   Object.assign(this.#params,params);
    
-            //if (this.#params.matrix.length<this.#process.dimOperation)
-                this.#params.matrix = Ebk.Matrix.matrixToHigherDim({matrix:this.#params.matrix});
+            this.#processMatrixOperation();
+
+            // this.#params.matrix = Ebk.Matrix.matrixToHigherDim({matrix:this.#params.matrix});
 
     
-            this.#process.translation = Ebk.Matrix.translation({position:this.#params.origin});
-            this.#process.matrixOperation = Ebk.Matrix.multMatrices({
-                matrices: [this.#process.translation ,this.#params.matrix]
-            });
+            // this.#process.translation = Ebk.Matrix.translation({position:this.#params.origin});
+ 
+
+            // this.#process.matrixOperation = Ebk.Matrix.multMatrices({
+            //     matrices: [this.#process.translation ,this.#params.matrix]
+            // });
     
         }
+
+    }
+
+    #processMatrixOperation(){
+         
+        this.#params.matrix = Ebk.Matrix.matrixToHigherDim({matrix:this.#params.matrix});
+
+    
+        this.#process.translation = Ebk.Matrix.translation({position:this.#params.origin});
+
+        this.#process.matrixOperation = Ebk.Matrix.multMatrices({
+            // matrices: [Ebk.Matrix.identity({dim:this.#params.matrix.length}) ,this.#params.matrix]
+             matrices: [this.#process.translation ,this.#params.matrix]
+        });
+
+        console.log(`matrixOperation`, this.#process.translation, this.#params.matrix)
+
+        this.#process.dimOperation = this.#params.matrix.length;
 
     }
 
@@ -3469,23 +3490,47 @@ Ebk.ClassModel = class EbkClassModel {
     #params;
     #process;
     #isCreate;
+    #dataError;
     
  
     constructor(params ={ 
            }){
 
     
-        this.name = `Ebk.Sequence.Creation`;
 
-        this.#isCreate = false;
 
-        this.#params = {};
-        this.#process = {};
 
-        this.#params =  Object.assign({},  params );
-  
+            this.#dataError = `Attribut matrix, origin have to be defined in params this way, {   origin : [0,0],   matrix: [[4,2,0], [3,6,0]]  }`;
+          
+            this.#isCreate = false;
+            this.name = `Ebk.GeoMatrix`;
+            if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.origin))){
+         
+                console.error(this.#dataError);
+                return null; 
+         
+            } else { 
+         
+                this.#params =   Object.assign({},params);
+         
+              
+    
+                this.name = `Ebk.Sequence.Creation`;
+
+                this.#isCreate = false;
         
-        this.#isCreate = true;
+                this.#params = {};
+                this.#process = {};
+        
+                this.#params =  Object.assign({},  params );
+          
+                
+                this.#isCreate = true;
+    
+            }
+
+            
+
         
     }
     
