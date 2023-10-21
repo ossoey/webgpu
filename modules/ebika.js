@@ -264,6 +264,29 @@ Ebk.ObjectInstance.testsCreateAndUpdate = (className, paramsTestOptions =[
 }
 
 
+Ebk.objectDeepCopy = (obj) => {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+    
+    if (Array.isArray(obj)) {
+      const copyArr = [];
+      for (let i = 0; i < obj.length; i++) {
+        copyArr[i] = Ebk.objectDeepCopy(obj[i]);
+      }
+      return copyArr;
+    }
+    
+    const copyObj = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        copyObj[key] = Ebk.objectDeepCopy(obj[key]);
+      }
+    }
+    
+    return copyObj;
+  }
+  
 
 /////// Ebk.Rand 
 
@@ -636,6 +659,9 @@ Ebk.Matrix.arrGetSubarrayWithoutIndex =(params = {arr : [1,2,3,4,5,6,7,8,9], wit
 
 }
 
+Ebk.Matrix.deepCopy=(params = {arr : [1,2,3,4,5,6,7,8,9]}) => {
+    return JSON.parse(JSON.stringify(params.arr));
+}
 
 Ebk.Matrix.arrLoadElementNtimes =(params = {elt:0,times:10}) => {
     let arr = [];
@@ -673,6 +699,48 @@ Ebk.Matrix.identity = (params = {dim: 3}) => {
 
 }
 
+Ebk.Matrix.vectToLowerDim = (params = {v:[3,1,4]}) => {
+
+    let arrInfo = `Attribut v has to be defined in params this way, v:[3,1,4]`;
+
+    if (!(Ebk.isObject(params))||(!Ebk.isArrayOfNumbers(params.v))){
+ 
+        console.error(arrInfo);
+        return null; 
+ 
+    } else {
+        let vect = Ebk.Matrix.deepCopy({arr:params.v}) ;
+        vect.pop();
+        return vect ;
+    }
+
+}
+
+Ebk.Matrix.matrixToLowerDim = (params = {matrix:[[3,1],[5,3]]}) => {
+
+
+    let arrInfo = `Attribut matrix has to be defined in params this way, matrix:[[3,1],[5,3]]`;
+
+    if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.matrix))){
+ 
+        console.error(arrInfo);
+        return null; 
+ 
+    } else {
+        let matrix =  Ebk.Matrix.deepCopy({arr:params.matrix});
+
+        matrix.forEach((itm,ndx) =>{
+            matrix[ndx].pop();
+        });
+    
+        matrix.pop();
+    
+    
+        return  matrix;
+    }
+
+}
+
 Ebk.Matrix.vectToHigherDim = (params = {v:[3,1,4]}) => {
 
     let arrInfo = `Attribut v has to be defined in params this way, v:[3,1,4]`;
@@ -683,11 +751,10 @@ Ebk.Matrix.vectToHigherDim = (params = {v:[3,1,4]}) => {
         return null; 
  
     } else {
-        let vect =  params.v;
+        let vect =  Ebk.Matrix.deepCopy({arr: params.v}); 
         vect.push(1)
         return vect ;
     }
-
 
 }
 
@@ -702,7 +769,7 @@ Ebk.Matrix.matrixToHigherDim = (params = {matrix:[[3,1],[5,3]]}) => {
         return null; 
  
     } else {
-        let matrix =  params.matrix;
+        let matrix =  Ebk.Matrix.deepCopy({arr: params.matrix}); 
 
         matrix.forEach(itm =>{
             itm.push(0);
@@ -714,8 +781,6 @@ Ebk.Matrix.matrixToHigherDim = (params = {matrix:[[3,1],[5,3]]}) => {
     
         return  matrix;
     }
-
-
 
 }
 
@@ -3338,19 +3403,11 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
      
         } else { 
      
-            this.#params =   Object.assign({},params);
+            this.#params =   Object.assign({}, Ebk.objectDeepCopy (params));
      
           
             this.#process = {};
             this.#processMatrixOperation();
-
-            //   this.#params.matrix = Ebk.Matrix.matrixToHigherDim({matrix:this.#params.matrix});
-            // this.#process.translation = Ebk.Matrix.translation({position:this.#params.origin});
- 
-            // this.#process.matrixOperation = Ebk.Matrix.multMatrices({
-            //     matrices: [this.#process.translation ,this.#params.matrix]
-            // });
-
     
             this.#isCreate = true;
 
@@ -3372,20 +3429,10 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
      
         } else { 
      
-            this.#params =   Object.assign(this.#params,params);
+            this.#params =   Object.assign(this.#params, Ebk.objectDeepCopy (params));
    
             this.#processMatrixOperation();
 
-            // this.#params.matrix = Ebk.Matrix.matrixToHigherDim({matrix:this.#params.matrix});
-
-    
-            // this.#process.translation = Ebk.Matrix.translation({position:this.#params.origin});
- 
-
-            // this.#process.matrixOperation = Ebk.Matrix.multMatrices({
-            //     matrices: [this.#process.translation ,this.#params.matrix]
-            // });
-    
         }
 
     }
@@ -3398,11 +3445,10 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
         this.#process.translation = Ebk.Matrix.translation({position:this.#params.origin});
 
         this.#process.matrixOperation = Ebk.Matrix.multMatrices({
-            // matrices: [Ebk.Matrix.identity({dim:this.#params.matrix.length}) ,this.#params.matrix]
+         
              matrices: [this.#process.translation ,this.#params.matrix]
         });
 
-        console.log(`matrixOperation`, this.#process.translation, this.#params.matrix)
 
         this.#process.dimOperation = this.#params.matrix.length;
 

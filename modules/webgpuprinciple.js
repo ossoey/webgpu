@@ -1906,6 +1906,10 @@ let functions_entries = [
 //   {position: [3,1,9],m2:[[1,3],[2,4]],m1:[[2,1],[0,2]],arr : [1,2,3,4,5,6,7,8,9], vectors:[[3,1,4],[5,3,-8]], fromIndex : 2, toIndex : 5, withoutIndex : 2,elt:[],times:10, dim: 7}
 // ])
 
+
+// console.log(`DEEP OBJECT COPY`,Ebk.objectDeepCopy ({coco:2,cedro:{a:1,b:`a`}}));
+
+
 Ebk.GeoMatrixTests ( [
     
     {creation:  { 
