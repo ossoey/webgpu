@@ -1623,7 +1623,7 @@ Ebk.Trajectory = class EbkTrajectory{
 
 
     getParams(){
-        return Object.assign({},this.#params);
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
 
     #computeDistances(){
@@ -1817,7 +1817,7 @@ Ebk.ERythm.Linear = class EbkERythmLinear {
     }
   
     getParams(){
-        return Object.assign({},this.#params);
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
 
     isflowRight(flow =(x)=>{return 2*x }){
@@ -2031,7 +2031,7 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
      }
     
     getParams(){
-      return Object.assign({},this.#params);
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
     
     #computeEntry(params ={step:1}){
@@ -2229,7 +2229,7 @@ Ebk.ERythm.Creation = class EbkERythmCreation {
     }
 
     getParams(){
-        return Object.assign({},this.#params);
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
       
     locate(params ={step:1}){
@@ -2362,7 +2362,7 @@ Ebk.Rythm = class EbkRythm {
     }
 
     getParams(){
-        return Object.assign({},this.#params);
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
 
     getInfos(){
@@ -3157,7 +3157,7 @@ Ebk.Sequence.Creation = class EbkSequenceCreation {
     }
 
     getParams(){
-        return Object.assign({},this.#params);
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
 
     locate(params = {step:2}){
@@ -3284,7 +3284,7 @@ Ebk.Navigation = class EbkNavigation {
     }
 
     getParams(){
-        return Object.assign({},this.#params);
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
 
     inc(params = {incDec:2}){
@@ -3455,7 +3455,7 @@ Ebk.GeoMatrix = class EbkGeoMatrix {
     }
 
     getParams(){
-        return Object.assign({},this.#params);
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
 
     locate(params = { scalars : [0,0]}){
@@ -3531,6 +3531,94 @@ Ebk.GeoMatrixTests = (paramsTestOptions =[
 }
 
 
+/////// Ebk.CustomizedCoords
+Ebk.CustomizedCoords = class EbkClassModel {
+    #params;
+    #process;
+    #isCreate;
+    #dataError;
+    
+    constructor(params ={ 
+               
+                    0: {lines:[
+                        [[0,0],[0,1],[0,2],[0,3]],
+                        [[1,0],[1,1],[1,2],[1,3]],
+                        [[2,0],[2,1],[2,2],[2,3]],
+                        [[3,0],[3,1],[3,2],[4,3]],
+                    ],
+                    rythm: {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}
+                   },
+
+                   1: {lines:[
+                        [[0,0],[1,0],[2,0],[3,0]],
+                        [[0,1],[1,1],[2,1],[3,1]],
+                        [[0,2],[1,2],[2,2],[3,2]],
+                        [[0,3],[1,3],[2,3],[3,3]],
+
+                       ],
+                      rythm: {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 1/2*x+1; }, granularity:10,messy:[-1,1]}
+                      } ,
+
+                          
+           }){
+
+    
+
+
+
+            this.#dataError = `Attribut matrix, origin have to be defined in params this way, {   origin : [0,0],   matrix: [[4,2,0], [3,6,0]]  }`;
+          
+            this.#isCreate = false;
+            this.name = `Ebk.GeoMatrix`;
+            if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.origin))){
+         
+                console.error(this.#dataError);
+                return null; 
+         
+            } else { 
+         
+                this.#params =   Object.assign({},params);
+         
+              
+    
+                this.name = `Ebk.Sequence.Creation`;
+
+                this.#isCreate = false;
+        
+                this.#params = {};
+                this.#process = {};
+        
+                this.#params =  Object.assign({},  params );
+          
+                
+                this.#isCreate = true;
+    
+            }
+
+            
+
+        
+    }
+    
+    _update(params ={ 
+
+     }){
+        
+    
+        this.#params =  Object.assign(this.#params,  params );
+   
+    }
+
+
+    getParams(){
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
+    }
+
+
+
+}  
+
+
 /////// Ebk.Navigation
 Ebk.ClassModel = class EbkClassModel {
     #params;
@@ -3591,7 +3679,7 @@ Ebk.ClassModel = class EbkClassModel {
 
 
     getParams(){
-        return Object.assign({},this.#params);
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
 
 
