@@ -288,6 +288,96 @@ Ebk.objectDeepCopy = (obj) => {
   }
   
 
+  /////// Ebk.Conversion
+
+Ebk.Conversion = {};
+
+Ebk.Conversion.name = `Ebk.Conversion`;
+
+// absolute to relative normalized. 
+Ebk.Conversion.absToRelNzd  = (params={elt:-0.8})=>{
+    
+    if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`elt`,params)))||(!(Ebk.isNumber(params.elt)))   ) {
+        console.error(`params error!`);
+        return null;
+    }else {
+  
+        return 2*params.elt -1;
+    }
+
+}
+
+//  relative   to absolute  normalized. 
+Ebk.Conversion.relToAbsNzd  = (params={elt:0.8})=>{
+    
+    if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`elt`,params)))||(!(Ebk.isNumber(params.elt)))   ) {
+        console.error(`params error!`);
+        return null;
+    }else {
+  
+        return  (params.elt +1)/2;
+    }
+
+}
+
+// absolute to relative normalized collection
+Ebk.Conversion.absToRelNzdColl  = (params={eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]})=>{
+    
+    if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`eltMatrix`,params)))||(!(Ebk.isArrayOfNumbers(params.eltMatrix)))   ) {
+        console.error(`params error!`);
+        return null;
+    }else {
+        
+        let arr = [];
+
+        params.eltMatrix.forEach(itm => {
+            arr.push(Ebk.Conversion.absToRelNzd({elt:itm}));
+        })
+
+        return arr; 
+        
+    }
+
+}
+
+
+// absolute to relative normalized collection
+Ebk.Conversion.relToAbsNzdColl  = (params={eltMatrix:[
+    -2,-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1,
+    0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 3,1]})=>{
+    
+    if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`eltMatrix`,params)))||(!(Ebk.isArrayOfNumbers(params.eltMatrix)))   ) {
+        console.error(`params error!`);
+        return null;
+    }else {
+        
+        let arr = [];
+
+        params.eltMatrix.forEach(itm => {
+            arr.push(Ebk.Conversion.relToAbsNzd({elt:itm}));
+        })
+
+        return arr; 
+        
+    }
+}
+
+Ebk.Conversion.tests = (paramsTestOptions =[
+    `ff`,
+   {elt: 0.5, eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]},
+   {elt: -0.5, eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]}, 
+   
+   {elt: -0.5,  eltMatrix:[
+                -2,-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1,
+                0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 3,1
+               ]
+            },  
+            
+    
+])=>{
+Ebk.ObjectName.tests(Ebk.Conversion,paramsTestOptions ); 
+}
+
 /////// Ebk.Rand 
 
 Ebk.Rand = {};
