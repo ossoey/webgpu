@@ -1761,7 +1761,202 @@ Ebk.TrajectoryTests = (paramsTestOptions =[
 }
 
 
+/////// Ebk.CustomizedCoords
+Ebk.TrajectoriesVertiMap = class EbkClassModel {
+    #params;
+    #process;
+    #isCreate;
+    #dataError;
+    
+    constructor(params ={  paths:[
+            [[0,0],[0,1],[0,2],[0,3]],
+            [[1,0],[1,1],[1,2],[1,3]],
+            [[2,0],[2,1],[2,2],[2,3]],
+            [[3,0],[3,1],[3,2],[4,3]],
+            ]
+           }){
 
+            this.#dataError = `Attribut  path has to be defined in params this way,{ 
+               
+                paths:[
+                    [[0,0],[0,1],[0,2],[0,3]],
+                    [[1,0],[1,1],[1,2],[1,3]],
+                    [[2,0],[2,1],[2,2],[2,3]],
+                    [[3,0],[3,1],[3,2],[4,3]],
+                    ]               
+                   `;
+          
+            this.#isCreate = false;
+            this.name = `Ebk.GeoMatrix`;
+            if (!(Ebk.isObject(params))||(!Ebk.isMatrixClusterOfNumbers(params.paths))){
+         
+                console.error(this.#dataError);
+                return null; 
+         
+            } else { 
+         
+                this.#params =   Object.assign({},params);
+                       
+                this.name = `Ebk.TrajectoriesVertiMap`;
+
+                this.#isCreate = false;
+        
+                this.#process = {};
+                this.#isCreate = true;
+
+                this.#processTrajectories();
+            }
+
+    }
+    
+    _update(params ={ 
+        paths:[
+            [[0,0],[0,1],[0,2],[0,3]],
+            [[1,0],[1,1],[1,2],[1,3]],
+            [[2,0],[2,1],[2,2],[2,3]],
+            [[3,0],[3,1],[3,2],[4,3]],
+            ]
+     }){
+        
+        this.#params =  Object.assign(this.#params,  params );
+        this.#processTrajectories();
+   
+    }
+
+
+    locate(params ={coords:[0.3,0.8]}){ 
+
+        if (!(Ebk.isObject(params))||(!Ebk.isArrayOfNumbers(params.coords))){
+         
+            console.error(`Attribut coords has to be defined in params this way,{coords:[0.3,0.8] } `);
+            return null; 
+     
+        } else { 
+     
+            this.#process.trajectoriesVerti.forEach(itm =>{
+
+                this.#process.pathHorizontal.push( itm.locate({target:params.coords[0] }));
+            });
+
+            this.#process.trajectoryHorizontal = new Ebk.Trajectory({path:this.#process.pathHorizontal});
+
+            return this.#process.trajectoryHorizontal.locate({target:params.coords[1]});
+        }
+
+    }
+
+    locateCollection(params = { coordsMatrix : [[0.0,0.0],[0.1,0.18],[0.3,0.8],[5,3],[1,1]]  }) {
+        if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.coordsMatrix))){
+         
+            console.error(`Attribut coordsMatrix has to be defined in params this way,{coordsMatrix : [[0.0,0.0],[0.1,0.18],[0.3,0.8],[5,3],[1,1]]  } `);
+            return null; 
+     
+        } else {
+
+            let arr = [];
+             params.coordsMatrix.forEach(itm =>{
+                arr.push(this.locate({coords:itm}));
+             })
+
+            return arr; 
+
+       }
+
+    }
+
+    locateAltern(params ={coords:[0.3,0.8]}){ 
+
+        if (!(Ebk.isObject(params))||(!Ebk.isArrayOfNumbers(params.coords))){
+         
+            console.error(`Attribut coords has to be defined in params this way,{coords:[0.3,0.8] } `);
+            return null; 
+     
+        } else { 
+     
+            this.#process.trajectoriesVerti.forEach(itm =>{
+
+                this.#process.pathHorizontal.push( itm.locate({target:params.coords[1] }));
+            });
+
+            this.#process.trajectoryHorizontal = new Ebk.Trajectory({path:this.#process.pathHorizontal});
+
+            return this.#process.trajectoryHorizontal.locate({target:params.coords[0]});
+        }
+
+    }
+
+    locateAlternCollection(params = { coordsMatrix : [[0.0,0.0],[0.1,0.18],[0.3,0.8],[5,3],[1,1]]  }) {
+        if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.coordsMatrix))){
+         
+            console.error(`Attribut coordsMatrix has to be defined in params this way,{coordsMatrix : [[0.0,0.0],[0.1,0.18],[0.3,0.8],[5,3],[1,1]]  } `);
+            return null; 
+     
+        } else {
+
+            let arr = [];
+             params.coordsMatrix.forEach(itm =>{
+                arr.push(this.locateAltern({coords:itm}));
+             })
+
+            return arr; 
+
+       }
+
+    }
+
+
+
+    getParams(){
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
+    }
+
+    #processTrajectories(){
+       
+        this.#process.trajectoriesVerti = [];
+        this.#process.pathHorizontal = [];
+        this.#process.trajectoryHorizontal;
+        this.#params.paths.forEach(item=>{
+            this.#process.trajectoriesVerti.push( new Ebk.Trajectory({path:item}));
+        })
+  
+   }
+
+}  
+
+
+Ebk.TrajectoriesVertiMapTests = (paramsTestOptions =[
+                  
+    {creation:{     paths:[
+        [[0,0],[0,1],[0,2],[0,3]],
+        [[1,0],[1,1],[1,2],[1,3]],
+        [[2,0],[2,1],[2,2],[2,3]],
+        [[3,0],[3,1],[3,2],[4,3]],
+        ], coords:[0.3,0.8],coordsMatrix : [[0.0,0.0],[0.1,0.18],[0.3,0.8],[5,3],[1,1]] }, 
+    update:{     paths:[
+        [[0,0],[0,1],[0,2],[0,3]],
+        [[1,0],[1,1],[1,2],[1,3]],
+        [[2,0],[2,1],[2,2],[2,3]],
+        [[3,0],[3,1],[3,2],[4,3]],
+        ], coords:[0.3,0.8] }} ,
+
+    {creation:{     paths:[
+        [[0,0],[0,1],[0,2],[0,3]],
+        [[1,0],[1,1],[1,2],[1,3]],
+        [[2,0],[2,1],[2,2],[2,3]],
+        [[3,0],[3,1],[3,2],[4,3]],
+        ], coords:[0.3,0.8]}, 
+    update:{     paths:[
+        [[0,0],[0,1],[0,2],[0,3]],
+        [[1,0],[1,1],[1,2],[1,3]],
+        [[2,0],[2,1],[2,2],[2,3]],
+        [[3,0],[3,1],[3,2],[4,3]],
+        ], coords:[0.3,0.8]} } ,
+ 
+],exceptions = ["_update", "getParams" ])=>{
+
+   Ebk.ObjectInstance.testsCreateAndUpdate (Ebk.TrajectoriesVertiMap, paramsTestOptions,exceptions );
+ 
+}
 
 
 
@@ -3531,93 +3726,6 @@ Ebk.GeoMatrixTests = (paramsTestOptions =[
 }
 
 
-/////// Ebk.CustomizedCoords
-Ebk.CustomizedCoords = class EbkClassModel {
-    #params;
-    #process;
-    #isCreate;
-    #dataError;
-    
-    constructor(params ={ 
-               
-                    0: {lines:[
-                        [[0,0],[0,1],[0,2],[0,3]],
-                        [[1,0],[1,1],[1,2],[1,3]],
-                        [[2,0],[2,1],[2,2],[2,3]],
-                        [[3,0],[3,1],[3,2],[4,3]],
-                    ],
-                    rythm: {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, granularity:10,messy:[-1,1]}
-                   },
-
-                   1: {lines:[
-                        [[0,0],[1,0],[2,0],[3,0]],
-                        [[0,1],[1,1],[2,1],[3,1]],
-                        [[0,2],[1,2],[2,2],[3,2]],
-                        [[0,3],[1,3],[2,3],[3,3]],
-
-                       ],
-                      rythm: {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 1/2*x+1; }, granularity:10,messy:[-1,1]}
-                      } ,
-
-                          
-           }){
-
-    
-
-
-
-            this.#dataError = `Attribut matrix, origin have to be defined in params this way, {   origin : [0,0],   matrix: [[4,2,0], [3,6,0]]  }`;
-          
-            this.#isCreate = false;
-            this.name = `Ebk.GeoMatrix`;
-            if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.origin))){
-         
-                console.error(this.#dataError);
-                return null; 
-         
-            } else { 
-         
-                this.#params =   Object.assign({},params);
-         
-              
-    
-                this.name = `Ebk.Sequence.Creation`;
-
-                this.#isCreate = false;
-        
-                this.#params = {};
-                this.#process = {};
-        
-                this.#params =  Object.assign({},  params );
-          
-                
-                this.#isCreate = true;
-    
-            }
-
-            
-
-        
-    }
-    
-    _update(params ={ 
-
-     }){
-        
-    
-        this.#params =  Object.assign(this.#params,  params );
-   
-    }
-
-
-    getParams(){
-        return Object.assign({},Ebk.objectDeepCopy (this.#params));
-    }
-
-
-
-}  
-
 
 /////// Ebk.Navigation
 Ebk.ClassModel = class EbkClassModel {
@@ -3632,8 +3740,6 @@ Ebk.ClassModel = class EbkClassModel {
 
     
 
-
-
             this.#dataError = `Attribut matrix, origin have to be defined in params this way, {   origin : [0,0],   matrix: [[4,2,0], [3,6,0]]  }`;
           
             this.#isCreate = false;
@@ -3645,7 +3751,7 @@ Ebk.ClassModel = class EbkClassModel {
          
             } else { 
          
-                this.#params =   Object.assign({},params);
+     
          
               
     
