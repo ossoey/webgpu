@@ -294,28 +294,49 @@ Ebk.Conversion = {};
 
 Ebk.Conversion.name = `Ebk.Conversion`;
 
-// absolute to relative normalized. 
-Ebk.Conversion.absToRelNzd  = (params={elt:-0.8})=>{
+// interval source to interval target. 
+Ebk.Conversion.intervalSourceToTarget  = (params={src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]}  })=>{
     
-    if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`elt`,params)))||(!(Ebk.isNumber(params.elt)))   ) {
-        console.error(`params error!`);
+    if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`src`,params)))||(!(Ebk.isObject(params.src) ))||(!(Ebk.isObject(params.dst) ))
+           ||(!(Ebk.isInObject(`interval`,params.src))  )  ||(!(Ebk.isInObject(`value`,params.src))  )    
+           ||(!(Ebk.isArrayOfNumbers(params.src.interval))  )  ||(!(Ebk.isArrayOfNumbers(params.dst.interval))) 
+           ||(!(Ebk.isNumber(params.src.value))) 
+        
+           ) {
+            console.error(`Params have to be defined this way:{src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]}  }`);
+           return null;
+    }else {
+  
+        return  (  ((params.src.value - params.src.interval[0])* (params.dst.interval[1]- params.dst.interval[0]))
+                /(params.src.interval[1] - params.src.interval[0])) + params.dst.interval[0]
+    }
+
+}
+
+// absolute to relative normalized. 
+Ebk.Conversion.absToRelNzd  = (params={value:-0.8})=>{
+    
+    if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`value`,params)))||(!(Ebk.isNumber(params.value)))   ) {
+        console.error(`Params have to be defined this way: {value:0.8}`);
         return null;
     }else {
   
-        return 2*params.elt -1;
+        return   Ebk.Conversion.intervalSourceToTarget({src:{interval:[0,1], value: params.value}, dst:{interval:[-1,1]}}); 
+                 // 2*params.value -1;
     }
 
 }
 
 //  relative   to absolute  normalized. 
-Ebk.Conversion.relToAbsNzd  = (params={elt:0.8})=>{
+Ebk.Conversion.relToAbsNzd  = (params={value:0.8})=>{
     
-    if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`elt`,params)))||(!(Ebk.isNumber(params.elt)))   ) {
-        console.error(`params error!`);
+    if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`value`,params)))||(!(Ebk.isNumber(params.value)))   ) {
+        console.error(`Params have to be defined this way: {value:0.8}`);
         return null;
     }else {
   
-        return  (params.elt +1)/2;
+        return  Ebk.Conversion.intervalSourceToTarget({src:{interval: [-1,1], value: params.value}, dst:{interval: [0,1]}}); 
+        // (params.value +1)/2;
     }
 
 }
@@ -324,14 +345,14 @@ Ebk.Conversion.relToAbsNzd  = (params={elt:0.8})=>{
 Ebk.Conversion.absToRelNzdColl  = (params={eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]})=>{
     
     if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`eltMatrix`,params)))||(!(Ebk.isArrayOfNumbers(params.eltMatrix)))   ) {
-        console.error(`params error!`);
+        console.error(`Params have to be defined this way:  {eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]}`);
         return null;
     }else {
         
         let arr = [];
 
         params.eltMatrix.forEach(itm => {
-            arr.push(Ebk.Conversion.absToRelNzd({elt:itm}));
+            arr.push(Ebk.Conversion.absToRelNzd({value:itm}));
         })
 
         return arr; 
@@ -347,14 +368,14 @@ Ebk.Conversion.relToAbsNzdColl  = (params={eltMatrix:[
     0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 3,1]})=>{
     
     if ((!(Ebk.isObject(params) ))||(!(Ebk.isInObject(`eltMatrix`,params)))||(!(Ebk.isArrayOfNumbers(params.eltMatrix)))   ) {
-        console.error(`params error!`);
+        console.error(`Params have to be defined this way:  {eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]}`);
         return null;
     }else {
         
         let arr = [];
 
         params.eltMatrix.forEach(itm => {
-            arr.push(Ebk.Conversion.relToAbsNzd({elt:itm}));
+            arr.push(Ebk.Conversion.relToAbsNzd({value:itm}));
         })
 
         return arr; 
@@ -364,13 +385,17 @@ Ebk.Conversion.relToAbsNzdColl  = (params={eltMatrix:[
 
 Ebk.Conversion.tests = (paramsTestOptions =[
     `ff`,
-   {elt: 0.5, eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]},
-   {elt: -0.5, eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]}, 
+   {value: 0.5, eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]},
+   {value: -0.5, eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+    src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]},
+}, 
    
-   {elt: -0.5,  eltMatrix:[
+   {value: -0.5,  eltMatrix:[
                 -2,-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1,
                 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 3,1
-               ]
+               ],
+
+               src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]}
             },  
             
     
@@ -1540,6 +1565,8 @@ Ebk.Matrix.determinant = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,1
     }
 
 }
+
+
 Ebk.Matrix.inverse = (params ={ matrix:[[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,22,24,25]]}) =>{
 
     let info =`matrix has to be defined. eg ={ matrix:[[3,1],[5,3]]}`;
