@@ -3905,10 +3905,128 @@ Ebk.ClassModel = class EbkClassModel {
         return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
 
+}  
+
+
+/////// Ebk.Tainsangle
+Ebk.Tainsangle = class EbkGeometryTainsangle {
+    #params;
+    #process;
+    #isCreate;
+    #dataError;
+    
+ 
+    constructor(params ={ granularity: 10,
+                          geomtrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
+                          axisRythmes:[
+                            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]} ,
+                            {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[-1,1]} ,
+                            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[-1,1]} ,
+                            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[-1,1]} ,
+                          ]   
+
+           }){
+
+    
+
+            // this.#dataError = `Attribut matrix, origin have to be defined in params this way, {   origin : [0,0],   matrix: [[4,2,0], [3,6,0]]  }`;
+          
+            // this.#isCreate = false;
+            // this.name = `Ebk.Tainsangle`;
+            // if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.origin))){
+         
+                 // console.error(this.#dataError);
+               // return null; 
+         
+            // } else { 
+         
+     
+         
+              
+    
+                this.name = `Ebk.Tainsangle`;
+
+                this.#isCreate = false;
+        
+                this.#params = {};
+                this.#process = {};
+        
+
+                this.#params =  Object.assign({},  params );
+
+                this.#assignSubParams();
+                
+                this.#isCreate = true;
+    
+            // }
+
+            
+
+        
+    }
+    
+    _update(params ={ 
+
+     }){
+        
+        
+    
+       // this.#params =  Object.assign(this.#params,  params );
+   
+    }
+
+    #assignSubParams( ){
+       
+        let samples = [
+            [[0],[1]],
+            [[0],[1]],
+            [[0],[-1]],
+            [[0],[-1]],
+        ]
+
+        this.#process.axisRythmes = [];
+        this.#params.axisRythmes.forEach((itm, ndx) =>{
+            itm.granularity = params.granularity;
+            this.#params.axisRythmes[ndx].sample = sample[ndx];
+
+            this.#process.axisRythmes.push(new Ebk.Rythm(this.#params.axisRythmes[ndx]));
+            
+        }); 
+                
+    }
+
+    #getSectionAxis( section = 0 ){
+
+        if (section == 0) return [0, 1]
+        else if (section == 1) return [2, 1]
+        else if (section == 2) return [2, 3]
+        else if (section == 3) return [0, 3]
+        else  return [0, 1];
+
+    }    
+
+    triangle(params = { section : 0, index: 0}){
+
+        let axis = this.#getSectionAxis(params.section);
+
+        let intersectionIndices = [index, (this.#process.granularity - index) -1  ]
+
+        let intersection = [
+            this.#process.axisRythmes[ axis[0] ].locate({step: intersectionIndices[0]}),
+            this.#process.axisRythmes[ axis[1] ].locate({step: intersectionIndices[1]})
+
+        ]
+        return intersection
+    }
+ 
+
+    getParams(){
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
+    }
+
 
 
 }  
-
 
 
 export {Ebk}
