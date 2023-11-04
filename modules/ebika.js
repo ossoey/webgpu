@@ -241,7 +241,7 @@ Ebk.ObjectInstance.testCreateAndUpdate = (className,params ={creation:{path:[[1,
 Ebk.ObjectInstance.testsCreateAndUpdate = (className, paramsTestOptions =[
                   
     {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3}, 
-    udpdate:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-0.3} } ,
+    update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-0.3} } ,
 
     {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:1.3}, 
     update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3} } ,
@@ -3917,7 +3917,7 @@ Ebk.Tainsangle = class EbkGeometryTainsangle {
     
  
     constructor(params ={ granularity: 10,
-                          geomtrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
+                          geomatrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
                           axisRythmes:[
                             {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]} ,
                             {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[-1,1]} ,
@@ -3954,8 +3954,17 @@ Ebk.Tainsangle = class EbkGeometryTainsangle {
 
                 this.#params =  Object.assign({},  params );
 
-                this.#assignSubParams();
+                                this.#process.samples = [
+                    [[0],[1]],
+                    [[0],[1]],
+                    [[0],[-1]],
+                    [[0],[-1]],
+                ]
                 
+
+                this.#assignSubParamsForCreation( );
+
+
                 this.#isCreate = true;
     
             // }
@@ -3965,35 +3974,55 @@ Ebk.Tainsangle = class EbkGeometryTainsangle {
         
     }
     
-    _update(params ={ 
+    _update(params =params ={ granularity: 10,
+        geomatrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
+        axisRythmes:[
+          {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]} ,
+          {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[-1,1]} ,
+          {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[-1,1]} ,
+          {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[-1,1]} ,
+        ]   
 
      }){
         
-        
+       this.#params = Object.assign(this.#params ,Ebk.objectDeepCopy (params));
+
+       this.#assignSubParamsForUpdate( );
     
-       // this.#params =  Object.assign(this.#params,  params );
-   
     }
 
-    #assignSubParams( ){
-       
-        let samples = [
-            [[0],[1]],
-            [[0],[1]],
-            [[0],[-1]],
-            [[0],[-1]],
-        ]
+
+    #assignSubParamsForCreation( ){
 
         this.#process.axisRythmes = [];
         this.#params.axisRythmes.forEach((itm, ndx) =>{
-            itm.granularity = params.granularity;
-            this.#params.axisRythmes[ndx].sample = sample[ndx];
+            itm.granularity = this.#params.granularity;
+            this.#params.axisRythmes[ndx].sample = this.#process.samples[ndx];
 
             this.#process.axisRythmes.push(new Ebk.Rythm(this.#params.axisRythmes[ndx]));
             
         }); 
+
+
+        this.#process.geoMatrix = new Ebk.GeoMatrix(this.#params.geomatrix); //this.#params.geomtrix
                 
     }
+
+    #assignSubParamsForUpdate( ){
+
+ 
+        this.#params.axisRythmes.forEach((itm, ndx) =>{
+            itm.granularity = this.#params.granularity;
+            this.#params.axisRythmes[ndx].sample = this.#process.samples[ndx];
+
+            this.#process.axisRythmes[ndx]._update(this.#params.axisRythmes[ndx]);  
+            
+        }); 
+
+        this.#process.geoMatrix._update( this.#params.geomatrix);  
+                
+    }
+
 
     #getSectionAxis( section = 0 ){
 
@@ -4009,16 +4038,45 @@ Ebk.Tainsangle = class EbkGeometryTainsangle {
 
         let axis = this.#getSectionAxis(params.section);
 
-        let intersectionIndices = [index, (this.#process.granularity - index) -1  ]
+        let intersectionIndices = [params.index, (this.#params.granularity - params.index) -1  ]
 
         let intersection = [
-            this.#process.axisRythmes[ axis[0] ].locate({step: intersectionIndices[0]}),
-            this.#process.axisRythmes[ axis[1] ].locate({step: intersectionIndices[1]})
+            this.#process.axisRythmes[ axis[0] ].locate({step: intersectionIndices[0]})[0],
+            this.#process.axisRythmes[ axis[1] ].locate({step: intersectionIndices[1]})[0]
 
+        ];
+
+        let triangleCoords = [
+            this.#process.geoMatrix.locate(params = { scalars : [0,0]}) ,
+            this.#process.geoMatrix.locate(params = { scalars : [0, this.#process.axisRythmes[ axis[0] ].locate({step: intersectionIndices[0]})[0]]}),
+            this.#process.geoMatrix.locate(params = { scalars : intersection})
         ]
-        return intersection
+
+        return triangleCoords
+    }
+
+    triangles(params = { section : 0}){
+
+        let arr = [];
+
+        for(let ndx = 1; ndx <= this.#params.granularity; ndx++ ){
+            arr.push(this.triangle({section: params.section, index: ndx}));
+        }
+
+        return arr;
     }
  
+    trianglesMatrix(){
+
+        let arr = [];
+
+          arr.push( this.triangles( { section : 0}));
+          arr.push( this.triangles( { section : 1}));
+          arr.push( this.triangles( { section : 2}));
+          arr.push( this.triangles( { section : 3}));
+
+        return arr;
+    }
 
     getParams(){
         return Object.assign({},Ebk.objectDeepCopy (this.#params));
@@ -4028,6 +4086,39 @@ Ebk.Tainsangle = class EbkGeometryTainsangle {
 
 }  
 
+
+Ebk.TainsangleTests = (paramsTestOptions =[
+    
+    {creation:  { granularity: 10,
+        geomatrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
+        axisRythmes:[
+          {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]} ,
+          {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[-1,1]} ,
+          {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[-1,1]} ,
+          {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[-1,1]} ,
+        ],
+        section: 0, index:0
+
+
+     },   
+
+      update:  { granularity: 10,
+        geomatrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
+        axisRythmes:[
+          {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]} ,
+          {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[-1,1]} ,
+          {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[-1,1]} ,
+          {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[-1,1]} ,
+        ]   ,
+        section: 1, index: 1
+
+}}] ,    exceptions = ["_update" ]    
+       
+)=>{
+
+    Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.Tainsangle,paramsTestOptions, exceptions );
+
+}
 
 export {Ebk}
 export default Ebk;

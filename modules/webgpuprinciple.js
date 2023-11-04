@@ -1745,18 +1745,18 @@ let functions_entries = [
 
        
 
-          Ebk.TrajectoryTests ( [
+          // Ebk.TrajectoryTests ( [
                   
-            {creation:{path:[[0],[0.7],[0.9],[0.99], [1], [2]],target:0.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
-            update:{path:[[1,2,3,5,9,10],[3,5,12,-2,2,3],[19,5,1,26,-52,6],[8,1,600,12,-2,-11]],target:-0.3,targets:[0,0.1,0.2,0.9,1] }} ,
+          //   {creation:{path:[[0],[0.7],[0.9],[0.99], [1]],target:0.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
+          //   update:{path:[[1,2,3,5,9,10],[3,5,12,-2,2,3],[19,5,1,26,-52,6],[8,1,600,12,-2,-11]],target:-0.3,targets:[0,0.1,0.2,0.9,1] }} ,
 
-            {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
-            update:{path:[[1,2,3,5,9,10],[3,5,12,-2,2,3],[19,5,1,26,-52,6],[8,1,600,12,-2,-11]],target:-0.3,targets:[0,0.1,0.2,0.9,1] }} ,
+          //   {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:0.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
+          //   update:{path:[[1,2,3,5,9,10],[3,5,12,-2,2,3],[19,5,1,26,-52,6],[8,1,600,12,-2,-11]],target:-0.3,targets:[0,0.1,0.2,0.9,1] }} ,
         
-            {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
-            update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]} } ,
+          //   {creation:{path:[[1,2,3],[-2,2,3],[5,1,6],[0,0,0]],target:1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]}, 
+          //   update:{path:[[1,2,3],[-2,2,3],[5,1,6],[1,1,1]],target:-1.3,targets:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]} } ,
          
-           ],  ["_update", "getParams" ]);
+          //  ],  ["_update", "getParams" ]);
           
 
           //  Ebk.ERythm.LinearTests ([
@@ -1993,23 +1993,83 @@ let functions_entries = [
             
 
 
-        Ebk.Conversion.tests  ( [
-          `ff`,
-          {value: 0.5, eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]},
-          {value: -0.5, eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-           src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]},
-       }, 
+      //   Ebk.Conversion.tests  ( [
+      //     `ff`,
+      //     {value: 0.5, eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]},
+      //     {value: -0.5, eltMatrix:[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+      //      src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]},
+      //  }, 
           
-          {value: -0.5,  eltMatrix:[
-                       -2,-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1,
-                       0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 3,1
-                      ],
+      //     {value: -0.5,  eltMatrix:[
+      //                  -2,-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1,
+      //                  0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 3,1
+      //                 ],
        
-                      src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]}
-                   },  
+      //                 src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]}
+      //              },  
                    
           
-      ])
+      // ])
+
+
+          Ebk.TainsangleTests ([
+        
+            {creation:  { granularity: 10,
+                geomatrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
+                axisRythmes:[
+                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[0,0]} ,
+                  {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[0,0]} ,
+                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[0,0]} ,
+                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[0,0]} ,
+                ],
+                section: 0, index:1
+        
+        
+            },   
+        
+              update:  { granularity: 4,
+                geomatrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
+                axisRythmes:[
+                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 3*x; }, messy:[0,0]} ,
+                  {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[0,0]} ,
+                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[0,0]} ,
+                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[0,0]} ,
+                ]   ,
+                section: 1, index: 1
+        
+        }} , 
+
+        {creation:  { granularity: 10,
+          geomatrix: {origin:[0,0],  matrix: [[0.3,0.2 ], [-0.3,0.6 ]] }, 
+          axisRythmes:[
+            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[0,0]} ,
+            {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[0,0]} ,
+            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[0,0]} ,
+            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[0,0]} ,
+          ],
+          section: 0, index:1
+  
+  
+      },   
+  
+        update:  { granularity: 4,
+          geomatrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
+          axisRythmes:[
+            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 3*x; }, messy:[0,0]} ,
+            {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[0,0]} ,
+            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[0,0]} ,
+            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[0,0]} ,
+          ]   ,
+          section: 1, index: 1
+  
+  }} , 
+  
+      
+      
+      ] ,     ["_update" ]    
+              
+        )
+
          obj.uiLoad();
 
          
