@@ -288,7 +288,91 @@ Ebk.objectDeepCopy = (obj) => {
   }
   
 
-  /////// Ebk.Conversion
+ /////// Ebk.WEBGPU
+
+ Ebk.WEBGPU = {};
+  
+ Ebk.WEBGPU.name = `Ebk.WEBGPU`;
+
+ Ebk.WEBGPU.shaderAddTrianglesString = (params= {triangles: [
+          [ [0, 0], [0.5, 0], [0, 0.5]] ,
+          [ [0, 0], [0, 0.5], [-0.5, 0]] , 
+          [ [0, 0], [-0.5, 0], [0, -0.5]] , 
+          [ [0, 0], [0, -0.5], [0.5, 0]] , 
+
+         ]} ) =>{
+
+         let result = `array( `
+         
+         params.triangles.forEach((triangle,tndx) =>{
+
+            triangle.forEach((coords, cndx) =>{
+                if (tndx < params.triangles.length-1)
+                    result = result +  `vec2f( ${coords[0]}, ${coords[1]} ), ` 
+                else if  (cndx<2)  result = result +  `vec2f( ${coords[0]}, ${coords[1]} ), ` 
+                else    result = result +  `vec2f( ${coords[0]}, ${coords[1]} )` 
+
+            }) ;
+
+         });
+
+         result = result + `);`;
+
+         return result;
+ };
+
+ Ebk.WEBGPU.shaderAddColorsString = (params= {colors: [
+    [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] ,
+    [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
+    [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
+    [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
+
+   ]} ) =>{
+
+   let result = `array<vec4f, ${params.colors.length*3}>( `
+   
+   params.colors.forEach((color,tndx) =>{
+
+      color.forEach((coords, cndx) =>{
+          if (tndx < params.colors.length-1)
+              result = result +  `vec4f( ${coords[0]}, ${coords[1]}, ${coords[2]} ,${coords[3]} ), ` 
+          else if  (cndx<2)  result = result + `vec4f( ${coords[0]}, ${coords[1]}, ${coords[2]} ,${coords[3]} ), ` 
+          else    result = result +  `vec4f( ${coords[0]}, ${coords[1]}, ${coords[2]} ,${coords[3]} ) ` 
+
+      }) ;
+
+   });
+
+   result = result + `);`;
+
+   return result;
+};
+
+ Ebk.WEBGPU.tests = (paramsTestOptions =[
+   {triangles: [
+    [ [0, 0], [0.5, 0], [0, 0.5]] ,
+    [ [0, 0], [0, 0.5], [-0.5, 0]] , 
+    [ [0, 0], [-0.5, 0], [0, -0.5]] , 
+    [ [0, 0], [0, -0.5], [0.5, 0]] , 
+
+   ],
+   colors: [
+    [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] ,
+    [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
+    [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
+    [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
+
+   ]
+
+},
+
+            
+    
+ ])=>{
+    Ebk.ObjectName.tests(Ebk.WEBGPU,paramsTestOptions ); 
+}
+
+ /////// Ebk.Conversion
 
 Ebk.Conversion = {};
 
@@ -3844,69 +3928,6 @@ Ebk.GeoMatrixTests = (paramsTestOptions =[
 
 
 
-/////// Ebk.Navigation
-Ebk.ClassModel = class EbkClassModel {
-    #params;
-    #process;
-    #isCreate;
-    #dataError;
-    
- 
-    constructor(params ={ 
-           }){
-
-    
-
-            this.#dataError = `Attribut matrix, origin have to be defined in params this way, {   origin : [0,0],   matrix: [[4,2,0], [3,6,0]]  }`;
-          
-            this.#isCreate = false;
-            this.name = `Ebk.GeoMatrix`;
-            if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.origin))){
-         
-                console.error(this.#dataError);
-                return null; 
-         
-            } else { 
-         
-     
-         
-              
-    
-                this.name = `Ebk.Sequence.Creation`;
-
-                this.#isCreate = false;
-        
-                this.#params = {};
-                this.#process = {};
-        
-                this.#params =  Object.assign({},  params );
-          
-                
-                this.#isCreate = true;
-    
-            }
-
-            
-
-        
-    }
-    
-    _update(params ={ 
-
-     }){
-        
-    
-        this.#params =  Object.assign(this.#params,  params );
-   
-    }
-
-
-    getParams(){
-        return Object.assign({},Ebk.objectDeepCopy (this.#params));
-    }
-
-}  
-
 
 /////// Ebk.Tainsangle
 Ebk.Tainsangle = class EbkGeometryTainsangle {
@@ -3954,7 +3975,7 @@ Ebk.Tainsangle = class EbkGeometryTainsangle {
 
                 this.#params =  Object.assign({},  params );
 
-                                this.#process.samples = [
+                this.#process.samples = [
                     [[0],[1]],
                     [[0],[1]],
                     [[0],[-1]],
@@ -4034,6 +4055,29 @@ Ebk.Tainsangle = class EbkGeometryTainsangle {
 
     }    
 
+    zone(){
+
+            let origin = this.#params.geomatrix.origin;
+            let p0 =  Ebk.Matrix.vectAdd({v1:this.#params.geomatrix.origin, v2: this.#params.geomatrix.matrix[0] });
+            let p1 =  Ebk.Matrix.vectAdd({v1:this.#params.geomatrix.origin, v2: this.#params.geomatrix.matrix[1] });
+            let p2 =  Ebk.Matrix.vectAdd({v1:this.#params.geomatrix.origin, v2:
+                      Ebk.Matrix.vectScale({v:this.#params.geomatrix.matrix[0],scalar: -1})
+                     });
+            let p3 =  Ebk.Matrix.vectAdd({v1:this.#params.geomatrix.origin, v2:
+                        Ebk.Matrix.vectScale({v:this.#params.geomatrix.matrix[1],scalar: -1})
+                       });         
+            
+
+        return [ 
+                 [ origin, p0,p1],
+                 [ origin, p1,p2],
+                 [ origin, p2,p3],
+                 [ origin, p3,p0],
+            ]
+
+
+    }
+
     triangle(params = { section : 0, index: 0}){
 
         let axis = this.#getSectionAxis(params.section);
@@ -4070,12 +4114,26 @@ Ebk.Tainsangle = class EbkGeometryTainsangle {
 
         let arr = [];
 
-          arr.push( this.triangles( { section : 0}));
-          arr.push( this.triangles( { section : 1}));
-          arr.push( this.triangles( { section : 2}));
-          arr.push( this.triangles( { section : 3}));
+         let arr0 = this.triangles( { section : 0});
+         let arr1 = this.triangles( { section : 1});
+         let arrA = arr0.concat(arr1);
 
-        return arr;
+         let arr2 = this.triangles( { section : 2});
+         let arrB = arrA.concat(arr2);
+
+         let arr3 = this.triangles( { section : 3});
+         let arrC = arrB.concat(arr3);
+
+    
+        return  arrC;
+    }
+
+    zoneNTrianglesMatrix(){
+        let arr = this.zone();
+        let arr1 = arr.concat(this.trianglesMatrix());
+
+        return arr1;
+
     }
 
     getParams(){
@@ -4119,6 +4177,73 @@ Ebk.TainsangleTests = (paramsTestOptions =[
     Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.Tainsangle,paramsTestOptions, exceptions );
 
 }
+
+
+
+/////// Ebk.Navigation
+Ebk.ClassModel = class EbkClassModel {
+    #params;
+    #process;
+    #isCreate;
+    #dataError;
+    
+ 
+    constructor(params ={ 
+           }){
+
+    
+
+            this.#dataError = `Attribut matrix, origin have to be defined in params this way, {   origin : [0,0],   matrix: [[4,2,0], [3,6,0]]  }`;
+          
+            this.#isCreate = false;
+            this.name = `Ebk.GeoMatrix`;
+            if (!(Ebk.isObject(params))||(!Ebk.isMatrixOfNumbers(params.matrix))||(!Ebk.isArrayOfNumbers(params.origin))){
+         
+                console.error(this.#dataError);
+                return null; 
+         
+            } else { 
+         
+     
+         
+              
+    
+                this.name = `Ebk.Sequence.Creation`;
+
+                this.#isCreate = false;
+        
+                this.#params = {};
+                this.#process = {};
+        
+                this.#params =  Object.assign({},  params );
+          
+                
+                this.#isCreate = true;
+    
+            }
+
+            
+
+        
+    }
+    
+    _update(params ={ 
+
+     }){
+        
+    
+        this.#params =  Object.assign(this.#params,  params );
+   
+    }
+
+
+    getParams(){
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
+    }
+
+}  
+
+
 
 export {Ebk}
 export default Ebk;
