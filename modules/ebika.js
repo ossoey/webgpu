@@ -4078,6 +4078,65 @@ Ebk.Tainsangle = class EbkGeometryTainsangle {
 
     }
 
+    
+    bar(params = { section : 0, index: 0}){
+
+        let axis = this.#getSectionAxis(params.section);
+
+        let ndx0 = params.index ;
+        let ndx1 = params.index + 1;
+       
+        let axis0Scalar0 =   this.#process.axisRythmes[ axis[0] ].locate({step: ndx0})[0];
+        let axis0Scalar1 =   this.#process.axisRythmes[ axis[0] ].locate({step: ndx1})[0];
+         
+        let axis1Scalar1 =   this.#process.axisRythmes[ axis[1] ].locate({step: ndx1})[0];
+
+        let coord0 =   this.#process.geoMatrix.locate(params = { scalars : [axis0Scalar0,0]});
+        let coord1 =   this.#process.geoMatrix.locate(params = { scalars : [axis0Scalar1,0]});
+         
+        let coord2 =   this.#process.geoMatrix.locate(params = { scalars : [axis0Scalar1,axis1Scalar1]});
+        let coord3 =   this.#process.geoMatrix.locate(params = { scalars : [axis0Scalar0,axis1Scalar1]});
+
+        
+         return [
+            [coord0, coord1, coord2],
+            [coord0, coord2, coord3]
+         ]
+    }
+
+
+
+    bars(params = { section : 0}){
+
+        let arr = [];
+
+        for(let ndx = 0; ndx < this.#params.granularity; ndx++ ){
+            arr = arr.concat(this.bar({ section : params.section, index: ndx}))
+        }
+
+        return arr;
+
+    }
+
+    barsMatrix(){
+
+        let arr = [];
+
+         let arr0 = this.bars( { section : 0});
+         let arr1 = this.bars( { section : 1});
+         let arrA = arr0.concat(arr1);
+
+         let arr2 = this.bars( { section : 2});
+         let arrB = arrA.concat(arr2);
+
+         let arr3 = this.bars( { section : 3});
+         let arrC = arrB.concat(arr3);
+
+    
+        return  arrC;
+    }
+
+
     triangle(params = { section : 0, index: 0}){
 
         let axis = this.#getSectionAxis(params.section);

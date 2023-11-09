@@ -2274,6 +2274,8 @@ let functions_entries = [
         obj.r = 0.3,  obj.g = 0.4, obj.b = 0.5
 
 
+       // Ebk.Matrix.tests();
+        //Ebk.Rand.tests();
        // Ebk.WEBGPU.tests()  
 
        // Ebk.TainsangleTests();
@@ -2388,18 +2390,32 @@ let functions_entries = [
         obj.func = async () =>{
 
        
+         let scalar = 1.95; 
 
+ 
 
          let triangle = new Ebk.Tainsangle({ granularity: 20,
-                geomatrix: {origin:[0,0],  matrix: [[1,0 ], [0,0.99 ]] }, 
+                geomatrix: {origin:[0,0],  matrix:  [[scalar*0.4,0*scalar ], [0.1*scalar, 1*scalar*0.3 ]] }, 
                 axisRythmes:[
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.05,x) ; }, messy:[0,0]} ,
-                  {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return   Math.sin(x); }, messy:[-1,-1]} ,
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x }, messy:[0,0]} ,
-                  {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return   Math.sin(x); }, messy:[-1,1]} ,
+                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(3.8, 1/6*x+1); }, messy:[0,0]} ,
+                  {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return  Math.cos( x); }, messy:[-1,0]} ,
+                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.8,  x+1) }, messy:[0,0]} ,
+                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return  1/2*x+1 }, messy:[0 , 0]} ,
                 ]   
 
             });
+          //  glaces
+          //   let triangle = new Ebk.Tainsangle({ granularity: 20,
+          //     geomatrix: {origin:[0,0],  matrix:  [[scalar*0.3,0*scalar ], [0*scalar,-1*scalar*0.3 ]] }, 
+          //     axisRythmes:[
+          //       {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(3.8, 1/6*x+1); }, messy:[0,1]} ,
+          //       {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return  Math.cos( x); }, messy:[-1,0]} ,
+          //       {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x }, messy:[0,0]} ,
+          //       {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return  Math.atan(x) }, messy:[-1,1]} ,
+          //     ]   
+
+          // });
+
 
            
             let triangleVal = triangle.triangles({section: 3})
@@ -2407,9 +2423,10 @@ let functions_entries = [
             triangleVal.concat(triangleZone);
             let allTriangles =  triangle.trianglesMatrix();
             let covers  = triangle.zoneNTrianglesMatrix();
+            let bar = triangle. barsMatrix();
         
 
-            let matrixSelector = covers;
+            let matrixSelector = bar;
 
             let colorsOBJ = new Ebk.Rythm({type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2,0.1,0.5,1], [0.7,0.05,0.8,1], [0.8,0.98,0.95,1]], flow:(x)=>{return 2*x; }, granularity:2,messy:[-1,1]});
 
@@ -2417,12 +2434,15 @@ let functions_entries = [
 
             matrixSelector.forEach(itm =>{
 
-              colorsOBJ._update({type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2,0.1,0.5,1], [0.7,0.05,0.8,1], [0.8,0.98,0.95,1]], flow:(x)=>{return Math.pow(3,x); }, granularity:2,messy:[-1,1]});
+              let r = Ebk.Rand.fRanges({ranges:[[0.,1.],[0.3, 0.6], [0.2, 0.5]], clamps:[[0,1],[0.2,0.4],[0.8,0.87]]});
+              let g = Ebk.Rand.fRanges({ranges:[[0.,1.],[0.3, 0.6], [0.2, 0.5]], clamps:[[0,1],[0.2,0.4],[0.8,0.87]]});
+              let b = Ebk.Rand.fRanges({ranges:[[0.,1.],[0.3, 0.6], [0.2, 0.5]], clamps:[[0,1],[0.2,0.4],[0.8,0.87]]});
+              colorsOBJ._update({type:Ebk.ERythm.TYPE.LINEAR, sample:[[r, g, b,1], [0.7,0.05,0.8,1], [r, g, b, 1]], flow:(x)=>{return Math.pow(3,x); }, granularity:2,messy:[-1,1]});
 
               colors.push(colorsOBJ.locateCollection());
             })
 
-            console.log(colors)
+          
                
                
                
