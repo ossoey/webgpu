@@ -5,7 +5,7 @@
 //    Authored by ebanga@ossoey.com/ebanga@hotmail.com  
 import { Ebk} from "./ebika.js";
 import { EbkGeo} from "./ebikageometry.js";
-
+import { EbkWebGPU} from "./ebikawebgpu.js";
 
 let  hexToRgba = (hexColor)=> {
   const hex = hexColor.substring(1); // Remove the leading '#'
@@ -2459,8 +2459,8 @@ let functions_entries = [
                 @vertex fn vs(
                   @builtin(vertex_index) vi : u32
                 ) ->  Transfer {
-                  let pos =  ${Ebk.WEBGPU.shaderAddTrianglesString({triangles: matrixSelector})}
-                  var colorrr =  ${Ebk.WEBGPU.shaderAddColorsString({colors: colors})}
+                  let pos =  ${EbkWebGPU.shaderAddTrianglesString({triangles: matrixSelector})}
+                  var colorrr =  ${EbkWebGPU.shaderAddColorsString({colors: colors})}
 
                   var transfer : Transfer;
                   transfer.posi  = vec4f(pos[vi], 0.0, 1.0);
