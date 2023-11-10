@@ -4,7 +4,7 @@
 
 //    Authored by ebanga@ossoey.com/ebanga@hotmail.com  
 import { Ebk} from "./ebika.js";
-
+import { EbkGeo} from "./ebikageometry.js";
 
 
 let  hexToRgba = (hexColor)=> {
@@ -2011,64 +2011,7 @@ let functions_entries = [
           
       // ])
 
-
-          Ebk.TainsangleTests ([
-        
-            {creation:  { granularity: 10,
-                geomatrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
-                axisRythmes:[
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[0,0]} ,
-                  {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[0,0]} ,
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[0,0]} ,
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[0,0]} ,
-                ],
-                section: 0, index:1
-        
-        
-            },   
-        
-              update:  { granularity: 4,
-                geomatrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
-                axisRythmes:[
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 3*x; }, messy:[0,0]} ,
-                  {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[0,0]} ,
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[0,0]} ,
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[0,0]} ,
-                ]   ,
-                section: 1, index: 1
-        
-        }} , 
-
-        {creation:  { granularity: 10,
-          geomatrix: {origin:[0,0],  matrix: [[0.3,0.2 ], [-0.3,0.6 ]] }, 
-          axisRythmes:[
-            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[0,0]} ,
-            {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[0,0]} ,
-            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[0,0]} ,
-            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[0,0]} ,
-          ],
-          section: 0, index:1
-  
-  
-      },   
-  
-        update:  { granularity: 4,
-          geomatrix: {origin:[0,0],  matrix: [[4,2 ], [3,6 ]] }, 
-          axisRythmes:[
-            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 3*x; }, messy:[0,0]} ,
-            {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return Math.cos(x); }, messy:[0,0]} ,
-            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.01, x); }, messy:[0,0]} ,
-            {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(0.05, x); }, messy:[0,0]} ,
-          ]   ,
-          section: 1, index: 1
-  
-  }} , 
-  
-      
-      
-      ] ,     ["_update" ]    
-              
-        )
+ 
 
          obj.uiLoad();
 
@@ -2269,17 +2212,11 @@ let functions_entries = [
         let gpuDevice = null;
 
         let obj = {};
-        obj.desc = `Test dynyTriangle`
+        obj.desc = `Bars dynyTriangle`
         
         obj.r = 0.3,  obj.g = 0.4, obj.b = 0.5
 
-
-       // Ebk.Matrix.tests();
-        //Ebk.Rand.tests();
-       // Ebk.WEBGPU.tests()  
-
-       // Ebk.TainsangleTests();
-
+ 
 
 
         obj.uiLoadColorPickers = (instance_ndx,index,color)=>{
@@ -2392,20 +2329,19 @@ let functions_entries = [
        
          let scalar = 1.95; 
 
- 
+            let barre = new EbkGeo.Geobartrix({ granularity: 20,
+              geomatrix: {origin:[0,0],  matrix:  [[scalar*0.4,0*scalar ], [0.1*scalar, 1*scalar*0.3 ]] }, 
+              axisRythmes:[
+                {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(3.8, 1/6*x+1); }, messy:[0,0]} ,
+                {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return  Math.cos( x); }, messy:[-1,0]} ,
+                {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.8,  x+1) }, messy:[0,0]} ,
+                {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return  1/2*x+1 }, messy:[0 , 0]} ,
+              ]   
 
-         let triangle = new Ebk.Tainsangle({ granularity: 20,
-                geomatrix: {origin:[0,0],  matrix:  [[scalar*0.4,0*scalar ], [0.1*scalar, 1*scalar*0.3 ]] }, 
-                axisRythmes:[
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(3.8, 1/6*x+1); }, messy:[0,0]} ,
-                  {type:Ebk.ERythm.TYPE.WAVY, flow:(x)=>{return  Math.cos( x); }, messy:[-1,0]} ,
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.8,  x+1) }, messy:[0,0]} ,
-                  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return  1/2*x+1 }, messy:[0 , 0]} ,
-                ]   
+          });
 
-            });
-          //  glaces
-          //   let triangle = new Ebk.Tainsangle({ granularity: 20,
+          //------ glasses
+          //   let barre = new EbkGeo.Geobartrix({ granularity: 20,
           //     geomatrix: {origin:[0,0],  matrix:  [[scalar*0.3,0*scalar ], [0*scalar,-1*scalar*0.3 ]] }, 
           //     axisRythmes:[
           //       {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(3.8, 1/6*x+1); }, messy:[0,1]} ,
@@ -2417,16 +2353,10 @@ let functions_entries = [
           // });
 
 
-           
-            let triangleVal = triangle.triangles({section: 3})
-            let triangleZone =  triangle.zone();
-            triangleVal.concat(triangleZone);
-            let allTriangles =  triangle.trianglesMatrix();
-            let covers  = triangle.zoneNTrianglesMatrix();
-            let bar = triangle. barsMatrix();
+            let barrr = barre.barsMatrix();
         
 
-            let matrixSelector = bar;
+            let matrixSelector = barrr;
 
             let colorsOBJ = new Ebk.Rythm({type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2,0.1,0.5,1], [0.7,0.05,0.8,1], [0.8,0.98,0.95,1]], flow:(x)=>{return 2*x; }, granularity:2,messy:[-1,1]});
 
@@ -2443,9 +2373,7 @@ let functions_entries = [
             })
 
           
-               
-               
-               
+            
             
          obj.uiLoad();
 
