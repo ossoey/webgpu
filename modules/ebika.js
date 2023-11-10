@@ -957,6 +957,40 @@ Ebk.Matrix.vectToHigherDim = (params = {v:[3,1,4]}) => {
 
 }
 
+Ebk.Matrix.vect2DPerpRight = (params = {v:[3,1,4]}) => {
+
+    let arrInfo = `Attribut v has to be defined in params this way, v:[3,1,4]`;
+
+    if (!(Ebk.isObject(params))||(!Ebk.isArrayOfNumbers(params.v))){
+ 
+        console.error(arrInfo);
+        return null; 
+ 
+    } else {
+        let vect =  Ebk.Matrix.deepCopy({arr: params.v}); 
+         
+        return [vect[1], -1*vect[0] ] ;
+    }
+
+}
+
+Ebk.Matrix.vect2DPerpLeft = (params = {v:[3,1,4]}) => {
+
+    let arrInfo = `Attribut v has to be defined in params this way, v:[3,1,4]`;
+
+    if (!(Ebk.isObject(params))||(!Ebk.isArrayOfNumbers(params.v))){
+ 
+        console.error(arrInfo);
+        return null; 
+ 
+    } else {
+        let vect =  Ebk.Matrix.deepCopy({arr: params.v}); 
+         
+        return [-1*vect[1], vect[0] ] ;
+    }
+
+}
+
 Ebk.Matrix.matrixToHigherDim = (params = {matrix:[[3,1],[5,3]]}) => {
 
 
