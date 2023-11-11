@@ -1207,6 +1207,12 @@ Ebk.Matrix.magnitude = (params ={v:[5,3,-8]}) =>{
     }
 }
 
+
+Ebk.Matrix.unit = (params ={v:[5,3,-8]}) =>{
+  let magnitude = Ebk.Matrix.magnitude({v:params.v});
+  return  Ebk.Matrix.vectScale({scalar: 1/magnitude, v: params.v});
+}
+
 Ebk.Matrix.distance = (params ={v1:[3,1,4],v2:[5,3,-8]}) =>{
     return  Ebk.Matrix.magnitude( {v:Ebk.Matrix.vector({v1:params.v1, v2:params.v2 }) } );
 }
