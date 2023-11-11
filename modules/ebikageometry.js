@@ -5,8 +5,8 @@
 //    Authored by ebanga@ossoey.com/ebanga@hotmail.com  
  
 import { Ebk} from "./ebika.js";
-
-
+import { EbkCov} from "./ebikacovering.js";
+ 
 Ebk.Geometry = {}
 /////// Ebk.Geometry.Geobartrix
 Ebk.Geometry.Geobartrix = class EbkGeometryGeobartrix {
@@ -215,17 +215,11 @@ Ebk.Geometry.Geobartrix = class EbkGeometryGeobartrix {
         return  arrC;
     }
 
-
-
-
     getParams(){
         return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
 
-
-
 }  
-
 
 Ebk.Geometry.GeobartrixTests = (paramsTestOptions =[
     
@@ -260,6 +254,411 @@ Ebk.Geometry.GeobartrixTests = (paramsTestOptions =[
 
 }
 
+Ebk.Geometry.CircleTrix2D = class EbkGeometryCircleTrix2D  {
+    #params;
+    #process;
+    #isCreate;
+    #dataError;
+   
+    constructor(params ={   
+                           radius: 1., 
+                           verticesCount: 8,
+                           geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+                           rythms: {
+                             angle: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0],[2*Math.PI] ], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                             edge: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0.01], [0.04]], flow:(x)=>{return Math.sin(x); }, messy:[-1,1]},
+                           }
+                            
+               }){
+
+                this.name = `Ebk.Geometry.CircleTrix2D`;
+
+                this.#isCreate = false;
+        
+                this.#params = {};
+                this.#process = {};
+
+                this.#params =  Object.assign({},  params );
+
+                this.#assignSubParamsForCreation( );
+
+                this.#isCreate = true;
+  
+    }
+    
+    _update(params  ={ 
+        radius: 1., 
+        verticesCount: 8,
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          angle:   {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0],[2*Math.PI] ], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          edge: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0.01], [0.04]], flow:(x)=>{return Math.sin(x); }, messy:[-1,1]},
+        }
+     }){
+        
+       this.#params = Object.assign(this.#params , Ebk.objectDeepCopy (params));
+
+       this.#assignSubParamsForUpdate( );
+    
+    }
+
+    #assignSubParamsForCreation( ){
+
+        this.#params.rythms.edge.granularity = this.#params.verticesCount+1;
+        this.#params.rythms.angle.granularity = this.#params.verticesCount+1;
+
+        this.#process.geoMatrix = new Ebk.GeoMatrix(this.#params.geomatrix);
+        this.#process.rythms = {};
+        this.#process.rythms.angle = new  Ebk.Rythm(this.#params.rythms.angle);
+       // this.#process.rythms.angle.locate({step:0})[0]
+               
+    }
+
+    #assignSubParamsForUpdate( ){
+
+        this.#params.rythms.edge.granularity = this.#params.verticesCount+1;
+        this.#params.rythms.angle.granularity = this.#params.verticesCount+1;
+
+        this.#process.geoMatrix._update(this.#params.geomatrix);
+        this.#process.rythms.angle._update(this.#params.rythms.angle); 
+ 
+    }
+
+    #getVertexPosition(index) {
+       let currentAngle = this.#process.rythms.angle.locate({step:index})[0];
+       let location = this.#process.geoMatrix.locate({scalars: [ this.#params.radius*Math.cos(currentAngle), this.#params.radius*Math.sin(currentAngle)]})
+
+      return  [location[0], location[1]];
+    }
+
+    getVerticesPosition() {
+        let arr = [];
+
+        for(let ndx = 0; ndx <= this.#params.rythms.angle.granularity; ndx++ ){
+            arr.push(  this.#getVertexPosition( ndx ) );
+        }
+
+        return arr;
+    } 
+
+    getCoveredCircle() {
+    
+        let covering = new EbkCov.OpenPath2D({
+            positions: this.getVerticesPosition(),
+            thicknessRythm:this.#params.rythms.edge
+        });
+         
+        return   covering.thicknessPath();
+    } 
+
+
+    getParams(){
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
+    }
+
+}  
+
+Ebk.Geometry.CircleTrix2DTests = (paramsTestOptions =[
+    
+    {creation:  { 
+        radius: 1., 
+        verticesCount: 8,
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          angle: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [Math.PI]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2], [0.4]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+        }
+     },   
+
+      update: { 
+        radius: 1., 
+        verticesCount: 8,
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          angle: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [Math.PI]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2], [0.4]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+        }
+     }}] ,    exceptions = ["_update" ]    
+       
+)=>{
+
+    Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.Geometry.CircleTrix2D,paramsTestOptions, exceptions );
+
+}
+
+
+Ebk.Geometry.CircloidTrix2D = class EbkGeometryCircloidTrix2D  {
+    #params;
+    #process;
+    #isCreate;
+    #dataError;
+   
+    constructor(params ={   
+                           radius: [1., 0.5 ], 
+                           verticesCount: 8,
+                           geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+                           rythms: {
+                             angle: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0],[2*Math.PI] ], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                             edge: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0.01], [0.04]], flow:(x)=>{return Math.sin(x); }, messy:[-1,1]},
+                           }
+                            
+               }){
+
+                this.name = `Ebk.Geometry.Circloid2D`;
+
+                this.#isCreate = false;
+        
+                this.#params = {};
+                this.#process = {};
+
+                this.#params =  Object.assign({},  params );
+
+                this.#assignSubParamsForCreation( );
+
+                this.#isCreate = true;
+  
+    }
+    
+    _update(params  ={ 
+        radius: [1., 0.5 ], 
+        verticesCount: 8,
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          angle:   {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0],[2*Math.PI] ], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          edge: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0.01], [0.04]], flow:(x)=>{return Math.sin(x); }, messy:[-1,1]},
+        }
+     }){
+        
+       this.#params = Object.assign(this.#params , Ebk.objectDeepCopy (params));
+
+       this.#assignSubParamsForUpdate( );
+    
+    }
+
+    #assignSubParamsForCreation( ){
+
+        this.#params.rythms.edge.granularity = this.#params.verticesCount+1;
+        this.#params.rythms.angle.granularity = this.#params.verticesCount+1;
+
+        this.#process.geoMatrix = new Ebk.GeoMatrix(this.#params.geomatrix);
+        this.#process.rythms = {};
+        this.#process.rythms.angle = new  Ebk.Rythm(this.#params.rythms.angle);
+       // this.#process.rythms.angle.locate({step:0})[0]
+               
+    }
+
+    #assignSubParamsForUpdate( ){
+
+        this.#params.rythms.edge.granularity = this.#params.verticesCount+1;
+        this.#params.rythms.angle.granularity = this.#params.verticesCount+1;
+
+        this.#process.geoMatrix._update(this.#params.geomatrix);
+        this.#process.rythms.angle._update(this.#params.rythms.angle); 
+ 
+    }
+
+    #getVertexPosition(index) {
+       let currentAngle = this.#process.rythms.angle.locate({step:index})[0];
+       let location = this.#process.geoMatrix.locate({scalars: [ this.#params.radius[0]*Math.cos(currentAngle), this.#params.radius[1]*Math.sin(currentAngle)]})
+
+      return  [location[0], location[1]];
+    }
+
+    getVerticesPosition() {
+        let arr = [];
+
+        for(let ndx = 0; ndx <= this.#params.rythms.angle.granularity; ndx++ ){
+            arr.push(  this.#getVertexPosition( ndx ) );
+        }
+
+        return arr;
+    } 
+
+    getCoveredCircle() {
+    
+        let covering = new EbkCov.OpenPath2D({
+            positions: this.getVerticesPosition(),
+            thicknessRythm:this.#params.rythms.edge
+        });
+         
+        return   covering.thicknessPath();
+    } 
+
+
+    getParams(){
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
+    }
+
+}  
+
+Ebk.Geometry.Circloid2DTests = (paramsTestOptions =[
+    
+    {creation:  { 
+        radius: [1., 0.5 ], 
+        verticesCount: 8,
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          angle: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [Math.PI]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2], [0.4]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+        }
+     },   
+
+      update: { 
+        radius: [1., 0.5 ], 
+        verticesCount: 8,
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          angle: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [Math.PI]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2], [0.4]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+        }
+     }}] ,    exceptions = ["_update" ]    
+       
+)=>{
+
+    Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.Geometry.CircloidTrix2D,paramsTestOptions, exceptions );
+
+}
+
+Ebk.Geometry.SpiralTrix2D = class EbkGeometryCircleTrix2D  {
+    #params;
+    #process;
+    #isCreate;
+    #dataError;
+   
+    constructor(params ={   
+                            
+                           verticesCount: 18,
+                           geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+                           rythms: {
+                             angle: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0],[2*Math.PI] ], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                             edge: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0.01], [0.04]], flow:(x)=>{return Math.sin(x); }, messy:[-1,1]},
+                             radius: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.1], [0.6]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                           }
+                            
+               }){
+
+                this.name = `Ebk.Geometry.SpiralTrix2D`;
+
+                this.#isCreate = false;
+        
+                this.#params = {};
+                this.#process = {};
+
+                this.#params =  Object.assign({},  params );
+
+                this.#assignSubParamsForCreation( );
+
+                this.#isCreate = true;
+  
+    }
+    
+    _update(params  ={ 
+      
+        verticesCount: 18,
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          angle:   {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0],[2*Math.PI] ], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          edge: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0.01], [0.04]], flow:(x)=>{return Math.sin(x); }, messy:[-1,1]},
+          radius: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.1], [0.6]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+        }
+     }){
+        
+       this.#params = Object.assign(this.#params , Ebk.objectDeepCopy (params));
+
+       this.#assignSubParamsForUpdate( );
+    
+    }
+
+    #assignSubParamsForCreation( ){
+
+        this.#params.rythms.edge.granularity = this.#params.verticesCount+1;
+        this.#params.rythms.angle.granularity = this.#params.verticesCount+1;
+        this.#params.rythms.radius.granularity = this.#params.verticesCount+1;
+
+        this.#process.geoMatrix = new Ebk.GeoMatrix(this.#params.geomatrix);
+        this.#process.rythms = {};
+        this.#process.rythms.angle = new  Ebk.Rythm(this.#params.rythms.angle);
+        this.#process.rythms.radius = new  Ebk.Rythm(this.#params.rythms.radius);
+       // this.#process.rythms.angle.locate({step:0})[0]
+               
+    }
+
+    #assignSubParamsForUpdate( ){
+
+        this.#params.rythms.edge.granularity = this.#params.verticesCount+1;
+        this.#params.rythms.angle.granularity = this.#params.verticesCount+1;
+        this.#params.rythms.radius.granularity = this.#params.verticesCount+1;
+
+        this.#process.geoMatrix._update(this.#params.geomatrix);
+        this.#process.rythms.angle._update(this.#params.rythms.angle); 
+        this.#process.rythms.radius._update(this.#params.rythms.radius); 
+    }
+
+    #getVertexPosition(index) {
+       let currentAngle = this.#process.rythms.angle.locate({step:index})[0];
+       let currentRadius = this.#process.rythms.radius.locate({step:index})[0];
+
+       let location = this.#process.geoMatrix.locate({scalars: [ currentRadius*Math.cos(currentAngle), currentRadius*Math.sin(currentAngle)]})
+
+      return  [location[0], location[1]];
+    }
+
+    getVerticesPosition() {
+        let arr = [];
+
+        for(let ndx = 0; ndx <= this.#params.rythms.angle.granularity; ndx++ ){
+            arr.push(  this.#getVertexPosition( ndx ) );
+        }
+
+        return arr;
+    } 
+
+    getCoveredCircle() {
+    
+        let covering = new EbkCov.OpenPath2D({
+            positions: this.getVerticesPosition(),
+            thicknessRythm:this.#params.rythms.edge
+        });
+         
+        return   covering.thicknessPath();
+    } 
+
+
+    getParams(){
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
+    }
+
+}  
+
+Ebk.Geometry.SpiralTrix2DTests = (paramsTestOptions =[
+    
+    {creation:  { 
+     
+        verticesCount: 8,
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          angle: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [Math.PI]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2], [0.4]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          radius: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.1], [0.6]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+        }
+     },   
+
+      update: { 
+        radius: 1., 
+        verticesCount: 8,
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          angle: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [Math.PI]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2], [0.4]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+          radius: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.1], [0.6]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+        }
+     }}] ,    exceptions = ["_update" ]    
+       
+)=>{
+
+    Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.Geometry.SpiralTrix2D, paramsTestOptions, exceptions );
+
+}
 
 
 let EbkGeo = Ebk.Geometry
