@@ -285,94 +285,8 @@ Ebk.objectDeepCopy = (obj) => {
     }
     
     return copyObj;
-  }
+}
   
-
- /////// Ebk.WEBGPU
-
-//  Ebk.WEBGPU = {};
-  
-//  Ebk.WEBGPU.name = `Ebk.WEBGPU`;
-
-//  Ebk.WEBGPU.shaderAddTrianglesString = (params= {triangles: [
-//           [ [0, 0], [0.5, 0], [0, 0.5]] ,
-//           [ [0, 0], [0, 0.5], [-0.5, 0]] , 
-//           [ [0, 0], [-0.5, 0], [0, -0.5]] , 
-//           [ [0, 0], [0, -0.5], [0.5, 0]] , 
-
-//          ]} ) =>{
-
-//          let result = `array( `
-         
-//          params.triangles.forEach((triangle,tndx) =>{
-
-//             triangle.forEach((coords, cndx) =>{
-//                 if (tndx < params.triangles.length-1)
-//                     result = result +  `vec2f( ${coords[0]}, ${coords[1]} ), ` 
-//                 else if  (cndx<2)  result = result +  `vec2f( ${coords[0]}, ${coords[1]} ), ` 
-//                 else    result = result +  `vec2f( ${coords[0]}, ${coords[1]} )` 
-
-//             }) ;
-
-//          });
-
-//          result = result + `);`;
-
-//          return result;
-//  };
-
-//  Ebk.WEBGPU.shaderAddColorsString = (params= {colors: [
-//     [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] ,
-//     [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
-//     [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
-//     [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
-
-//    ]} ) =>{
-
-//    let result = `array<vec4f, ${params.colors.length*3}>( `
-   
-//    params.colors.forEach((color,tndx) =>{
-
-//       color.forEach((coords, cndx) =>{
-//           if (tndx < params.colors.length-1)
-//               result = result +  `vec4f( ${coords[0]}, ${coords[1]}, ${coords[2]} ,${coords[3]} ), ` 
-//           else if  (cndx<2)  result = result + `vec4f( ${coords[0]}, ${coords[1]}, ${coords[2]} ,${coords[3]} ), ` 
-//           else    result = result +  `vec4f( ${coords[0]}, ${coords[1]}, ${coords[2]} ,${coords[3]} ) ` 
-
-//       }) ;
-
-//    });
-
-//    result = result + `);`;
-
-//    return result;
-// };
-
-//  Ebk.WEBGPU.tests = (paramsTestOptions =[
-//    {triangles: [
-//     [ [0, 0], [0.5, 0], [0, 0.5]] ,
-//     [ [0, 0], [0, 0.5], [-0.5, 0]] , 
-//     [ [0, 0], [-0.5, 0], [0, -0.5]] , 
-//     [ [0, 0], [0, -0.5], [0.5, 0]] , 
-
-//    ],
-//    colors: [
-//     [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] ,
-//     [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
-//     [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
-//     [ [1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]] , 
-
-//    ]
-
-// },
-
-            
-    
-//  ])=>{
-//     Ebk.ObjectName.tests(Ebk.WEBGPU,paramsTestOptions ); 
-// }
-
- /////// Ebk.Conversion
 
 Ebk.Conversion = {};
 
@@ -800,6 +714,14 @@ Ebk.Rand.mixArr = (params={arr:[10,1,{a:1},3,'23']})=>{
 
    }
 }    
+
+
+Ebk.Rand.pullFromMix = (params={arr:[10,1,{a:1},3,'23']})=>{
+
+   // let randNdx =   Ebk.Rand.iRange (params={range:[0,params.arr.length -1 ], clamp:[0,1]});
+
+    return Ebk.Rand.mixArr(params)[0];
+}
 
 Ebk.Rand.tests = (paramsTestOptions =[
     `ff`,
@@ -2419,7 +2341,7 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
         this.name = `Ebk.ERythm.Wavy`;
         this.#params = Object.assign({},params);
         this.#infos = {};
-        this.#infos.domain = [0,2*Math.PI];
+        this.#infos.domain = [0, 2*Math.PI];
         this.#infos.codomain = [1,-1];
         return true;
         //this._update(params);
@@ -2446,7 +2368,7 @@ Ebk.ERythm.Wavy = class EbkERythmWavy {
                     
                     this.#params = params;
                     this.#infos = {};
-                    this.#infos.domain = [0,2*Math.PI];
+                    this.#infos.domain = [0, 2*Math.PI];
                     this.#infos.codomain = [1,-1];
                     return true;
                 }
