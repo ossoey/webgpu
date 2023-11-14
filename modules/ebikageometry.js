@@ -341,7 +341,7 @@ Ebk.Geometry.CircleTrix2D = class EbkGeometryCircleTrix2D  {
         return arr;
     } 
 
-    getCoveredCircle() {
+    getCoveredPosition() {
     
         let covering = new EbkCov.OpenPath2D({
             positions: this.getVerticesPosition(),
@@ -385,7 +385,6 @@ Ebk.Geometry.CircleTrix2DTests = (paramsTestOptions =[
     Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.Geometry.CircleTrix2D,paramsTestOptions, exceptions );
 
 }
-
 
 Ebk.Geometry.CircloidTrix2D = class EbkGeometryCircloidTrix2D  {
     #params;
@@ -474,7 +473,7 @@ Ebk.Geometry.CircloidTrix2D = class EbkGeometryCircloidTrix2D  {
         return arr;
     } 
 
-    getCoveredCircle() {
+    getCoveredPosition() {
     
         let covering = new EbkCov.OpenPath2D({
             positions: this.getVerticesPosition(),
@@ -613,7 +612,7 @@ Ebk.Geometry.SpiralTrix2D = class EbkGeometryCircleTrix2D  {
         return arr;
     } 
 
-    getCoveredCircle() {
+    getCoveredPosition() {
     
         let covering = new EbkCov.OpenPath2D({
             positions: this.getVerticesPosition(),
@@ -755,7 +754,7 @@ Ebk.Geometry.DyniPathTrix2D = class EbkGeometryDyniPathTrix2D  {
         return arr;
     } 
 
-    getCoveredCircle() {
+    getCoveredPosition() {
     
         let covering = new EbkCov.OpenPath2D({
             positions: this.getVerticesPosition(),
@@ -797,6 +796,223 @@ Ebk.Geometry.DyniPathTrix2DTests = (paramsTestOptions =[
 )=>{
 
     Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.Geometry.DyniPathTrix2D, paramsTestOptions, exceptions );
+
+}
+
+
+Ebk.Geometry.GridTrix2D = class EbkGeometryGridTrix2D  {
+    #params;
+    #inputs;
+    #process;
+    #isCreate;
+    #dataError;
+    constructor(params ={   
+                            
+                    width: 10,
+                    height: 9, 
+                    geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+                    rythms: {
+                    edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.01], [0.04]], flow:(x)=>{return 2*x; }, messy:[-1,1]},   
+                    abs:    [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                                {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, messy:[-1,1]},
+                            ]   ,
+
+                    ord:  [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                                    {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, messy:[-1,1]},
+                            ]  
+                                    
+                    }
+     
+                        
+               }){
+
+                this.name = `Ebk.Geometry.GridTrix2D`;
+
+                this.#isCreate = false;
+        
+                this.#params = {};
+                this.#inputs = {};
+
+                this.#inputs.rythms = {};
+
+                this.#process = {};
+                this.#process.rythms = {};
+
+                this.#params =   Object.assign(this.#params , Ebk.objectDeepCopy (params));
+                this.#process.geoMatrix = new Ebk.GeoMatrix(this.#params.geomatrix);
+            
+                this.#isCreate = true;
+  
+    }
+    
+    _update(params  ={ 
+      
+        width: 10,
+        height: 9, 
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.01], [0.04]], flow:(x)=>{return 2*x; }, messy:[-1,1]},   
+          abs:    [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                      {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, messy:[-1,1]},
+                  ]   ,
+
+          ord:  [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                           {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, messy:[-1,1]},
+                ]  
+                           
+        }
+     
+     }){
+        
+         this.#params = Object.assign(this.#params , Ebk.objectDeepCopy (params));
+         this.#process.geoMatrix._update(this.#params.geomatrix);
+
+    }
+
+    #getCoord(index, rythmAttribut,sizeAttribut ) {
+
+        let randIndex = Ebk.Rand.iRange ( {range:[0, this.#params.rythms[rythmAttribut].length-1]})
+
+        this.#inputs.rythms[rythmAttribut] = this.#params.rythms[rythmAttribut][randIndex];
+        this.#inputs.rythms[rythmAttribut].sample = [[0], [1]];
+        this.#inputs.rythms[rythmAttribut].granularity = this.#params[sizeAttribut] +1;
+
+        this.#process.rythms[rythmAttribut] = new Ebk.Rythm(this.#inputs.rythms[rythmAttribut]);
+        let coord;
+
+        if ((index == 0)||(index == this.#params[sizeAttribut])) {
+            coord =  this.#process.rythms[rythmAttribut].locate({step: index})[0];
+            
+        }   else {
+
+            let bound0 = (this.#process.rythms[rythmAttribut].locate({step: index-1})[0]+ this.#process.rythms[rythmAttribut].locate({step: index})[0])/2;
+            let bound1 = (this.#process.rythms[rythmAttribut].locate({step: index})[0]+ this.#process.rythms[rythmAttribut].locate({step: index+1})[0])/2; 
+           
+            coord = Ebk.Rand.fRange({range:[bound0, bound1], clamp: [0, 1]});
+        }
+
+        return coord;
+
+     }
+
+     #getRowCol(row, col ) { 
+
+         return  this.#process.geoMatrix.locate({scalars: [  this.#getCoord(row, `abs`, `width` ) , this.#getCoord(col, `ord`, `height` ) ]}) ;
+     }
+
+     #getRow(row) { 
+        let arr = [];
+
+        for(let ndx = 0; ndx <= this.#params.height + 1; ndx++ ){
+            arr.push(   this.#getRowCol(row, ndx ) );
+        } 
+
+        return arr;
+    }
+
+    #getCol(col) { 
+        let arr = [];
+
+        for(let ndx = 0; ndx <= this.#params.width+1; ndx++ ){
+            arr.push(   this.#getRowCol(ndx, col ) );
+        } 
+
+        return arr;
+    }
+
+    getRows() { 
+        
+        let arr = [];
+
+        for(let ndx = 0; ndx <= this.#params.width+1; ndx++ ){
+            arr = arr.concat(this.#getRow(ndx));
+        } 
+
+        return arr;
+    }
+
+    getCols() { 
+        
+        let arr = [];
+
+        for(let ndx = 0; ndx <= this.#params.height+1; ndx++ ){
+            arr = arr.concat(this.#getCol(ndx));
+        } 
+
+        return arr;
+    }
+
+    getVerticesPosition() {
+
+        let rows = this.getRows();
+        let cols = this.getCols();
+        let positions = rows.concat(cols);
+     
+        return positions;
+    } 
+
+    getCoveredPosition() {
+        this.#params.rythms.edge.granularity =    (this.#params.width +1) * (this.#params.height +1)
+        let covering = new EbkCov.OpenPath2D({
+            positions: this.getVerticesPosition(),
+            thicknessRythm:this.#params.rythms.edge
+        });
+         
+        return   covering.thicknessPath();
+    } 
+
+    getParams(){
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
+    }
+
+}  
+
+Ebk.Geometry.GridTrix2DTests = (paramsTestOptions =[
+    
+    {creation:  { 
+     
+        width: 10,
+        height: 9, 
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.01], [0.04]], flow:(x)=>{return 2*x; }, messy:[-1,1]},   
+          abs:    [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                      {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, messy:[-1,1]},
+                  ]   ,
+
+          ord:  [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                           {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, messy:[-1,1]},
+                ]  
+                           
+        }
+     
+     },   
+
+      update: { 
+
+         width: 10,
+        height: 9, 
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+          edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.01], [0.04]], flow:(x)=>{return 2*x; }, messy:[-1,1]},   
+          abs:    [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                      {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, messy:[-1,1]},
+                  ]   ,
+
+          ord:  [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                           {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, messy:[-1,1]},
+                ]  
+                           
+        }
+     
+
+     }
+    
+    }] ,    exceptions = ["_update" ]    
+       
+)=>{
+
+    Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.Geometry.GridTrix2D, paramsTestOptions, exceptions );
 
 }
 
