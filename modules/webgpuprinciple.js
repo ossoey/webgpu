@@ -98,7 +98,7 @@ let functions_entries = [
         let gpuDevice = null;
 
         let obj = {};
-        obj.desc = `Ebk.Geometry.GridTrix2D`
+        obj.desc = `Ebk.Geometry.GridTrix2DTests`
         
         obj.r = 0.3,  obj.g = 0.4, obj.b = 0.5
 
@@ -215,77 +215,48 @@ let functions_entries = [
        
          let scalar = 1.95; 
 
-          // let input = [
-
-          //   {   
-          //     verticesCount: 150,
-          //     geomatrix: {origin:[-0.8,0.4],  matrix: [[0, -1.0 ], [1.7, 0 ]] }, 
-          //     rythms: {
-          //       abs: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0], [1]], flow:(x)=>{return    x*Math.cos(4*x);}, messy:[-1,1]},
-          //       ord: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [1]], flow:(x)=>{return  Math.pow(1.2, x); }, messy:[-1,1]},
-          //       edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.003], [0.003001]], flow:(x)=>{return 2*x; }, messy:[0,0]},               }
-          // }  ,
-
-          //     {   
-          //       verticesCount: 50,
-          //       geomatrix: {origin:[-0.8,0.4],  matrix: [[0, -1.0 ], [1.7, 0 ]] }, 
-          //       rythms: {
-          //         abs: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0], [1]], flow:(x)=>{return   x*Math.cos(10*x);}, messy:[-1,1]},
-          //         ord: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [1]], flow:(x)=>{return 1/Math.pow(1.2, x); }, messy:[-1,1]},
-          //         edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.003], [0.003001]], flow:(x)=>{return 2*x; }, messy:[0,0]},               }
-          //   }  ,
-
-          //   {   
-          //     verticesCount: 50,
-          //     geomatrix: {origin:[-0.8,0.4],  matrix: [[0, -2.0 ], [0.4, 0 ]] }, 
-          //     rythms: {
-          //       abs: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0], [1]], flow:(x)=>{return    Math.sin( (1/2)*x);}, messy:[0, 0]},
-          //       ord: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [1]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
-          //       edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.003], [0.003001]], flow:(x)=>{return 2*x; }, messy:[0,0]},               }
-          // }  ,
-          
-
-          // ]
-                
-
-          //  let dyniPathTrix2D = new  Ebk.Geometry.DyniPathTrix2D( 
-
-          //      Ebk.Rand.pullFromMix({arr: input})
-               
-
-          //  )
-
-
-           
-           let dyniPathTrix2Dzzz = new  Ebk.Geometry.GridTrix2D( 
-
-            // Ebk.Rand.pullFromMix({arr: input})
+          let input = [
 
             {   
-                          
-              width: 10,
-              height: 9, 
-              geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+              verticesCount: 150,
+              geomatrix: {origin:[-0.8,0.4],  matrix: [[0, -1.0 ], [1.7, 0 ]] }, 
               rythms: {
-              edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.01], [0.04]], flow:(x)=>{return 2*x; }, messy:[-1,1]},   
-              abs:    [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
-                          {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, messy:[-1,1]},
-                      ]   ,
+                abs: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0], [1]], flow:(x)=>{return    x*Math.cos(4*x);}, messy:[-1,1]},
+                ord: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [1]], flow:(x)=>{return  Math.pow(1.2, x); }, messy:[-1,1]},
+                edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.003], [0.003001]], flow:(x)=>{return 2*x; }, messy:[0,0]},               }
+          }  ,
 
-              ord:  [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
-                              {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, messy:[-1,1]},
-                      ]  
-                              
-              }
+              {   
+                verticesCount: 50,
+                geomatrix: {origin:[-0.8,0.4],  matrix: [[0, -1.0 ], [1.7, 0 ]] }, 
+                rythms: {
+                  abs: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0], [1]], flow:(x)=>{return   x*Math.cos(10*x);}, messy:[-1,1]},
+                  ord: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [1]], flow:(x)=>{return 1/Math.pow(1.2, x); }, messy:[-1,1]},
+                  edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.003], [0.003001]], flow:(x)=>{return 2*x; }, messy:[0,0]},               }
+            }  ,
 
-                  
-         } )
+            {   
+              verticesCount: 50,
+              geomatrix: {origin:[-0.8,0.4],  matrix: [[0, -2.0 ], [0.4, 0 ]] }, 
+              rythms: {
+                abs: {type:Ebk.ERythm.TYPE.WAVY, sample:[[0], [1]], flow:(x)=>{return    Math.sin( (1/2)*x);}, messy:[0, 0]},
+                ord: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0], [1]], flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.003], [0.003001]], flow:(x)=>{return 2*x; }, messy:[0,0]},               }
+          }  ,
+          
+
+          ]
+                
+
+           let dyniPathTrix2D = new  Ebk.Geometry.DyniPathTrix2D( 
+
+               Ebk.Rand.pullFromMix({arr: input})
+               
+
+           )
 
 
-         console.log(`zzzzz`,dyniPathTrix2Dzzz.getCoveredPosition())
-
-
-            let matrixSelector =  dyniPathTrix2Dzzz.getCoveredPosition();
+            let matrixSelector =  dyniPathTrix2D.getCoveredPosition();
 
             let colorsOBJ = new Ebk.Rythm({type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2,0.1,0.5,1], [0.7,0.05,0.8,1], [0.8,0.98,0.95,1]], flow:(x)=>{return 2*x; }, granularity:2,messy:[-1,1]});
 
