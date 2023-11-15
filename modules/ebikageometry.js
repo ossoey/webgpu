@@ -899,7 +899,7 @@ Ebk.Geometry.GridTrix2D = class EbkGeometryGridTrix2D  {
             let bound0 = (this.#process.rythms[rythmAttribut].locate({step: index-1})[0]+ this.#process.rythms[rythmAttribut].locate({step: index})[0])/2;
             let bound1 = (this.#process.rythms[rythmAttribut].locate({step: index})[0]+ this.#process.rythms[rythmAttribut].locate({step: index+1})[0])/2; 
            
-            coord =   Ebk.Rand.fRange({range:[bound0, bound1], clamp: [0, 1]});
+            coord =    this.#process.rythms[rythmAttribut].locate({step: index})[0]
         }
 
         return coord;
@@ -914,17 +914,17 @@ Ebk.Geometry.GridTrix2D = class EbkGeometryGridTrix2D  {
      #getRow(row) { 
         let arr = [];
 
-        for(let ndx = 0; ndx <= this.#params.height + 1; ndx++ ){
+        for(let ndx = 0; ndx <  this.#inputs.height; ndx++ ){
             arr.push(   this.#getRowCol(row, ndx ) );
         } 
 
-        return arr;
+        return arr; //[ this.#getRowCol(row, 0 ), this.#getRowCol(row, 1 ), this.#getRowCol(row, 2 ), this.#getRowCol(row, 3) ];
     }
 
     #getCol(col) { 
         let arr = [];
 
-        for(let ndx = 0; ndx <= this.#params.width+1; ndx++ ){
+        for(let ndx = 0; ndx <= this.#params.width; ndx++ ){
             arr.push(   this.#getRowCol(ndx, col ) );
         } 
 
@@ -937,7 +937,6 @@ Ebk.Geometry.GridTrix2D = class EbkGeometryGridTrix2D  {
         for(let row = 0; row<this.#params.width; row++ ) {
             for(let col = 0; col <this.#params.height; col ++ ) {
 
-                
                 arr.push([this.#getRowCol(row, col )]);
                 //arr.push([this.#getCoord(row, `abs`, `width` ) ,this.#getCoord(col, `ord`, `height` ) ]);
             }
@@ -949,13 +948,15 @@ Ebk.Geometry.GridTrix2D = class EbkGeometryGridTrix2D  {
 
     getRows() { 
         
-        let arr = [ ];
+        let arr = [];
 
-        for(let ndx = 0; ndx < this.#inputs.width; ndx++ ){
-             arr = arr.concat(this.#getRow(ndx));
-         } 
+        for(let ndx = 0; ndx <=  this.#inputs.height ; ndx++ ){
+            arr = arr.concat(this.#getRow(ndx));
+        } 
 
-        return arr;
+        //return [];
+   
+        return arr; // this.#getRow(0)
     }
 
     getCols() { 
@@ -966,7 +967,7 @@ Ebk.Geometry.GridTrix2D = class EbkGeometryGridTrix2D  {
             arr = arr.concat(this.#getCol(ndx));
         } 
 
-        return arr;
+        return [];
     }
 
     getVerticesPosition() {
@@ -975,7 +976,7 @@ Ebk.Geometry.GridTrix2D = class EbkGeometryGridTrix2D  {
         let cols = this.getCols();
         let positions = rows.concat(cols);
      
-        return positions;
+        return this.getRows();
     } 
 
     getCoveredPosition() {

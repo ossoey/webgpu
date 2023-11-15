@@ -43,8 +43,9 @@ let createUIInputsContainer = () =>{
     uiInputsContainer.style.alignItems = "center";
     
     document.querySelector(`#menu`).appendChild(uiInputsContainer);
-
 }
+
+
 
 let removeUIInputsContainer = () =>{
 
@@ -57,7 +58,7 @@ let removeUIInputsContainer = () =>{
 let createUIFunctionList = () =>{
 
 
-  functions_entries[0].entry().func();
+   
 
 
   let selectContainer = document.createElement(`div`);
@@ -85,6 +86,8 @@ let createUIFunctionList = () =>{
       functions_entries[select.functionId].entry().func();           
 
   });
+
+  functions_entries[0].entry().func();
 
 }
 
@@ -247,16 +250,38 @@ let functions_entries = [
 
           ]
                 
+       
+          let grid = new  Ebk.Geometry.GridTrix2D({ 
+      
+            width: 3,
+            height: 9, 
+            geomatrix: {origin:[0.5,-0.4],  matrix: [[-1, 0], [0, 1 ]] }, 
+            rythms: {
+              edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.01], [0.01002]], flow:(x)=>{return 2*x; }, messy:[-1,1]},   
+              abs:    [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x  }, messy:[0, 0]},
+                        {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x  }, messy:[0, 0]},
+                      ]   ,
+    
+              ord:  [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
+                               {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x }, messy:[0, 0]},
+                    ]  
+                               
+            }
+         
+         });
 
-           let dyniPathTrix2D = new  Ebk.Geometry.DyniPathTrix2D( 
+             
+           let openPath2D = new EbkCov.OpenPath2D({ 
+            positions:   grid.getRows( ),
+            thicknessRythm:{type:Ebk.ERythm.TYPE.WAVY, sample:[[0.002], [0.005]], flow:(x)=>{return Math.sin(x); }, messy:[0,0]}
+         });
+          
 
-               Ebk.Rand.pullFromMix({arr: input})
-               
+       
 
-           )
+          let matrixSelector = openPath2D.thicknessPath();
 
-
-            let matrixSelector =  dyniPathTrix2D.getCoveredPosition();
+ 
 
             let colorsOBJ = new Ebk.Rythm({type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2,0.1,0.5,1], [0.7,0.05,0.8,1], [0.8,0.98,0.95,1]], flow:(x)=>{return 2*x; }, granularity:2,messy:[-1,1]});
 
