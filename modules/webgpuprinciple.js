@@ -251,35 +251,30 @@ let functions_entries = [
           ]
                 
        
-          let grid = new  Ebk.Geometry.GridTrix2D({ 
+       let grid = new  Ebk.Geometry.GridTrix2D({ 
       
-            width: 3,
-            height: 9, 
-            geomatrix: {origin:[0.5,-0.4],  matrix: [[-1, 0], [0, 1 ]] }, 
-            rythms: {
-              edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.01], [0.01002]], flow:(x)=>{return 2*x; }, messy:[-1,1]},   
-              abs:    [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x  }, messy:[0, 0]},
-                        {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x  }, messy:[0, 0]},
-                      ]   ,
-    
-              ord:  [ {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, messy:[-1,1]},
-                               {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x }, messy:[0, 0]},
-                    ]  
-                               
-            }
+        geomatrix: {origin:[0,0],  matrix: [[0.5, 0 ], [0, 0.3 ]] }, 
+        rythms: {
+        edge: {type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.01], [0.010001]], flow:(x)=>{return 2*x; }, messy:[-1,1]},   
+        abs:  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return Math.pow(1.3, x); }, granularity: 10, messy:[-1,1]}, 
+
+        ord:  {type:Ebk.ERythm.TYPE.LINEAR, flow:(x)=>{return 2*x; }, granularity: 10, messy:[-1,1]} 
+                        
+        }
+
          
-         });
+        });
 
              
-           let openPath2D = new EbkCov.OpenPath2D({ 
-            positions:   grid.getRows( ),
+         let openPath2D = new EbkCov.OpenPath2D({ 
+            positions:   [ [-0.5, 0.1],  [-0.3, -0.2], [-0.1,0], [0,0], [0.1, 0], [0.3, 0], [0.5, 0], [0.7, 0] , [0.8, 0]],
             thicknessRythm:{type:Ebk.ERythm.TYPE.WAVY, sample:[[0.002], [0.005]], flow:(x)=>{return Math.sin(x); }, messy:[0,0]}
          });
           
 
        
 
-          let matrixSelector = openPath2D.thicknessPath();
+          let matrixSelector = grid.getCoveredPosition();
 
  
 
@@ -2049,7 +2044,7 @@ let functions_entries = [
             
 
 
-            let matrixSelector = openPath2D.thicknessPath();
+            let matrixSelector = openPath2D.thickPath();
 
             let colorsOBJ = new Ebk.Rythm({type:Ebk.ERythm.TYPE.LINEAR, sample:[[0.2,0.1,0.5,1], [0.7,0.05,0.8,1], [0.8,0.98,0.95,1]], flow:(x)=>{return 2*x; }, granularity:2,messy:[-1,1]});
 

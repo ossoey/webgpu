@@ -147,7 +147,7 @@ Ebk.Covering.OpenPath2D = class EbkCoveringOpenPath  {
          ]
     }
 
-    thicknessPath(){
+    thickPath(){
 
         let arr = [];
 
