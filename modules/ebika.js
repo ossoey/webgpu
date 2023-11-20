@@ -3891,7 +3891,7 @@ Ebk.GeoMatrixTests = (paramsTestOptions =[
 
 
 /////// Ebk.Navigation
-Ebk.ClassModel = class EbkClassModel {
+Ebk.ClassModel0 = class EbkClassModel0 {
     #params;
     #process;
     #isCreate;
@@ -3952,6 +3952,83 @@ Ebk.ClassModel = class EbkClassModel {
     }
 
 }  
+
+
+/////// Ebk.ClassModel
+Ebk.ClassModel = class ClassModel {
+    #params;
+    #process;
+  
+    
+    constructor(params ={ name: 'position' ,  size: 4, byteCount: 4 }) {
+               
+        this.name = `Ebk.Sequence.Creation`;            
+                    
+        this.#process = {};
+        
+        this.#params =  Object.assign({},  params );
+  
+        this.#params.byteSize = this.#params.size*this.#params.byteCount;
+
+        this.#params.bitCount = 8*this.#params.byteCount*this.#params.size;
+
+     
+    }
+    
+    _update(params = { name: 'position' ,  size: 4, byteCount: 4 }){
+        
+        this.#params =  Object.assign(this.#params,  params );
+  
+        this.#params.byteSize = this.#params.size*this.#params.byteCount;
+
+        this.#params.bitCount = 8*this.#params.byteCount*this.#params.size;
+        
+    }
+
+
+    getName(){
+        return this.getParams().name;
+    }   
+
+    getSize(){
+        return this.getParams().size;
+    }   
+
+    getByteSize(){
+        return this.getParams().byteSize;
+    }  
+
+    getByteCount(){
+        return this.getParams().byteCount;
+    }  
+
+    getBitCount(){
+        return this.getParams().bitCount;
+    }  
+
+    getParams(){
+        return Object.assign({},Ebk.objectDeepCopy (this.#params));
+    }
+
+}  
+
+Ebk.ClassModelTests = (paramsTestOptions =[
+    
+    {
+        creation:  { name: 'position' ,  size: 4, byteCount: 4 },   
+
+        update: {  name: 'scale' ,  size: 2, byteCount: 4 }
+    
+    }
+    
+    ] ,    exceptions = ["_update" ]    
+       
+)=>{
+
+    Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.ClassModel, paramsTestOptions, exceptions );
+
+}
+
 
 
 
