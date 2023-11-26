@@ -107,8 +107,8 @@ let functions_entries = [
 
         //Ebk.WEBGPU.Buffer.PropertyTests();
 
-        Ebk.WEBGPU.Buffer.PropertiesTests();
-
+       // Ebk.WEBGPU.Buffer.PropertiesTests();
+       Ebk.WEBGPU.Buffer.PropertyTests();
 
         obj.uiLoadColorPickers = (instance_ndx,index,color)=>{
           

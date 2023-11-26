@@ -94,6 +94,11 @@ Ebk.WEBGPU.Buffer =  {};
 
 Ebk.WEBGPU.Buffer.TYPE = {
 
+    f: {type: `float<f32>`, description: `a type with 1 f32`, size: 1, byteCount: 4, short: `f`}, 
+    u: {type: `unsigned<u32>`, description: `a type with 1 u32`, size: 1, byteCount: 4, short: `u`}, 
+    i: {type: `integer<i32>`, description: `a type with 1 u32`, size: 1, byteCount: 4, short: `i`}, 
+    h: {type: `float<h16>`, description: `a type with 1 h16`, size: 1, byteCount: 2, short: `h`}, 
+
     vec2f: {type: `vec2<f32>`, description: `a type with 2 f32s`, size: 2, byteCount: 4, short: `vec2f`}, 
     vec2u: {type: `vec2<u32>`, description: `a type with 2 u32s`, size: 2, byteCount: 4, short: `vec2u`}, 
     vec2i: {type: `vec2<i32>`, description: `a type with 2 i32s`, size: 2, byteCount: 4, short: `vec2i`},  		
@@ -143,16 +148,40 @@ Ebk.WEBGPU.Buffer.TYPE = {
     mat4x4i: {type: `mat4x4<i32>`, description: `a matrix of 4 vec4<i32>s`, size: 4*4, byteCount: 4, short: `mat4x4i`}, 
     mat4x4h: {type: `mat4x4<f16>`, description: `a matrix of 4 vec4<f16>s`, size: 4*4, byteCount: 2, short: `mat4x4h`}, 
      
+    bufferSize: (type, length =1) =>{
+        return Ebk.WEBGPU.Buffer.TYPE[type].size * Ebk.WEBGPU.Buffer.TYPE[type].byteCount * length; 
+    }, 
+
+    type: (type) => {
+        return Ebk.WEBGPU.Buffer.TYPE[type].type;
+    },
+
+    description: (type) => {
+        return Ebk.WEBGPU.Buffer.TYPE[type].description;
+    }, 
+
+    size: (type) => {
+        return Ebk.WEBGPU.Buffer.TYPE[type].size;
+    }, 
+
+    byteCount: (type) => {
+        return Ebk.WEBGPU.Buffer.TYPE[type].byteCount;
+    }, 
+
+    bitCount: (type, length) => {
+        return Ebk.WEBGPU.Buffer.TYPE.bufferSize(type, length )*8;
+    }, 
+
+
 }
 	
-
-/////// Ebk.WEBGPU.Buffer.Property 
+///// Ebk.WEBGPU.Buffer.Property 
 Ebk.WEBGPU.Buffer.Property = class WEBGPUBufferProperty  {
     #params;
     #process;
   
     
-    constructor(params ={ name: 'position' ,  size: 4, byteCount: 4 }) {
+    constructor(params ={ name: 'position' ,  type: Ebk.WEBGPU.Buffer.TYPE.f, length: 1 }) {
                
         this.name = `Ebk.WEBGPU.Buffer.Property`;            
                     
@@ -160,41 +189,36 @@ Ebk.WEBGPU.Buffer.Property = class WEBGPUBufferProperty  {
         
         this.#params =  Object.assign({},  params );
   
-        this.#params.byteSize = this.#params.size*this.#params.byteCount;
-
-        this.#params.bitCount = 8*this.#params.byteCount*this.#params.size;
-
     }
     
-    _update(params = { name: 'position' ,  size: 4, byteCount: 4 }){
+    _update(params = { name: 'position' ,  type: Ebk.WEBGPU.Buffer.TYPE.f, length: 1}){
         
         this.#params =  Object.assign(this.#params,  params );
-  
-        this.#params.byteSize = this.#params.size*this.#params.byteCount;
-
-        this.#params.bitCount = 8*this.#params.byteCount*this.#params.size;
         
     }
-
 
     getName(){
         return this.getParams().name;
     }   
 
+    getBufferSize(){
+      return Ebk.WEBGPU.Buffer.TYPE.bufferSize(this.#params.type, this.#params.length);
+    }
+
+    getTypeDescription(){
+        return Ebk.WEBGPU.Buffer.TYPE.description(this.#params.type);
+    }
+
     getSize(){
-        return this.getParams().size;
+        return Ebk.WEBGPU.Buffer.TYPE.size(this.#params.type);
     }   
 
-    getByteSize(){
-        return this.getParams().byteSize;
-    }  
-
     getByteCount(){
-        return this.getParams().byteCount;
+        return  Ebk.WEBGPU.Buffer.TYPE.byteCount(this.#params.type);
     }  
 
     getBitCount(){
-        return this.getParams().bitCount;
+        return  Ebk.WEBGPU.Buffer.TYPE.bitCount(this.#params.type, this.#params.length);
     }  
 
     getParams(){
@@ -203,14 +227,23 @@ Ebk.WEBGPU.Buffer.Property = class WEBGPUBufferProperty  {
 
 }  
 
+
 Ebk.WEBGPU.Buffer.PropertyTests = (paramsTestOptions =[
     
     {
-        creation:  { name: 'position' ,  size: 4, byteCount: 4 },   
+        creation:  {  name: 'position' ,  type: `f`, length: 1 },   
 
-        update: {  name: 'scale' ,  size: 2, byteCount: 4 }
+        update: {   name: 'position' ,  type: `f`, length: 10 }
     
-    }
+    } ,
+
+    {
+        creation:  {  name: 'positions' ,  type: `vec2f`, length: 1 },   
+
+        update: {   name: 'positions' ,  type:  `vec2f`, length: 10 }
+    
+    } ,
+    
     
     ] ,    exceptions = ["_update" ]    
        
