@@ -282,6 +282,7 @@ Ebk.WEBGPU.Buffer.PropertyTests = (paramsTestOptions =[
 }
 
 
+
 /////// Ebk.WEBGPU.Buffer.Properties 
 Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
     #params;
@@ -314,7 +315,7 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
                                  ], 
                                  structName: `VertexColor` ,
                                  device: {}
-                                 ,}) {
+                                 }) {
 
         this.#params =  Object.assign(this.#params,  params );
          this.#buildProperties(1);

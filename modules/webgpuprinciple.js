@@ -107,7 +107,7 @@ let functions_entries = [
 
         //Ebk.WEBGPU.Buffer.PropertyTests();
 
-         Ebk.WEBGPU.Buffer.PropertiesTests();
+        // Ebk.WEBGPU.Buffer.PropertiesTests();
         // Ebk.WEBGPU.Buffer.PropertyTests();
       
   
@@ -269,7 +269,18 @@ let functions_entries = [
             });
 
             
-        
+     
+            let properties = new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+            { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+            { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+            ],
+            structName: `VertexColor`,
+            device: gpuDevice });
+            
+            console.log(properties.getParams()) 
+
+
+
             //run onWebGPUInitialized
             obj.onWebGPUInitialized();
         
