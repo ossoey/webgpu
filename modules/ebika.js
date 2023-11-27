@@ -768,7 +768,6 @@ Ebk.Matrix.arrGetSubarray =(params = {arr : [1,2,3,4,5,6,7,8,9], fromIndex : 2, 
     return      params.arr.slice(params.fromIndex, params.toIndex+1);
 }
 
-
 Ebk.Matrix.arrGetSubarrayWithoutIndex =(params = {arr : [1,2,3,4,5,6,7,8,9], withoutIndex : 2}) => {
 
     if (params.withoutIndex < 0 || params.withoutIndex >= params.arr.length) {  
@@ -793,7 +792,9 @@ Ebk.Matrix.arrLoadElementNtimes =(params = {elt:0,times:10}) => {
     return      arr;
 }
 
-
+Ebk.Matrix.arrFlatten =(params = {arr :  [[0.1, 0.2], [0.4, 0.3]], fromIndex : 2, toIndex : 5} ) => {
+    return      params.arr.slice().flat().map(Number);
+}
 
 Ebk.Matrix.identity = (params = {dim: 3}) => {
 

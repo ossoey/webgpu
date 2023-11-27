@@ -94,55 +94,66 @@ Ebk.WEBGPU.Buffer =  {};
 
 Ebk.WEBGPU.Buffer.TYPE = {
 
-    f: {type: `float<f32>`, description: `a type with 1 f32`, size: 1, byteCount: 4, short: `f`}, 
-    u: {type: `unsigned<u32>`, description: `a type with 1 u32`, size: 1, byteCount: 4, short: `u`}, 
-    i: {type: `integer<i32>`, description: `a type with 1 u32`, size: 1, byteCount: 4, short: `i`}, 
-    h: {type: `float<h16>`, description: `a type with 1 h16`, size: 1, byteCount: 2, short: `h`}, 
+    f32: {type: `float<f32>`, description: `a type with 1 f32`, size: 1, byteCount: 4, short: `f32`}, 
+    i32: {type: `integer<i32>`, description: `a type with 1 u32`, size: 1, byteCount: 4, short: `i32`}, 
+    u32: {type: `unsigned<u32>`, description: `a type with 1 u32`, size: 1, byteCount: 4, short: `u32`}, 
+    h16: {type: `float<h16>`, description: `a type with 1 h16`, size: 1, byteCount: 2, short: `h16`}, 
 
     vec2f: {type: `vec2<f32>`, description: `a type with 2 f32s`, size: 2, byteCount: 4, short: `vec2f`}, 
     vec2u: {type: `vec2<u32>`, description: `a type with 2 u32s`, size: 2, byteCount: 4, short: `vec2u`}, 
     vec2i: {type: `vec2<i32>`, description: `a type with 2 i32s`, size: 2, byteCount: 4, short: `vec2i`},  		
-    vec2h: {type: `vec2<f16>`, description: `a type with 2 f16s`, size: 2, byteCount: 2, short: `vec2h`},  	
+    vec2h: {type: `vec2<f16>`, description: `a type with 2 f16s`, size: 2, byteCount: 2, short: `vec2h`}, 
+
     vec3f: {type: `vec3<f32>`, description: `a type with 3 f32s`, size: 3, byteCount: 4, short: `vec3f`}, 		
     vec3u: {type: `vec3<u32>`, description: `a type with 3 u32s`, size: 3, byteCount: 4, short: `vec3u`},  		
     vec3i: {type: `vec3<i32>`, description: `a type with 3 i32s`, size: 3, byteCount: 4, short: `vec3i`},  	
-    vec3h: {type: `vec3<f16>`, description: `a type with 3 f16s`, size: 3, byteCount: 2, short: `vec3h`},  		
+    vec3h: {type: `vec3<f16>`, description: `a type with 3 f16s`, size: 3, byteCount: 2, short: `vec3h`}, 
+
     vec4f: {type: `vec4<f32>`, description: `a type with 4 f32s`, size: 4, byteCount: 4, short: `vec4f`},  
     vec4u: {type: `vec4<u32>`, description: `a type with 4 u32s`, size: 4, byteCount: 4, short: `vec4u`}, 
     vec4i: {type: `vec4<i32>`, description: `a type with 4 i32s`, size: 4, byteCount: 4, short: `vec4i`}, 
     vec4h: {type: `vec4<f16>`, description: `a type with 4 f16s`, size: 4, byteCount: 2, short: `vec4h`}, 
+
     mat2x2f: {type: `mat2x2<f32>`, description: `a matrix of 2 vec2<f32>s`, size: 2*2, byteCount: 4, short: `mat2x2f`}, 
     mat2x2u: {type: `mat2x2<u32>`, description: `a matrix of 2 vec2<u32>s`, size: 2*2, byteCount: 4, short: `mat2x2u`}, 
     mat2x2i: {type: `mat2x2<i32>`, description: `a matrix of 2 vec2<i32>s`, size: 2*2, byteCount: 4, short: `mat2x2i`}, 
     mat2x2h: {type: `mat2x2<f16>`, description: `a matrix of 2 vec2<f16>s`, size: 2*2, byteCount: 2, short: `mat2x2h`}, 
+
     mat2x3f: {type: `mat2x3<f32>`, description: `a matrix of 2 vec3<f32>s`, size: 2*3, byteCount: 4, short: `mat2x3f`}, 
     mat2x3u: {type: `mat2x3<u32>`, description: `a matrix of 2 vec3<u32>s`, size: 2*3, byteCount: 4, short: `mat2x3u`}, 
     mat2x3i: {type: `mat2x3<i32>`, description: `a matrix of 2 vec3<i32>s`, size: 2*3, byteCount: 4, short: `mat2x3i`}, 
     mat2x3h: {type: `mat2x3<f16>`, description: `a matrix of 2 vec3<f16>s`, size: 2*3, byteCount: 2, short: `mat2x3h`}, 
+
     mat2x4f: {type: `mat2x4<f32>`, description: `a matrix of 2 vec4<f32>s`, size: 2*4, byteCount: 4, short: `mat2x4f`}, 
     mat2x4u: {type: `mat2x4<u32>`, description: `a matrix of 2 vec4<u32>s`, size: 2*4, byteCount: 4, short: `mat2x4u`}, 
     mat2x4i: {type: `mat2x4<i32>`, description: `a matrix of 2 vec4<i32>s`, size: 2*4, byteCount: 4, short: `mat2x4i`}, 
     mat2x4h: {type: `mat2x4<f16>`, description: `a matrix of 2 vec4<f16>s`, size: 2*4, byteCount: 2, short: `mat2x4h`}, 
+
     mat3x2f: {type: `mat3x2<f32>`, description: `a matrix of 3 vec2<f32>s`, size: 3*2, byteCount: 4, short: `mat3x2f`}, 
     mat3x2u: {type: `mat3x2<u32>`, description: `a matrix of 3 vec2<u32>s`, size: 3*2, byteCount: 4, short: `mat3x2u`}, 
     mat3x2i: {type: `mat3x2<i32>`, description: `a matrix of 3 vec2<i32>s`, size: 3*2, byteCount: 4, short: `mat3x2i`}, 
     mat3x2h: {type: `mat3x2<f16>`, description: `a matrix of 3 vec2<f16>s`, size: 3*2, byteCount: 2, short: `mat3x2h`}, 
+
     mat3x3f: {type: `mat3x3<f32>`, description: `a matrix of 3 vec3<f32>s`, size: 3*3, byteCount: 4, short: `mat3x3f`}, 
     mat3x3u: {type: `mat3x3<u32>`, description: `a matrix of 3 vec3<u32>s`, size: 3*3, byteCount: 4, short: `mat3x3u`}, 
     mat3x3i: {type: `mat3x3<i32>`, description: `a matrix of 3 vec3<i32>s`, size: 3*3, byteCount: 4, short: `mat3x3i`},   	
     mat3x3h: {type: `mat3x3<f16>`, description: `a matrix of 3 vec3<f16>s`, size: 3*3, byteCount: 2, short: `mat3x3h`}, 
+
     mat3x4f: {type: `mat3x4<f32>`, description: `a matrix of 3 vec4<f32>s`, size: 3*4, byteCount: 4, short: `mat3x4f`}, 
     mat3x4u: {type: `mat3x4<u32>`, description: `a matrix of 3 vec4<u32>s`, size: 3*4, byteCount: 4, short: `mat3x4u`}, 
     mat3x4i: {type: `mat3x4<i32>`, description: `a matrix of 3 vec4<i32>s`, size: 3*4, byteCount: 2, short: `mat3x4i`}, 
     mat3x4h: {type: `mat3x4<f16>`, description: `a matrix of 3 vec4<f16>s`, size: 3*4, byteCount: 4, short: `mat3x4h`}, 
+
     mat4x2f: {type: `mat4x2<f32>`, description: `a matrix of 4 vec2<f32>s`, size: 4*2, byteCount: 4, short: `mat4x2f`}, 
     mat4x2u: {type: `mat4x2<u32>`, description: `a matrix of 4 vec2<u32>s`, size: 4*2, byteCount: 4, short: `mat4x2u`}, 
     mat4x2i: {type: `mat4x2<i32>`, description: `a matrix of 4 vec2<i32>s`, size: 4*2, byteCount: 4, short: `mat4x2i`}, 
     mat4x2h: {type: `mat4x2<f16>`, description: `a matrix of 4 vec2<f16>s`, size: 4*2, byteCount: 2, short: `mat4x2h`}, 
+
     mat4x3f: {type: `mat4x3<f32>`, description: `a matrix of 4 vec3<f32>s`, size: 4*3, byteCount: 4, short: `mat4x3f`}, 
     mat4x3u: {type: `mat4x3<u32>`, description: `a matrix of 4 vec3<u32>s`, size: 4*3, byteCount: 4, short: `mat4x3u`}, 
     mat4x3i: {type: `mat4x3<i32>`, description: `a matrix of 4 vec3<i32>s`, size: 4*3, byteCount: 4, short: `mat4x3i`}, 
     mat4x3h: {type: `mat4x3<f16>`, description: `a matrix of 4 vec3<f16>s`, size: 4*3, byteCount: 2, short: `mat4x3h`}, 
+
     mat4x4f: {type: `mat4x4<f32>`, description: `a matrix of 4 vec4<f32>s`, size: 4*4, byteCount: 4, short: `mat4x4f`}, 
     mat4x4u: {type: `mat4x4<u32>`, description: `a matrix of 4 vec4<u32>s`, size: 4*4, byteCount: 4, short: `mat4x4u`}, 
     mat4x4i: {type: `mat4x4<i32>`, description: `a matrix of 4 vec4<i32>s`, size: 4*4, byteCount: 4, short: `mat4x4i`}, 
@@ -181,20 +192,21 @@ Ebk.WEBGPU.Buffer.Property = class WEBGPUBufferProperty  {
     #process;
   
     
-    constructor(params ={ name: 'position' ,  type: Ebk.WEBGPU.Buffer.TYPE.f, length: 1 }) {
+    constructor(params ={ name: 'position' ,  type: `f32`, data: [7.0]  }) {
                
         this.name = `Ebk.WEBGPU.Buffer.Property`;            
                     
         this.#process = {};
         
         this.#params =  Object.assign({},  params );
-  
+        this.#params.length = this.#params.data.length;
+
     }
     
-    _update(params = { name: 'position' ,  type: Ebk.WEBGPU.Buffer.TYPE.f, length: 1}){
+    _update(params = { name: 'position' ,  type: `f32`, data: [7.0]}){
         
         this.#params =  Object.assign(this.#params,  params );
-        
+        this.#params.length = this.#params.data.length;
     }
 
     getName(){
@@ -221,6 +233,23 @@ Ebk.WEBGPU.Buffer.Property = class WEBGPUBufferProperty  {
         return  Ebk.WEBGPU.Buffer.TYPE.bitCount(this.#params.type, this.#params.length);
     }  
 
+    getData(){
+        return this.getParams().data;
+    }   
+
+    getflattenData(){
+        return  Ebk.Matrix.arrFlatten({arr: this.getParams().data}) ;
+    }   
+
+    getWGSL_StructProperty(){
+          
+        
+
+        return  (this.#params.length == 1) ? 
+                   (`${this.#params.name}: ${this.#params.type}`) :
+                   (`${this.#params.name}: array<${this.#params.type}, ${this.#params.length}>`);
+    }   
+
     getParams(){
         return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
@@ -231,19 +260,18 @@ Ebk.WEBGPU.Buffer.Property = class WEBGPUBufferProperty  {
 Ebk.WEBGPU.Buffer.PropertyTests = (paramsTestOptions =[
     
     {
-        creation:  {  name: 'position' ,  type: `f`, length: 1 },   
+        creation:  {name: 'position',  type: `f32`, data: [7.0, 0.1, 0.2]  },   
 
-        update: {   name: 'position' ,  type: `f`, length: 10 }
+        update: {name: 'position',  type: `f32`, data: [7.0, 0.1, 0.2, 7.0, 0.1, 0.2]  }
     
     } ,
 
     {
-        creation:  {  name: 'positions' ,  type: `vec2f`, length: 1 },   
+        creation:  {  name: 'positions',  type: `vec2f`, data: [[0.1, 0.2], [0.4, 0.3]] },   
 
-        update: {   name: 'positions' ,  type:  `vec2f`, length: 10 }
+        update: {   name: 'positions',  type: `vec2f`, length: [[0.1, 0.2], [0.4, 0.3]] }
     
     } ,
-    
     
     ] ,    exceptions = ["_update" ]    
        
@@ -253,19 +281,20 @@ Ebk.WEBGPU.Buffer.PropertyTests = (paramsTestOptions =[
 
 }
 
+
 /////// Ebk.WEBGPU.Buffer.Properties 
 Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
     #params;
     #process;
   
-    constructor(params ={ properties:[ {name: 'color' ,  size: 4, byteCount: 4},
-                                       {name: 'scale' ,  size: 2, byteCount: 4},
-                                       {name: 'offset' ,  size: 2, byteCount: 4},
+    constructor(params ={ properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+                                       { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                                       { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
                                      ],
-                                  
-                    
-                                    }) {
-               
+                                    structName: `VertexColor`,
+                                    device: {} }) {
+                     
+                                
         this.name = `Ebk.WEBGPU.Buffer.Properties`;            
                     
         this.#process = {};
@@ -273,113 +302,122 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
         this.#params =  Object.assign({},  params );
 
         this.#process.properties = [];
+
         this.#buildProperties(0);
   
      
     }
     
-    _update(params ={ properties:[ {name: 'color' ,  size: 4, byteCount: 4},
-                                   {name: 'scale' ,  size: 2, byteCount: 4},
-                                   {name: 'offset' ,  size: 2, byteCount: 4},
-                                ] }) {
-                                        
+    _update(params ={ properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+                                    { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                                    { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                                 ], 
+                                 structName: `VertexColor` ,
+                                 device: {}
+                                 ,}) {
+
         this.#params =  Object.assign(this.#params,  params );
-        this.#buildProperties(1);
+         this.#buildProperties(1);
   
     }
 
     #buildProperties(opt){
          
-        let offset = 0;
-        let cumulativeSize = 0;
-        let cumulativeByteSize = 0;
+        let bufferSizeOffset = 0;
+        let sizeOffset = 0;
+       
+        this.#process.wgsl_structure = `struct ${this.#params.structName} { \n`
+
+        if  (opt == 0) this.#process.properties = {}; 
 
         this.#params.properties.forEach((itm, ndx) =>{
 
-            if  (opt == 0) this.#process.properties.push(new Ebk.WEBGPU.Buffer.Property(itm));
-            else if (opt == 1) this.#process.properties[ndx]._update(itm);
+            let paramsIn = {};
+            Object.entries(itm).forEach(key =>{
+                paramsIn.name = key[0];
+                Object.entries(key[1]).forEach((key1, value1) =>{
+                    paramsIn[key1[0]] = key1[1];
+                });
 
-            this.#process.properties[ndx].offset = offset;
-            this.#process.properties[ndx].bufferSize =  this.#process.properties[ndx].getSize();
-            this.#process.properties[ndx].name =  this.#process.properties[ndx].getName();
+                 if  (opt == 0) this.#process.properties[key[0]] = new Ebk.WEBGPU.Buffer.Property(paramsIn);
+                 else if (opt == 1) this.#process.properties[key[0]]._update(paramsIn);
+                 
+                                                                    
+                this.#process.properties[key[0]].bufferSizeOffset = bufferSizeOffset;
+                this.#process.properties[key[0]].sizeOffset = sizeOffset;
+                this.#process.properties[key[0]].name = this.#process.properties[key[0]].getName;
+                this.#process.properties[key[0]].bufferSize = this.#process.properties[key[0]].getBufferSize();
+                this.#process.properties[key[0]].typeDescription = this.#process.properties[key[0]].getTypeDescription();
+                this.#process.properties[key[0]].size = this.#process.properties[key[0]].getSize();
+                this.#process.properties[key[0]].byCount = this.#process.properties[key[0]].getByteCount();
+                this.#process.properties[key[0]].bitCount = this.#process.properties[key[0]].getBitCount();
+                this.#process.properties[key[0]].data = this.#process.properties[key[0]].getData();
+                this.#process.properties[key[0]].flattenData = this.#process.properties[key[0]].getflattenData();
+                this.#process.properties[key[0]].wgsl_structProperty = this.#process.properties[key[0]].getWGSL_StructProperty();
 
-            offset += this.#process.properties[ndx].getSize();
-            cumulativeSize += this.#process.properties[ndx].getSize();
-            cumulativeByteSize += this.#process.properties[ndx].getByteSize();
-        });
+                if (ndx < this.#params.properties.length-1)
+                 this.#process.wgsl_structure+= `  ` + this.#process.properties[key[0]].wgsl_structProperty+ `, \n`
+                else this.#process.wgsl_structure+= `  ` +  this.#process.properties[key[0]].wgsl_structProperty+ `\n};`
 
-        this.#params.bufferSize = cumulativeByteSize;
-        this.#params.dataLength = cumulativeSize;
+                bufferSizeOffset +=  this.#process.properties[key[0]].getBufferSize();
+                sizeOffset +=  this.#process.properties[key[0]].getSize();
 
-        this.#process.stride = this.#params.dataLength;
-  
-    }
-
-    getPropertyByIndex(params ={index: 0, subPropertyName: 'name'}){
-
-        return    this.#process.properties[params.index][params.subPropertyName];
-   
-    }
-
-    getPropertiesByIndex(params ={index: 0, subPropertiesName: ['name', 'offset', `bufferSize`]}){
-
-        let arr = [];
-
-        params.subPropertiesName.forEach(itm =>{
-             let obj = {};
-             obj[itm] = this.getPropertyByIndex({index: params.index, subPropertyName: itm})
-            arr.push(obj);
-        })
-
-        return arr; 
-   
-    }
-
-    getAllPropertiesByIndex(params ={subPropertiesName: ['name', 'offset', `bufferSize`]}){
-
-        let arr = [];
-        this.#process.properties.forEach((itm,ndx) =>{
-            arr.push( this.getPropertiesByIndex({index: ndx, subPropertiesName: params.subPropertiesName}));
+            });
 
         });
 
-        return arr; 
+        this.#process.bufferSize = bufferSizeOffset;
+
+    }
+
+    getPropertyInfo(params ={property: 'color'}){
+
+        return    this.#process.properties;
    
     }
 
-    getStride(){
-        return this.#process.stride;
+    getPropertyValue(params ={property: 'color', value: `data`}){
+
+        return    this.#process.properties[params.property][params.value];
+   
     }
 
+    getPropertyValues(params ={property: 'color' }){
 
+        let arr = {};
+            Object.entries(this.#process.properties[params.property]).forEach(key =>{
+                arr[key[0]] =  key[1]; 
 
+            });
 
-    // getPropertyValueByIndex(params ={index: 0, property: 'name'}){
+        return arr;    
+    }
 
-    //    if  (this.#process.properties[params.index].hasOwnProperty(params.property) )
-    //     return    this.#process.properties[params.index]
-    //    else return undefined;
-    // }
+    getWGSL_structure( ){
 
-    // getPropertyValuesByIndex(params = {index: 0}){
-         
-    //     let arr = [];
+        return    this.#process.wgsl_structure;
+   
+    }
 
-    //     this.#process.properties.forEach((itm, ndx) =>{
+    getbufferSize(){
+       return this.#process.bufferSize;
+    }
 
-    //         Object.entries(itm).forEach(([key, value]) => {
+    createBuffer_UniformReadOnly( ){
 
-    //             arr.push(this.getPropertyValueByIndex({index: ndx, property: key}));
-    //         // let obj = {};
-    //         // obj[key] = value;
-    //         // arr.push(obj[key]);
-    //         });
+        // if (this.#params.device) {
+        //     const uniformBuffer = this.#params.device.createBuffer({
+        //         size: this.getbufferSize(),
+        //         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        //       });
+    
+        //     return   uniformBuffer;
+        // } else {
+        //     console.error(`device is not defined`);
+        //     return null;
+        // }
 
-    //     })
-
-
-    //     return  arr;
-    // }
+    }
 
     getParams(){
         return Object.assign({},Ebk.objectDeepCopy (this.#params));
@@ -390,26 +428,57 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
 Ebk.WEBGPU.Buffer.PropertiesTests = (paramsTestOptions =[
     
     {
-        creation:  {  properties:[ {name: 'color' ,  size: 4, byteCount: 4},
-                                   {name: 'scale' ,  size: 2, byteCount: 4},
-                                   {name: 'offset' ,  size: 2, byteCount: 4},
-                    ],
-                    index:0,
-                    subPropertyName: 'name',
-                    subPropertiesName: ['name', 'offset', `bufferSize`]
-                },   
+        creation:  {  properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+                                        { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                                        { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                                ], 
+                       structName: `VertexColor` ,
+                       device: {},            
+                       property: `color`,
+                       value: `data`
+     
+                   },   
 
-        update: {   properties:[ {name: 'color' ,  size: 4, byteCount: 4},
-                                 {name: 'scale' ,  size: 2, byteCount: 4},
-                                 {name: 'offset' ,  size: 2, byteCount: 4},
-                            ],
-                        index: 1,
-                        subPropertyName: 'name',
-                        subPropertiesName: ['name', 'offset', `bufferSize`]
+        update:  {  properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+                                    { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                                    { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                                ],
+            structName: `VertexColor` ,
+            device: {},  
+            property: `scale`,
+            value: `data`
 
-                        }
+                }
     
-    }
+}  ,
+
+{
+    creation:  {  properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0], [0.1, 0.2, 0.3, 1.0]]}},
+                                    { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                                    { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                                    { index: { type: `i32`, data: [0, 1, 2, 3, 4 ]}}
+                            ], 
+                   structName: `VertexColor` ,
+                   device: {},              
+                   property: `color`,
+                   value: `data`
+ 
+               },   
+
+    update:  {  properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+                                { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                                { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+                            ],
+        structName: `VertexColor` ,
+        device: {},  
+        property: `scale`,
+        value: `data`
+
+            }
+
+}
+
+
     
     ] ,    exceptions = ["_update" ]    
        
@@ -418,6 +487,9 @@ Ebk.WEBGPU.Buffer.PropertiesTests = (paramsTestOptions =[
     Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.WEBGPU.Buffer.Properties, paramsTestOptions, exceptions );
 
 }
+
+
+
 
 
 let EbkWebGPU = Ebk.WEBGPU

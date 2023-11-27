@@ -107,9 +107,10 @@ let functions_entries = [
 
         //Ebk.WEBGPU.Buffer.PropertyTests();
 
-       // Ebk.WEBGPU.Buffer.PropertiesTests();
-       Ebk.WEBGPU.Buffer.PropertyTests();
-
+         Ebk.WEBGPU.Buffer.PropertiesTests();
+        // Ebk.WEBGPU.Buffer.PropertyTests();
+      
+  
         obj.uiLoadColorPickers = (instance_ndx,index,color)=>{
           
           obj.colorPickers[instance_ndx][index].htmlInputColorLabel = document.createElement(`div`);
@@ -266,6 +267,8 @@ let functions_entries = [
                   obj.initializeWebGPU();
                 }
             });
+
+            
         
             //run onWebGPUInitialized
             obj.onWebGPUInitialized();
@@ -284,6 +287,9 @@ let functions_entries = [
 
             //context assignment
             const context = canvas.getContext('webgpu');
+
+      
+          
 
             // preferredCanvasFormat assignment
             const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -446,6 +452,8 @@ let functions_entries = [
         
           //Initialize WebGPU
           obj.initializeWebGPU();
+
+          
 
         }
 
