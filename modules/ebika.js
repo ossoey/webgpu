@@ -265,26 +265,27 @@ Ebk.ObjectInstance.testsCreateAndUpdate = (className, paramsTestOptions =[
 
 
 Ebk.objectDeepCopy = (obj) => {
-    if (obj === null || typeof obj !== 'object') {
-      return obj;
-    }
+
+    // if (obj === null || typeof obj !== 'object') {
+    //   return obj;
+    // }
     
-    if (Array.isArray(obj)) {
-      const copyArr = [];
-      for (let i = 0; i < obj.length; i++) {
-        copyArr[i] = Ebk.objectDeepCopy(obj[i]);
-      }
-      return copyArr;
-    }
+    // if (Array.isArray(obj)) {
+    //   const copyArr = [];
+    //   for (let i = 0; i < obj.length; i++) {
+    //     copyArr[i] = Ebk.objectDeepCopy(obj[i]);
+    //   }
+    //   return copyArr;
+    // }
     
-    const copyObj = {};
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        copyObj[key] = Ebk.objectDeepCopy(obj[key]);
-      }
-    }
+    // const copyObj = {};
+    // for (const key in obj) {
+    //   if (obj.hasOwnProperty(key)) {
+    //     copyObj[key] = Ebk.objectDeepCopy(obj[key]);
+    //   }
+    // }
     
-    return copyObj;
+    return obj;
 }
   
 
