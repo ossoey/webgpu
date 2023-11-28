@@ -290,65 +290,18 @@ let functions_entries = [
 
 
 
-            // let properties = new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
-            // { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-            // { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-            // ],
-            // structName: `VertexColor`,
-            // device: gpuDevice });
-            
-            // console.log(properties.getParams()) 
-      
-
-
-           
-              // Ebk.WEBGPU.Buffer.PropertiesTests ([
-                  
-              //   {
-              //       creation:  {  properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
-              //                                       { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-              //                                       { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-              //                               ], 
-              //                     structName: `VertexColor` ,
-              //                     shaderLabel: `build triangle`,
-              //                     device: gpuDevice,            
-              //                     property: `color`,
-              //                     value: `data`,
-              //                     exeptions: [`scale`],
-                
-              //                 },   
-
-              //       update:  {  properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
-              //                                   { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-              //                                   { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-              //                               ],
-              //           structName: `VertexColor` ,
-              //           shaderLabel: `build triangle`,
-              //           device: gpuDevice,  
-              //           property: `scale`,
-              //           value: `data`,
-              //           exeptions: [`scale`],
-
-              //               }
-                
-              //   } 
-
-              //   ] ,  ["_update" ]    
-                  
-              // ) 
-          
-
              let properties = new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[0.8, 0.2, 0.9, 1.0]]}},
                                                                             { scale: { type: `vec2f`, data: [[0.1, 0.9 ]]}},
                                                                             { offset: { type: `vec2f`, data: [[ 0.5, -0.25 ]]}},
                                                                           ],
                                           structName: `OurStruct`,
                                           shaderLabel: `build triangle`,
-                                          device: gpuDevice });
+                                          device: gpuDevice
+                                        
+                                        });
 
 
                                                                   
-
 
             // preferredCanvasFormat assignment
             const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -404,7 +357,6 @@ let functions_entries = [
             });
 
 
-
            //Create Buffer   
            properties.createBuffer_UniformReadOnly()   
             
@@ -418,14 +370,17 @@ let functions_entries = [
 
            console.log(properties.data);
 
+           
 
-            //Bindgroup statement 
-            const bindGroup = gpuDevice.createBindGroup({
-              layout: pipeline.getBindGroupLayout(0),
-              entries: [
-                { binding: 0, resource: { buffer: properties.buffer }},
-              ],
-            });
+          //Bindgroup statement 
+           properties.createBindGroup( {pipeline});
+
+            // const bindGroup = gpuDevice.createBindGroup({
+            //   layout: pipeline.getBindGroupLayout(0),
+            //   entries: [
+            //     { binding: 0, resource: { buffer: properties.buffer }},
+            //   ],
+            // });
 
 
             // renderPassDescriptor
@@ -459,10 +414,11 @@ let functions_entries = [
               renderPassDescriptor.colorAttachments[0].view =
                   context.getCurrentTexture().createView();
           
+
               const encoder = gpuDevice.createCommandEncoder();
               const pass = encoder.beginRenderPass(renderPassDescriptor);
               pass.setPipeline(pipeline);
-              pass.setBindGroup(0, bindGroup);
+              pass.setBindGroup(0, properties.bindGroup);
               pass.draw(3);  // call our vertex shader 3 times
               pass.end();
           
@@ -470,7 +426,9 @@ let functions_entries = [
               gpuDevice.queue.submit([commandBuffer]);
               //requestAnimationFrame(render)
               requestAnimationFrame(render);
-              count+=0.001;
+              //count+=0.01;
+
+              //count%=4;
             
             }
 
