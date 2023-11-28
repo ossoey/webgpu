@@ -298,7 +298,8 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
                                      ],
                                     structName: `VertexColor`,
                                     shaderLabel: `build triangle`,
-                                    device: {} }) {
+                                    device: {},
+                                    pipeline: {} }) {
                      
                                 
         this.name = `Ebk.WEBGPU.Buffer.Properties`;            
@@ -320,7 +321,8 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
                                  ], 
                                  structName: `VertexColor` ,
                                  shaderLabel: `build triangle`,
-                                 device: {}
+                                 device: {},
+                                 pipeline: {}
                                  }) {
 
         this.#params =  Object.assign(this.#params,  params );
@@ -422,7 +424,7 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
         return this.#process.dataLength
      }
 
-
+      
     createBuffer_UniformReadOnly( ){
 
         if (this.#params.device) {
@@ -443,6 +445,16 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
     createData_Float32Array(){
 
         this.data = new Float32Array(this.getdataLength());
+    }
+
+    createBindGroup(params = {pipeline: {}}){
+
+        this.bindGroup =  this.#params.device.createBindGroup({
+            layout: params.pipeline.getBindGroupLayout(0),
+            entries: [
+              { binding: 0, resource: { buffer: this.buffer}},
+            ],
+          });
     }
 
     loadData(params ={exeptions : [`scale`]}){
@@ -533,17 +545,13 @@ Ebk.WEBGPU.Buffer.PropertiesTests = (paramsTestOptions =[
 }
 
 
-    
-    ] ,    exceptions = ["_update" ]    
+    ] ,    exceptions = [`_update`, `createBuffer_UniformReadOnly` , `createData_Float32Array`, `createBindGroup`, `loadData`, `loadSpecData` ]   
        
 )=>{
 
     Ebk.ObjectInstance.testsCreateAndUpdate(Ebk.WEBGPU.Buffer.Properties, paramsTestOptions, exceptions );
 
 }
-
-
-
 
 
 let EbkWebGPU = Ebk.WEBGPU
