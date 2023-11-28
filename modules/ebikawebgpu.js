@@ -241,6 +241,10 @@ Ebk.WEBGPU.Buffer.Property = class WEBGPUBufferProperty  {
         return  Ebk.Matrix.arrFlatten({arr: this.getParams().data}) ;
     }   
 
+    getdataLength(){
+        return  this.getflattenData().length ;
+    }   
+
     getWGSL_StructProperty(){
           
         
@@ -293,6 +297,7 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
                                        { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
                                      ],
                                     structName: `VertexColor`,
+                                    shaderLabel: `build triangle`,
                                     device: {} }) {
                      
                                 
@@ -314,6 +319,7 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
                                     { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
                                  ], 
                                  structName: `VertexColor` ,
+                                 shaderLabel: `build triangle`,
                                  device: {}
                                  }) {
 
@@ -326,6 +332,8 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
          
         let bufferSizeOffset = 0;
         let sizeOffset = 0;
+        let dataLength = 0;
+     
        
         this.#process.wgsl_structure = `struct ${this.#params.structName} { \n`
 
@@ -354,6 +362,8 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
                 this.#process.properties[key[0]].bitCount = this.#process.properties[key[0]].getBitCount();
                 this.#process.properties[key[0]].data = this.#process.properties[key[0]].getData();
                 this.#process.properties[key[0]].flattenData = this.#process.properties[key[0]].getflattenData();
+                this.#process.properties[key[0]].dataLength = this.#process.properties[key[0]].getdataLength();
+                
                 this.#process.properties[key[0]].wgsl_structProperty = this.#process.properties[key[0]].getWGSL_StructProperty();
 
                 if (ndx < this.#params.properties.length-1)
@@ -363,11 +373,15 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
                 bufferSizeOffset +=  this.#process.properties[key[0]].getBufferSize();
                 sizeOffset +=  this.#process.properties[key[0]].getSize();
 
+                dataLength +=  this.#process.properties[key[0]].getdataLength();
+                
+
             });
 
         });
 
         this.#process.bufferSize = bufferSizeOffset;
+        this.#process.dataLength = dataLength;
 
     }
 
@@ -404,23 +418,54 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
        return this.#process.bufferSize;
     }
 
+    getdataLength(){
+        return this.#process.dataLength
+     }
+
+
     createBuffer_UniformReadOnly( ){
 
-        // if (this.#params.device) {
-        //     const uniformBuffer = this.#params.device.createBuffer({
-        //         size: this.getbufferSize(),
-        //         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        //       });
+        if (this.#params.device) {
+            this.buffer = this.#params.device.createBuffer({
+                label: this.#params.shaderLabel +`, Uniform Buffer`,
+                size: this.getbufferSize(),
+                usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+              });
     
-        //     return   uniformBuffer;
-        // } else {
-        //     console.error(`device is not defined`);
-        //     return null;
-        // }
+       
+        } else {
+            console.error(`device is not defined`);
+            this.buffer = null;
+        }
 
     }
 
+    createData_Float32Array(){
+
+        this.data = new Float32Array(this.getdataLength());
+    }
+
+    loadData(params ={exeptions : [`scale`]}){
+
+        Object.entries(this.#process.properties).forEach(key =>{
+                if (!params.exeptions.includes(key[0])) 
+                 this.data.set(this.getPropertyValue({property: key[0], value: `flattenData`}) , this.getPropertyValue({property: key[0], value: `sizeOffset`}) )
+           
+        });
+    }
+
+    loadSpecData(params ={property:`offset`, data : [0.2, 0.3] }){
+
+        this.#process.properties[params.property].data = [params.data];
+        this.#process.properties[params.property].flattenData = params.data;
+ 
+        this.data.set(this.getPropertyValue({property: params.property, value: `flattenData`}) , 
+                       this.getPropertyValue({property: params.property, value: `sizeOffset`}) );
+    }
+
+
     getParams(){
+
         return Object.assign({},Ebk.objectDeepCopy (this.#params));
     }
 
@@ -434,10 +479,12 @@ Ebk.WEBGPU.Buffer.PropertiesTests = (paramsTestOptions =[
                                         { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
                                 ], 
                        structName: `VertexColor` ,
+                       shaderLabel: `build triangle`,
                        device: {},            
                        property: `color`,
-                       value: `data`
-     
+                       value: `data`,
+                       exeptions: [`scale`],
+                       data: [0.1, 0.2 ]
                    },   
 
         update:  {  properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
@@ -445,9 +492,13 @@ Ebk.WEBGPU.Buffer.PropertiesTests = (paramsTestOptions =[
                                     { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
                                 ],
             structName: `VertexColor` ,
+            shaderLabel: `build triangle`,
             device: {},  
             property: `scale`,
-            value: `data`
+            value: `data`,
+            exeptions: [`scale`],
+            data: [0.1, 0.2 ]
+
 
                 }
     
@@ -462,8 +513,9 @@ Ebk.WEBGPU.Buffer.PropertiesTests = (paramsTestOptions =[
                    structName: `VertexColor` ,
                    device: {},              
                    property: `color`,
-                   value: `data`
- 
+                   value: `data`,
+                   exeptions: [`scale`],
+                   data: [0.1, 0.2 ]
                },   
 
     update:  {  properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
@@ -473,8 +525,9 @@ Ebk.WEBGPU.Buffer.PropertiesTests = (paramsTestOptions =[
         structName: `VertexColor` ,
         device: {},  
         property: `scale`,
-        value: `data`
-
+        value: `data`,
+        exeptions : [`scale`],
+        data: [0.1, 0.2 ]
             }
 
 }

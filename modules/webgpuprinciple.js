@@ -268,18 +268,6 @@ let functions_entries = [
                 }
             });
 
-            
-     
-            let properties = new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
-            { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-            { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-            ],
-            structName: `VertexColor`,
-            device: gpuDevice });
-            
-            console.log(properties.getParams()) 
-
-
 
             //run onWebGPUInitialized
             obj.onWebGPUInitialized();
@@ -299,8 +287,68 @@ let functions_entries = [
             //context assignment
             const context = canvas.getContext('webgpu');
 
+
+
+
+            // let properties = new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+            // { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+            // { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+            // ],
+            // structName: `VertexColor`,
+            // device: gpuDevice });
+            
+            // console.log(properties.getParams()) 
       
+
+
+           
+              // Ebk.WEBGPU.Buffer.PropertiesTests ([
+                  
+              //   {
+              //       creation:  {  properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+              //                                       { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+              //                                       { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+              //                               ], 
+              //                     structName: `VertexColor` ,
+              //                     shaderLabel: `build triangle`,
+              //                     device: gpuDevice,            
+              //                     property: `color`,
+              //                     value: `data`,
+              //                     exeptions: [`scale`],
+                
+              //                 },   
+
+              //       update:  {  properties:[ { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+              //                                   { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+              //                                   { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
+              //                               ],
+              //           structName: `VertexColor` ,
+              //           shaderLabel: `build triangle`,
+              //           device: gpuDevice,  
+              //           property: `scale`,
+              //           value: `data`,
+              //           exeptions: [`scale`],
+
+              //               }
+                
+              //   } 
+
+              //   ] ,  ["_update" ]    
+                  
+              // ) 
           
+
+             let properties = new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[0.8, 0.2, 0.9, 1.0]]}},
+                                                                            { scale: { type: `vec2f`, data: [[0.1, 0.9 ]]}},
+                                                                            { offset: { type: `vec2f`, data: [[ 0.5, -0.25 ]]}},
+                                                                          ],
+                                          structName: `OurStruct`,
+                                          shaderLabel: `build triangle`,
+                                          device: gpuDevice });
+
+
+                                                                  
+
 
             // preferredCanvasFormat assignment
             const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -317,40 +365,27 @@ let functions_entries = [
               label: 'our hardcoded red triangle shaders',
               code: `
 
-                struct Transfer {
-                  @builtin(position) position : vec4f,
-                  @location(0) color : vec4f
-                }
-
-                @vertex fn vs(
-                  @builtin(vertex_index) vi : u32
-                ) ->  Transfer {
-                  let pos =   array(
-                    vec2f( 0.0,  0.5),  // top center
-                    vec2f(-0.5, -0.5),  // bottom left
-                    vec2f( 0.5, -0.5)   // bottom right
-                  );
-
-                  let color = array<vec4f, 3>(
-                     vec4f(1.0, 0.0, 0.0, 1.0),
-                     vec4f(1.0, 0.6, 0.0, 1.0),
-                     vec4f(1.0, 0.0, 0.7, 1.0),
-
-                  );
-
-                  var transfer : Transfer;
-
-                  transfer.position = vec4f(pos[vi], 0.0, 1.0);
-
-                  transfer.color = color[vi];
+                  ${properties.getWGSL_structure()}
                   
-                  return transfer;
-                }
-          
-                @fragment fn fs(transfer: Transfer ) -> @location(0) vec4f {
-                  return transfer.color;
-                }
-
+            
+                  @group(0) @binding(0) var<uniform> ourStruct: OurStruct;
+            
+                  @vertex fn vs(
+                    @builtin(vertex_index) vertexIndex : u32
+                  ) -> @builtin(position) vec4f {
+                    let pos = array(
+                      vec2f( 0.0,  0.5),  // top center
+                      vec2f(-0.5, -0.5),  // bottom left
+                      vec2f( 0.5, -0.5)   // bottom right
+                    );
+            
+                    return vec4f(
+                      pos[vertexIndex] * ourStruct.scale + ourStruct.offset, 0.0, 1.0);
+                  }
+            
+                  @fragment fn fs() -> @location(0) vec4f {
+                    return ourStruct.color;
+                  }
               `,
             });
           
@@ -369,17 +404,28 @@ let functions_entries = [
             });
 
 
-           //Data statement 
+
+           //Create Buffer   
+           properties.createBuffer_UniformReadOnly()   
+            
+            
+           //Create data 
+           properties.createData_Float32Array(); 
 
 
-           //Data statement 
-         
+           //load data
+           properties.loadData({exeptions : [`scale`]});
 
-           //Buffer statement 
-      
+           console.log(properties.data);
+
 
             //Bindgroup statement 
-  
+            const bindGroup = gpuDevice.createBindGroup({
+              layout: pipeline.getBindGroupLayout(0),
+              entries: [
+                { binding: 0, resource: { buffer: properties.buffer }},
+              ],
+            });
 
 
             // renderPassDescriptor
@@ -396,49 +442,35 @@ let functions_entries = [
             };
           
 
-
+             let count = 0.5
             //function render   
             function render() {
   
-              //assign renderDescriptor.colorAttachments[0].view
+              const aspect = canvas.width / canvas.height;
+              
+              //load changing data
+              properties.loadSpecData({property:`scale`, data :[count / aspect, count] });
 
+              // copy the values from JavaScript to the GPU
+              gpuDevice.queue.writeBuffer(properties.buffer, 0, properties.data);
+          
+              // Get the current texture from the canvas context and
+              // set it as the texture to render to.
               renderPassDescriptor.colorAttachments[0].view =
                   context.getCurrentTexture().createView();
           
-              // commandEncoder  statement    
-              const encoder =  gpuDevice.createCommandEncoder({ label: 'our encoder' });
-
-              // renderPass statement
+              const encoder = gpuDevice.createCommandEncoder();
               const pass = encoder.beginRenderPass(renderPassDescriptor);
-
-              // pipeline setup
               pass.setPipeline(pipeline);
-
-              //assign changing data
-
-
-              // write on buffer
-              
-
-              // setup bindgroup
-          
-              // draw or compute
-              pass.draw(3);   
-
-              
-              //end
+              pass.setBindGroup(0, bindGroup);
+              pass.draw(3);  // call our vertex shader 3 times
               pass.end();
           
-
-              //finish encoder with command buffer
               const commandBuffer = encoder.finish();
-
-              //submit command
               gpuDevice.queue.submit([commandBuffer]);
-
               //requestAnimationFrame(render)
               requestAnimationFrame(render);
-            
+              count+=0.001;
             
             }
 
