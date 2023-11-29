@@ -101,6 +101,395 @@ let functions_entries = [
         let gpuDevice = null;
 
         let obj = {};
+        obj.desc = `Practice multiple Uniforms`
+        
+        obj.r = 0.3,  obj.g = 0.4, obj.b = 0.5
+
+     
+        obj.uiLoadColorPickers = (instance_ndx,index,color)=>{
+          
+          obj.colorPickers[instance_ndx][index].htmlInputColorLabel = document.createElement(`div`);
+          obj.colorPickers[instance_ndx][index].htmlInputColorLabel.innerHTML = ``+index;
+          obj.colorPickers[instance_ndx][index].htmlInputColorLabel.style.padding = "0 5px"
+          obj.colorsContainer[instance_ndx].appendChild(obj.colorPickers[instance_ndx][index].htmlInputColorLabel);
+
+          obj.colorPickers[instance_ndx][index].htmlInputColor =  document.createElement(`input`);
+          obj.colorPickers[instance_ndx][index].htmlInputColor.setAttribute(`type`,"color");
+          obj.colorPickers[instance_ndx][index].htmlInputColor.setAttribute(`value`,color);
+          obj.colorsContainer[instance_ndx].appendChild(obj.colorPickers[instance_ndx][index].htmlInputColor);
+
+          obj.colorPickers[instance_ndx][index].htmlInputColor.addEventListener(`input`,(event)=>{
+
+            let  {r,g,b} = hexToRgbaNormal(event.target.value);
+            obj.colorPickers[instance_ndx][index].r =r; obj.colorPickers[instance_ndx][index].g =g; obj.colorPickers[instance_ndx][index].b=b;
+
+          });
+
+ 
+            let  {r,g,b} = hexToRgbaNormal(obj.colorPickers[instance_ndx][index].htmlInputColor.value);
+            obj.colorPickers[instance_ndx][index].r =r; obj.colorPickers[instance_ndx][index].g =g; obj.colorPickers[instance_ndx][index].b=b;
+ 
+        }
+
+        obj.uiLoadColorButton = (ndx,label)=>{
+          obj.colorButton[ndx] = document.createElement(`button`);
+        
+          obj.colorButton[ndx].innerHTML = label;
+          obj.colorButton[ndx].style.margin = `4px`;
+          document.querySelector(`#uiInputsContainer`).appendChild(obj.colorButton[ndx]);
+          obj.colorButton[ndx].addEventListener(`click`, ()=>{
+             if (obj.colorsContainer[ndx] .style.display == `none`){
+                obj.colorsContainer[ndx] .style.display = `flex`;
+             } else if (obj.colorsContainer[ndx] .style.display == `flex`){
+              obj.colorsContainer[ndx] .style.display = `none`;
+            }
+          })
+        }  
+
+        obj.uiLoadObjectsCount = ()=>{
+
+
+          obj.objectsCountLabel = document.createElement(`div`);
+        
+          obj.objectsCountLabel.innerHTML =`objectsCount`;
+          obj.objectsCountLabel.style.margin = `4px`;
+     
+           
+          document.querySelector(`#uiInputsContainer`).appendChild(obj.objectsCountLabel);
+
+          obj.objectsCount = document.createElement(`input`);
+          obj.objectsCount.setAttribute(`type`,`text`);
+          obj.objectsCount.setAttribute(`size`,`1`);
+          document.querySelector(`#uiInputsContainer`).appendChild(obj.objectsCount);
+
+          obj.objectsCount.addEventListener(`change`, ()=>{
+            obj.objectsCountValue =  obj.objectsCount.value;
+      
+            obj.onWebGPUInitialized();
+         
+            //console.log(obj.objectsCountValue);
+            
+          })
+        }  
+        
+        obj.uiLoadColorContainer = (instance_ndx,top =30,left=25)=>{
+
+          obj.colorsContainer[instance_ndx] = document.createElement(`div`);    
+          obj.colorsContainer[instance_ndx] .style.display = `flex`;
+          obj.colorsContainer[instance_ndx] .style.position = `absolute`;
+          obj.colorsContainer[instance_ndx] .style.top = top +`px`;
+          obj.colorsContainer[instance_ndx] .style.left = left +`px`;
+          obj.colorsContainer[instance_ndx] .style.flexDirection = `column`; 
+          obj.colorsContainer[instance_ndx] .style.display = `none`;
+           
+          document.querySelector(`#uiInputsContainer`).appendChild(obj.colorsContainer[instance_ndx] );
+        } 
+
+        obj.uiLoadInstanceColorPickers = (instance_ndx,colors = ["#DD3698","#36109E","#E6DB65"])=>{
+          obj.uiLoadColorPickers(instance_ndx,0,colors[0]);
+          obj.uiLoadColorPickers(instance_ndx,1,colors[1]);
+          obj.uiLoadColorPickers(instance_ndx,2,colors[2]);
+        }
+
+        obj.uiLoad = ()=>{
+
+          obj.colorButton = [,];
+          obj.colorsContainer= [,]
+          obj.colorPickers = [[{},{},{}],[{},{},{}]];
+          createUIInputsContainer(); 
+
+          obj.uiLoadObjectsCount()
+
+          obj.uiLoadColorButton(0,`Color Start`);
+          obj.uiLoadColorButton(1,`Color End`);
+
+          obj.uiLoadColorContainer(0,35,345);
+          obj.uiLoadColorContainer(1,35,445);
+          obj.uiLoadInstanceColorPickers(0,["#DD3698","#36109E","#E6DB65"]);
+          obj.uiLoadInstanceColorPickers(1,["#DF3608","#36709E","#A6DB95"]);
+
+        }
+        
+ 
+        obj.func = async () =>{
+
+
+          // run uiload
+          obj.uiLoad();
+       
+
+          // function initializeWebGPU
+          obj.initializeWebGPU = async() => {
+            // Check to ensure the user agent supports WebGPU.
+            if (!('gpu' in navigator)) {
+                console.error("User agent doesn’t support WebGPU.");
+                return false;
+            }
+        
+            // Request an adapter.
+            const gpuAdapter = await navigator.gpu.requestAdapter();
+        
+            // requestAdapter may resolve with null if no suitable adapters are found.
+            if (!gpuAdapter) {
+                console.error('No WebGPU adapters found.');
+                return false;
+            }
+        
+            // Request a device.
+            // Note that the promise will reject if invalid options are passed to the optional
+            // dictionary. To avoid the promise rejecting always check any features and limits
+            // against the adapters features and limits prior to calling requestDevice().
+            gpuDevice = await gpuAdapter.requestDevice();
+        
+            // requestDevice will never return null, but if a valid device request can’t be
+            // fulfilled for some reason it may resolve to a device which has already been lost.
+            // Additionally, devices can be lost at any time after creation for a variety of reasons
+            // (ie: browser resource management, driver updates), so it’s a good idea to always
+            // handle lost devices gracefully.
+            gpuDevice.lost.then((info) => {
+                console.error(`WebGPU device was lost: ${info.message}`);
+        
+                gpuDevice = null;
+        
+                // Many causes for lost devices are transient, so applications should try getting a
+                // new device once a previous one has been lost unless the loss was caused by the
+                // application intentionally destroying the device. Note that any WebGPU resources
+                // created with the previous device (buffers, textures, etc) will need to be
+                // re-created with the new one.
+                if (info.reason != 'destroyed') {
+
+                  // run initializewebGPU
+                  obj.initializeWebGPU();
+                }
+            });
+
+
+            //run onWebGPUInitialized
+            obj.onWebGPUInitialized();
+        
+            return true;
+          }
+
+          // onWebGPUInitialized 
+          obj.onWebGPUInitialized = () => {
+            
+            // reload canvas
+            reloadCanvas();
+
+            //canvas assigment
+            const canvas = document.querySelector('canvas');
+
+            //context assignment
+            const context = canvas.getContext('webgpu');
+
+           
+
+
+
+             let properties = new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[0.8, 0.2, 0.9, 1.0]]}},
+                                                                            { scale: { type: `vec2f`, data: [[0.1, 0.9 ]]}},
+                                                                            { offset: { type: `vec2f`, data: [[ 0.5, -0.25 ]]}},
+                                                                          ],
+                                          structName: `OurStruct`,
+                                          shaderLabel: `build triangle`,
+                                          device: gpuDevice
+                                        
+                                        });
+                                        
+
+            // preferredCanvasFormat assignment
+            const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+            context.configure({
+              device:gpuDevice,
+              format: canvasFormat,
+            });
+          
+
+      
+            const mainLabel =  obj.desc;
+
+            const module = gpuDevice.createShaderModule({
+              label: 'our hardcoded red triangle shaders',
+              code: `
+
+                  struct OurStruct {
+                    color: vec4f,
+                    scale: vec2f,
+                    offset: vec2f,
+                  };
+                      
+            
+                  @group(0) @binding(0) var<uniform> ourStruct: OurStruct;
+            
+                  @vertex fn vs(
+                    @builtin(vertex_index) vertexIndex : u32
+                  ) -> @builtin(position) vec4f {
+                    let pos = array(
+                      vec2f( 0.0,  0.5),  // top center
+                      vec2f(-0.5, -0.5),  // bottom left
+                      vec2f( 0.5, -0.5)   // bottom right
+                    );
+            
+                    return vec4f(
+                      pos[vertexIndex] * ourStruct.scale + ourStruct.offset, 0.0, 1.0);
+                  }
+            
+                  @fragment fn fs() -> @location(0) vec4f {
+                    return ourStruct.color;
+                  }
+              `,
+            });
+          
+            const pipeline =  gpuDevice.createRenderPipeline({
+              label: 'our hardcoded red triangle pipeline',
+              layout: 'auto',
+              vertex: {
+                module,
+                entryPoint: 'vs',
+              },
+              fragment: {
+                module,
+                entryPoint: 'fs',
+                targets: [{ format: canvasFormat }],
+              },
+            });
+
+
+            let objCount = 1000;
+            let objs = []                           
+           
+            for(let objndx =0; objndx<objCount; objndx++){
+
+
+                let r = Ebk.Rand.fRanges({ranges:[[0.,1.],[0.5, 0.9]], clamps:[[0,1],[0.2,0.3]]});
+                let g = Ebk.Rand.fRanges({ranges:[[0.,1.],[0.5, 0.9]], clamps:[[0,1],[0.2,0.3]]});
+                let b = Ebk.Rand.fRanges({ranges:[[0.,1.],[0.5, 0.9]], clamps:[[0,1],[0.2,0.3]]});
+                
+
+                let offsetx = Ebk.Rand.fRanges({ranges:[[-0.99,0.99]], clamps:[[0,1]]});
+                let offsety = Ebk.Rand.fRanges({ranges:[[-0.99,0.99]], clamps:[[0,1]]});
+
+                 objs.push( new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[r, g, b, 1.0]]}},
+                             { scale: { type: `vec2f`, data: [[0.5, 0.5 ]]}},
+                             { offset: { type: `vec2f`, data: [[ offsetx, offsety ]]}},
+                    ],
+                     structName: `OurStruct`,
+                     shaderLabel: `build triangle`,
+                     device: gpuDevice   }));
+
+                     objs[objndx].createBuffer_UniformReadOnly();   
+                     objs[objndx].createData_Float32Array(); 
+                     objs[objndx].loadData({exeptions : [`scale`]}); 
+                     objs[objndx].createBindGroup( {pipeline});
+
+            }
+                                    
+
+
+            // renderPassDescriptor
+            const renderPassDescriptor = {
+              label: 'our basic canvas renderPass',
+              colorAttachments: [
+                {
+                 
+                  clearValue: [0.3, 0.3, 0.3, 1],
+                  loadOp: 'clear',
+                  storeOp: 'store',
+                },
+              ],
+            };
+          
+
+             let count = 0.5
+            //function render   
+            function render() {
+  
+              const aspect = canvas.width / canvas.height;
+              
+       
+          
+              // Get the current texture from the canvas context and
+              // set it as the texture to render to.
+              renderPassDescriptor.colorAttachments[0].view =
+                  context.getCurrentTexture().createView();
+          
+
+              const encoder = gpuDevice.createCommandEncoder();
+              const pass = encoder.beginRenderPass(renderPassDescriptor);
+
+
+
+              pass.setPipeline(pipeline);
+
+
+
+              for(let objndx =0; objndx<objCount; objndx++){
+
+             
+                  let scale = Ebk.Rand.fRanges({ranges:[[0.2, 0.5]], clamps:[[0.99,1]]});
+                    objs[objndx].loadSpecData({property:`scale`, data :[scale / aspect, scale] });  
+                    gpuDevice.queue.writeBuffer(objs[objndx].buffer, 0, objs[objndx].data);
+
+                    pass.setBindGroup(0, objs[objndx].bindGroup);
+
+                    pass.draw(3); 
+              }
+              pass.end();
+
+
+
+
+
+            
+              const commandBuffer = encoder.finish();
+              gpuDevice.queue.submit([commandBuffer]);
+              //requestAnimationFrame(render)
+              requestAnimationFrame(render);
+              //count+=0.01;
+
+              //count%=4;
+            
+            }
+
+            //requestAnimationFrame(render)
+            requestAnimationFrame(render);
+         
+            //object oberver  
+            const observer = new ResizeObserver(entries => {
+              for (const entry of entries) {
+                const canvas = entry.target;
+                const width = entry.contentBoxSize[0].inlineSize;
+                const height = entry.contentBoxSize[0].blockSize;
+                canvas.width = Math.max(1, Math.min(width, gpuDevice.limits.maxTextureDimension2D));
+                canvas.height = Math.max(1, Math.min(height, gpuDevice.limits.maxTextureDimension2D));
+               
+              }
+            });
+
+            observer.observe(canvas);
+                     
+           }
+        
+          //Initialize WebGPU
+          obj.initializeWebGPU();
+
+          
+
+        }
+
+
+        return {desc:obj.desc, func: obj.func};
+    }
+
+  } ,
+
+  {
+       
+    entry : ()=>{
+         
+        let gpuDevice = null;
+
+        let obj = {};
         obj.desc = `Practice Uniform`
         
         obj.r = 0.3,  obj.g = 0.4, obj.b = 0.5
@@ -463,7 +852,6 @@ let functions_entries = [
     }
 
   } ,
-
 
   {
        
