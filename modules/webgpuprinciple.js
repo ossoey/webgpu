@@ -377,10 +377,12 @@ let functions_entries = [
                      shaderLabel: `build triangle`,
                      device: gpuDevice   }));
 
-                     objs[objndx].createBuffer_UniformReadOnly();   
-                     objs[objndx].createData_Float32Array(); 
-                     objs[objndx].loadData({exeptions : [`scale`]}); 
-                     objs[objndx].createBindGroup( {pipeline});
+                    //  objs[objndx].createBuffer_UniformReadOnly();   
+                    //  objs[objndx].createData_Float32Array(); 
+                    //  objs[objndx].loadData({exeptions : [`scale`]}); 
+                    //  objs[objndx].createBindGroup( {pipeline});
+
+                     objs[objndx].bufferLoadBind( {pipeline: pipeline, exeptions : [`scale`] });
 
             }
                                     
@@ -427,13 +429,15 @@ let functions_entries = [
 
              
                   let scale = Ebk.Rand.fRanges({ranges:[[0.002, 0.093], [0.0008, 0.0193]], clamps:[[0.2, 1.0], [1.0, 1.0]]});
-                    objs[objndx].loadSpecData({property:`scale`, data :[scale / aspect, scale] });  
 
-                    objs[objndx].writeBuffer();
+                  objs[objndx].draw({pass: pass, data : {aspect: aspect ,scale: scale} });
+                    // objs[objndx].loadSpecData({property:`scale`, data :[scale / aspect, scale] });  
 
-                    pass.setBindGroup(0, objs[objndx].bindGroup);
+                    // objs[objndx].writeBuffer();
 
-                    pass.draw(3); 
+                    // pass.setBindGroup(0, objs[objndx].bindGroup);
+
+                    // pass.draw(3); 
               }
               pass.end();
 
