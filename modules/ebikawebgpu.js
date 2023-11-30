@@ -455,7 +455,14 @@ Ebk.WEBGPU.Buffer.Properties = class WEBGPUBufferProperties {
               { binding: 0, resource: { buffer: this.buffer}},
             ],
           });
+    } 
+
+    writeBuffer(){
+
+        this.#params.device.queue.writeBuffer(this.buffer, 0, this.data);
+
     }
+
 
     loadData(params ={exeptions : [`scale`]}){
 

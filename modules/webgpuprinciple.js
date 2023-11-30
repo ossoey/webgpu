@@ -286,15 +286,15 @@ let functions_entries = [
 
 
 
-             let properties = new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[0.8, 0.2, 0.9, 1.0]]}},
-                                                                            { scale: { type: `vec2f`, data: [[0.1, 0.9 ]]}},
-                                                                            { offset: { type: `vec2f`, data: [[ 0.5, -0.25 ]]}},
-                                                                          ],
-                                          structName: `OurStruct`,
-                                          shaderLabel: `build triangle`,
-                                          device: gpuDevice
+            //  let properties = new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[0.8, 0.2, 0.9, 1.0]]}},
+            //                                                                 { scale: { type: `vec2f`, data: [[0.1, 0.9 ]]}},
+            //                                                                 { offset: { type: `vec2f`, data: [[ 0.5, -0.25 ]]}},
+            //                                                               ],
+            //                               structName: `OurStruct`,
+            //                               shaderLabel: `build triangle`,
+            //                               device: gpuDevice
                                         
-                                        });
+            //                             });
                                         
 
             // preferredCanvasFormat assignment
@@ -355,19 +355,19 @@ let functions_entries = [
             });
 
 
-            let objCount = 1000;
+            let objCount = 2000;
             let objs = []                           
            
             for(let objndx =0; objndx<objCount; objndx++){
 
 
-                let r = Ebk.Rand.fRanges({ranges:[[0.,1.],[0.5, 0.9]], clamps:[[0,1],[0.2,0.3]]});
-                let g = Ebk.Rand.fRanges({ranges:[[0.,1.],[0.5, 0.9]], clamps:[[0,1],[0.2,0.3]]});
-                let b = Ebk.Rand.fRanges({ranges:[[0.,1.],[0.5, 0.9]], clamps:[[0,1],[0.2,0.3]]});
+                let r = Ebk.Rand.fRanges({ranges:[[1.,1.],[0.5, 0.9]], clamps:[[0,1],[0.2,0.3]]});
+                let g = Ebk.Rand.fRanges({ranges:[[0.,0.01],[0.05, 0.09]], clamps:[[0,1],[0.2,0.3]]});
+                let b = Ebk.Rand.fRanges({ranges:[[1.,1.],[0.5, 0.9]], clamps:[[0,1],[0.2,0.3]]});
                 
 
-                let offsetx = Ebk.Rand.fRanges({ranges:[[-0.99,0.99]], clamps:[[0,1]]});
-                let offsety = Ebk.Rand.fRanges({ranges:[[-0.99,0.99]], clamps:[[0,1]]});
+                let offsetx = Ebk.Rand.fRanges({ranges:[[-0.5, -0.1], [0, 0.3]], clamps:[[0,1],[0,1]]});
+                let offsety = Ebk.Rand.fRanges({ranges:[[-0.9, -0.4], [-0.1, 0.5], [0.7, 0.98]], clamps:[[0,1], [0,1], [0,1]]});
 
                  objs.push( new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[r, g, b, 1.0]]}},
                              { scale: { type: `vec2f`, data: [[0.5, 0.5 ]]}},
@@ -426,9 +426,10 @@ let functions_entries = [
               for(let objndx =0; objndx<objCount; objndx++){
 
              
-                  let scale = Ebk.Rand.fRanges({ranges:[[0.2, 0.5]], clamps:[[0.99,1]]});
+                  let scale = Ebk.Rand.fRanges({ranges:[[0.002, 0.093], [0.0008, 0.0193]], clamps:[[0.2, 1.0], [1.0, 1.0]]});
                     objs[objndx].loadSpecData({property:`scale`, data :[scale / aspect, scale] });  
-                    gpuDevice.queue.writeBuffer(objs[objndx].buffer, 0, objs[objndx].data);
+
+                    objs[objndx].writeBuffer();
 
                     pass.setBindGroup(0, objs[objndx].bindGroup);
 
