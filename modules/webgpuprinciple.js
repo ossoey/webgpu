@@ -380,7 +380,7 @@ let functions_entries = [
 
 
 
-            let circlesCount = 25;
+            let circlesCount = 55;
 
             let circles = [];
 
