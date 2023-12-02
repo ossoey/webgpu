@@ -285,7 +285,7 @@ let functions_entries = [
 
            
 
-
+            Ebk.WEBGPU.Buffer.PartsPropertiesTests();
 
             //  let properties = new Ebk.WEBGPU.Buffer.Properties({ properties:[ { color: { type: `vec4f`, data: [[0.8, 0.2, 0.9, 1.0]]}},
             //                                                                 { scale: { type: `vec2f`, data: [[0.1, 0.9 ]]}},

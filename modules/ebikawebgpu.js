@@ -585,26 +585,24 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
     #params;
     #process;
   
-    constructor(params ={ parts:[  {
-                                         properties: [
-                                                { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
-                                                { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-                                            ] , 
-                                            strucName:`Statics`    
-                                         }, 
+    constructor(params ={ parts: {
 
-                                          {
-                                         properties: [
-                                                { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-                                            ] , 
-                                            strucName:`Dynamics`    
-                                         }, 
+                        statics:{
 
-                                      ],
-        
-                                    shaderLabel: `Practice multi uniform`,
-                                    device: {},
-                                    pipeline: {} }) {
+                            color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]},
+                            offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}
+
+                        }, 
+
+                        dynamics:{scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }, 
+
+                    } , 
+
+                    shaderLabel: `Practice multi uniform`,
+                    device: {},
+
+                
+                }) {
                      
                                 
         this.name = `Ebk.WEBGPU.Buffer.PartsProperties`;            
@@ -613,99 +611,174 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
         
         this.#params =  Object.assign({},  params );
 
-        this.#process.properties = [];
+        this.#process.parts = {};
 
         this.#buildProperties(0);
   
      
     }
     
-    _update(params ={ parts:[  {
-                                properties: [
-                                    { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
-                                    { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-                                ] , 
-                                strucName:`Statics`    
-                                }, 
+    _update(params ={ parts: {
 
-                                {
-                                properties: [
-                                    { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-                                ] , 
-                                strucName:`Dynamics`    
-                                }, 
+                           statics:{
 
-                            ],
+                                color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]},
+                                offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}
+
+                            }, 
+     
+                            dynamics:{  scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }, 
+
+                         } , 
+        
 
                         shaderLabel: `Practice multi uniform`,
                         device: {},
-                        pipeline: {} }) {
+
+                    
+                    }) {
 
         this.#params =  Object.assign(this.#params,  params );
-         this.#buildProperties(1);
+        this.#buildProperties(1);
   
     }
 
-    #buildProperties(opt, part){
+    #buildProperties(opt){
          
-        let bufferSizeOffset = 0;
-        let sizeOffset = 0;
-        let dataLength = 0;
-     
-       
-        this.#process.wgsl_structure = `struct ${part.structName} { \n`
+   
 
-        if  (opt == 0) this.#process.parts = []; 
+        Object.entries(this.#params.parts).forEach(buffer =>{
+            if (opt==0) 
+            this.#process.parts[buffer[0]] = {};
 
-        part.properties.forEach((itm, ndx) =>{
 
-            let paramsIn = {};
-            Object.entries(itm).forEach(key =>{
-                paramsIn.name = key[0];
-                Object.entries(key[1]).forEach((key1, value1) =>{
-                    paramsIn[key1[0]] = key1[1];
+            let structName = buffer[0].charAt(0).toUpperCase() + buffer[0].slice(1);
+            this.#process.parts[buffer[0]].wgsl_structure = `struct ${structName} {`
+
+
+            let bufferSizeOffset = 0;
+            let sizeOffset = 0;
+            let dataLength = 0;
+
+            Object.entries(buffer[1]).forEach(property => {
+
+                let paramsIn = {};  // {name: 'position',  type: `f32`, data: [7.0, 0.1, 0.2]  }
+                paramsIn.name = property[0];
+
+                //console.log(property[1])
+
+                let propertiesCount = 0;
+
+                Object.entries(property[1]).forEach(propertyValues=>{
+                    paramsIn[propertyValues[0]] = propertyValues[1];
                 });
 
-                 if  (opt == 0) this.#process.parts[key[0]] = new Ebk.WEBGPU.Buffer.Property(paramsIn);
-                 else if (opt == 1) this.#process.properties[key[0]]._update(paramsIn);
-                 
-                                                                    
-                this.#process.properties[key[0]].bufferSizeOffset = bufferSizeOffset;
-                this.#process.properties[key[0]].sizeOffset = sizeOffset;
-                this.#process.properties[key[0]].name = this.#process.properties[key[0]].getName;
-                this.#process.properties[key[0]].bufferSize = this.#process.properties[key[0]].getBufferSize();
-                this.#process.properties[key[0]].typeDescription = this.#process.properties[key[0]].getTypeDescription();
-                this.#process.properties[key[0]].size = this.#process.properties[key[0]].getSize();
-                this.#process.properties[key[0]].byCount = this.#process.properties[key[0]].getByteCount();
-                this.#process.properties[key[0]].bitCount = this.#process.properties[key[0]].getBitCount();
-                this.#process.properties[key[0]].data = this.#process.properties[key[0]].getData();
-                this.#process.properties[key[0]].flattenData = this.#process.properties[key[0]].getflattenData();
-                this.#process.properties[key[0]].dataLength = this.#process.properties[key[0]].getdataLength();
-                
-                this.#process.properties[key[0]].wgsl_structProperty = this.#process.properties[key[0]].getWGSL_StructProperty();
+                if (opt==0)
+                  this.#process.parts[buffer[0]][property[0]] = new Ebk.WEBGPU.Buffer.Property(paramsIn);
+                else if (opt==1)
+                   this.#process.parts[buffer[0]][property[0]]._update(paramsIn);
+              
 
-                if (ndx < this.#params.properties.length-1)
-                 this.#process.wgsl_structure+= `  ` + this.#process.properties[key[0]].wgsl_structProperty+ `, \n`
-                else this.#process.wgsl_structure+= `  ` +  this.#process.properties[key[0]].wgsl_structProperty+ `\n};`
+                   this.#process.parts[buffer[0]][property[0]].bufferSizeOffset = bufferSizeOffset;
+                   this.#process.parts[buffer[0]][property[0]].sizeOffset = sizeOffset;
+                   this.#process.parts[buffer[0]][property[0]].name = this.#process.parts[buffer[0]][property[0]].getName();
+                   this.#process.parts[buffer[0]][property[0]].bufferSize = this.#process.parts[buffer[0]][property[0]].getBufferSize();
+                   this.#process.parts[buffer[0]][property[0]].typeDescription = this.#process.parts[buffer[0]][property[0]].getTypeDescription();
+                   this.#process.parts[buffer[0]][property[0]].size = this.#process.parts[buffer[0]][property[0]].getSize();
+                   this.#process.parts[buffer[0]][property[0]].byCount = this.#process.parts[buffer[0]][property[0]].getByteCount();
+                   this.#process.parts[buffer[0]][property[0]].bitCount = this.#process.parts[buffer[0]][property[0]].getBitCount();
+                   this.#process.parts[buffer[0]][property[0]].data = this.#process.parts[buffer[0]][property[0]].getData();
+                   this.#process.parts[buffer[0]][property[0]].flattenData = this.#process.parts[buffer[0]][property[0]].getflattenData();
+                   this.#process.parts[buffer[0]][property[0]].dataLength = this.#process.parts[buffer[0]][property[0]].getdataLength();
+                    
+                   this.#process.parts[buffer[0]][property[0]].wgsl_structProperty = this.#process.parts[buffer[0]][property[0]].getWGSL_StructProperty();
 
-                bufferSizeOffset +=  this.#process.properties[key[0]].getBufferSize();
-                sizeOffset +=  this.#process.properties[key[0]].getSize();
+                     if (propertiesCount < Object.keys(property).length-1)
+                    this.#process.parts[buffer[0]].wgsl_structure+= `  ` + this.#process.parts[buffer[0]][property[0]].wgsl_structProperty+ `,`
+                      else this.#process.wgsl_structure+= `  ` +  this.#process.parts[buffer[0]][property[0]].wgsl_structProperty+ `};`
 
-                dataLength +=  this.#process.properties[key[0]].getdataLength();
-                
+                    bufferSizeOffset +=  this.#process.parts[buffer[0]][property[0]].getBufferSize();
+                    sizeOffset +=  this.#process.parts[buffer[0]][property[0]].getSize();
+
+                    dataLength +=  this.#process.parts[buffer[0]][property[0]].getdataLength();
+
+                     propertiesCount++;
+
+                        console.log(this.#process.parts)
+
+                // Object.entries(property).forEach(key =>{
+                // paramsIn.name = key[0];
+                // Object.entries(key[1]).forEach((key1) =>{
+                //     paramsIn[key1[0]] = key1[1];
+                // });
+
+
+                // if (opt==0)
+                //  this.#process.parts[buffer[0]][property[0]] = new Ebk.WEBGPU.Buffer.Property(paramsIn);
+                // else if (opt==1)
+                //   this.#process.parts[buffer[0]][property[0]]._update(paramsIn);
 
             });
 
         });
+        // let bufferSizeOffset = 0;
+        // let sizeOffset = 0;
+        // let dataLength = 0;
+     
+       
+        // this.#process.wgsl_structure = `struct ${part.structName} { \n`
 
-        this.#process.bufferSize = bufferSizeOffset;
-        this.#process.dataLength = dataLength;
+        // if  (opt == 0) this.#process.parts = []; 
+
+        // part.properties.forEach((itm, ndx) =>{
+
+        //     let paramsIn = {};
+        //     Object.entries(itm).forEach(key =>{
+        //         paramsIn.name = key[0];
+        //         Object.entries(key[1]).forEach((key1, value1) =>{
+        //             paramsIn[key1[0]] = key1[1];
+        //         });
+
+        //          if  (opt == 0) this.#process.parts[key[0]] = new Ebk.WEBGPU.Buffer.Property(paramsIn);
+        //          else if (opt == 1) this.#process.properties[key[0]]._update(paramsIn);
+                 
+                                                                    
+        //         this.#process.properties[key[0]].bufferSizeOffset = bufferSizeOffset;
+        //         this.#process.properties[key[0]].sizeOffset = sizeOffset;
+        //         this.#process.properties[key[0]].name = this.#process.properties[key[0]].getName;
+        //         this.#process.properties[key[0]].bufferSize = this.#process.properties[key[0]].getBufferSize();
+        //         this.#process.properties[key[0]].typeDescription = this.#process.properties[key[0]].getTypeDescription();
+        //         this.#process.properties[key[0]].size = this.#process.properties[key[0]].getSize();
+        //         this.#process.properties[key[0]].byCount = this.#process.properties[key[0]].getByteCount();
+        //         this.#process.properties[key[0]].bitCount = this.#process.properties[key[0]].getBitCount();
+        //         this.#process.properties[key[0]].data = this.#process.properties[key[0]].getData();
+        //         this.#process.properties[key[0]].flattenData = this.#process.properties[key[0]].getflattenData();
+        //         this.#process.properties[key[0]].dataLength = this.#process.properties[key[0]].getdataLength();
+                
+        //         this.#process.properties[key[0]].wgsl_structProperty = this.#process.properties[key[0]].getWGSL_StructProperty();
+
+        //         if (ndx < this.#params.properties.length-1)
+        //          this.#process.wgsl_structure+= `  ` + this.#process.properties[key[0]].wgsl_structProperty+ `, \n`
+        //         else this.#process.wgsl_structure+= `  ` +  this.#process.properties[key[0]].wgsl_structProperty+ `\n};`
+
+        //         bufferSizeOffset +=  this.#process.properties[key[0]].getBufferSize();
+        //         sizeOffset +=  this.#process.properties[key[0]].getSize();
+
+        //         dataLength +=  this.#process.properties[key[0]].getdataLength();
+                
+
+        //     });
+
+        // });
+
+        // this.#process.bufferSize = bufferSizeOffset;
+        // this.#process.dataLength = dataLength;
 
     }
 
     getPropertyInfo(params ={property: 'color'}){
 
-        return    this.#process.properties;
+        return   /// this.#process.properties;
    
     }
 
@@ -809,56 +882,51 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
 Ebk.WEBGPU.Buffer.PartsPropertiesTests = (paramsTestOptions =[
     
     {
-        creation:  {  parts:[  {
-                                properties: [
-                                    { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
-                                    { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-                                ] , 
-                                strucName:`Statics`    
-                                }, 
+        creation:  { parts: {
 
-                                {
-                                properties: [
-                                    { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-                                ] , 
-                                strucName:`Dynamics`    
-                                }, 
+                    statics:{
 
-                            ],
-                 
-                       shaderLabel: `build triangle`,
-                       device: {},            
-                       property: `color`,
-                       value: `data`,
-                       exeptions: [`scale`],
-                       data: [0.1, 0.2 ]
-                   },   
+                        color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]},
+                        offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}
 
-        update:  {  parts:[  {
-                                    properties: [
-                                        { color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
-                                        { offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-                                    ] , 
-                                    strucName:`Statics`    
-                                    }, 
+                    }, 
 
-                                    {
-                                    properties: [
-                                        { scale: { type: `vec2f`, data: [[0.1, 0.2 ]]}},
-                                    ] , 
-                                    strucName:`Dynamics`    
-                                    }, 
+                    dynamics:{scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }, 
 
-                                ],
+                    } , 
 
-                                shaderLabel: `build triangle`,
-                                device: {},            
-                                property: `color`,
-                                value: `data`,
-                                exeptions: [`scale`],
-                                data: [0.1, 0.2 ]
+                    shaderLabel: `build triangle`,
+                    device: {},            
+                    property: `color`,
+                    value: `data`,
+                    exeptions: [`scale`],
+                    data: [0.1, 0.2 ]
 
-                    }
+            
+            },   
+
+        update:  { parts: {
+
+                        statics:{
+
+                            color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]},
+                            offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}
+
+                        }, 
+
+                        dynamics:{scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }, 
+
+                        } , 
+
+                        shaderLabel: `build triangle`,
+                        device: {},            
+                        property: `color`,
+                        value: `data`,
+                        exeptions: [`scale`],
+                        data: [0.1, 0.2 ]
+
+                
+                }
     
 }  
 
