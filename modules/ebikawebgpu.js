@@ -580,23 +580,45 @@ Ebk.WEBGPU.Buffer.PropertiesTests = (paramsTestOptions =[
 }
 
 
+
+let buffers = [
+    {statics:[
+        {color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+        {offset: { type: `vec2f`, data: [[0.1, 0.2 ]]} }
+    ]}, 
+
+    {dynamics: [
+
+        {scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }
+
+    ]}
+
+
+]
+
+
+
+
 /////// Ebk.WEBGPU.Buffer.PartsProperties 
 Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
     #params;
     #process;
   
-    constructor(params ={ parts: {
+    constructor(params ={ entries: [
 
-                        statics:{
-
-                            color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]},
-                            offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}
-
-                        }, 
-
-                        dynamics:{scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }, 
-
-                    } , 
+                        {statics:[
+                            {color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+                            {offset: { type: `vec2f`, data: [[0.1, 0.2 ]]} }
+                        ]}, 
+                    
+                        {dynamics: [
+                    
+                            {scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }
+                    
+                        ]}
+                    
+                    
+                    ] ,
 
                     shaderLabel: `Practice multi uniform`,
                     device: {},
@@ -618,22 +640,22 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
      
     }
     
-    _update(params ={ parts: {
+    _update(params ={ entries: [
 
-                           statics:{
-
-                                color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]},
-                                offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}
-
-                            }, 
-     
-                            dynamics:{  scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }, 
-
-                         } , 
-        
-
-                        shaderLabel: `Practice multi uniform`,
-                        device: {},
+                        {statics:[
+                            {color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+                            {offset: { type: `vec2f`, data: [[0.1, 0.2 ]]} }
+                        ]}, 
+                    
+                        {dynamics: [
+                    
+                            {scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }
+                    
+                        ]}
+                    
+                     ] ,
+                     shaderLabel: `Practice multi uniform`,
+                     device: {},
 
                     
                     }) {
@@ -882,18 +904,20 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
 Ebk.WEBGPU.Buffer.PartsPropertiesTests = (paramsTestOptions =[
     
     {
-        creation:  { parts: {
+        creation:  { entries: [
 
-                    statics:{
-
-                        color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]},
-                        offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}
-
-                    }, 
-
-                    dynamics:{scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }, 
-
-                    } , 
+                            {statics:[
+                                {color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+                                {offset: { type: `vec2f`, data: [[0.1, 0.2 ]]} }
+                            ]}, 
+                        
+                            {dynamics: [
+                        
+                                {scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }
+                        
+                            ]}
+                        
+                     ] , 
 
                     shaderLabel: `build triangle`,
                     device: {},            
@@ -905,18 +929,20 @@ Ebk.WEBGPU.Buffer.PartsPropertiesTests = (paramsTestOptions =[
             
             },   
 
-        update:  { parts: {
+        update:  {  entries: [
 
-                        statics:{
-
-                            color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]},
-                            offset: { type: `vec2f`, data: [[0.1, 0.2 ]]}
-
-                        }, 
-
-                        dynamics:{scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }, 
-
-                        } , 
+                            {statics:[
+                                {color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
+                                {offset: { type: `vec2f`, data: [[0.1, 0.2 ]]} }
+                            ]}, 
+                        
+                            {dynamics: [
+                        
+                                {scale: { type: `vec2f`, data: [[0.1, 0.2 ]]} }
+                        
+                            ]}
+                        
+                    ] , 
 
                         shaderLabel: `build triangle`,
                         device: {},            
