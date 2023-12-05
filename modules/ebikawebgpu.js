@@ -604,7 +604,7 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
     #params;
     #process;
   
-    constructor(params ={ entries: [
+    constructor(params ={ parts: [
 
                         {statics:[
                             {color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
@@ -640,7 +640,7 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
      
     }
     
-    _update(params ={ entries: [
+    _update(params ={ parts: [
 
                         {statics:[
                             {color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
@@ -667,82 +667,160 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
 
     #buildProperties(opt){
          
+        
+        this.#params.parts.forEach((part, part_ndx) =>{
+
+           Object.entries(part).forEach(bufferProperty =>{
+                  if (opt==0)   this.#process.parts[bufferProperty[0]] = {};
+                 
+                  let bufferSizeOffset = 0;
+                  let sizeOffset = 0;
+                  let dataLength = 0;
+
+                 let structName = bufferProperty[0].charAt(0).toUpperCase() + bufferProperty[0].slice(1);
+                 this.#process.parts[bufferProperty[0]].wgsl_structure = `struct ${structName} { `
+         
+                  bufferProperty[1].forEach((property, property_ndx) =>{
+
+                    
+                    Object.entries(property).forEach(propertyKeyValue=>{
+
+                        let  paramsIn = {};
+
+                        paramsIn.name = propertyKeyValue[0];
+
+
+                        Object.entries(propertyKeyValue[1]).forEach(propertyValues=>{
+                            paramsIn[propertyValues[0]] = propertyValues[1];
+
+                        })
+
+                        if (opt==0) {
+                            this.#process.parts[bufferProperty[0]][propertyKeyValue[0]]  =  new Ebk.WEBGPU.Buffer.Property(paramsIn);
+                        }   
+                        else {
+                            this.#process.parts[bufferProperty[0]][propertyKeyValue[0]]._update(paramsIn)
+                        }
+
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].bufferSizeOffset = bufferSizeOffset;
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].sizeOffset = sizeOffset;
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].name = this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getName();
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].bufferSize = this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getBufferSize();
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].typeDescription = this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getTypeDescription();
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].size = this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getSize();
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].byCount = this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getByteCount();
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].bitCount = this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getBitCount();
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].data = this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getData();
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].flattenData = this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getflattenData();
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].dataLength = this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getdataLength();
+                    
+                        this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].wgsl_structProperty = this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getWGSL_StructProperty();
+
+
+                        if (property_ndx <  (bufferProperty[1].length -1)) {
+
+                            this.#process.parts[bufferProperty[0]].wgsl_structure+= ` ` + this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].wgsl_structProperty+ `,`
+                      
+                        } else this.#process.parts[bufferProperty[0]].wgsl_structure+= ` ` +  this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].wgsl_structProperty+ `};`
+    
+                        bufferSizeOffset +=  this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getBufferSize();
+                        sizeOffset +=  this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getSize();
+    
+                        dataLength +=  this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getdataLength();
+                        console.log(this.#process.parts[bufferProperty[0]])
+
+                      
+
+                    });
+
+
+                   })
+
+         
    
+                   //     }
 
-        Object.entries(this.#params.parts).forEach(buffer =>{
-            if (opt==0) 
-            this.#process.parts[buffer[0]] = {};
+               })
+            
+
+           });
+
+        
+
+        // Object.entries(this.#params.parts).forEach(buffer =>{
+        //     if (opt==0) 
+        //     this.#process.parts[buffer[0]] = {};
 
 
-            let structName = buffer[0].charAt(0).toUpperCase() + buffer[0].slice(1);
-            this.#process.parts[buffer[0]].wgsl_structure = `struct ${structName} {`
+        //     let structName = buffer[0].charAt(0).toUpperCase() + buffer[0].slice(1);
+        //     this.#process.parts[buffer[0]].wgsl_structure = `struct ${structName} {`
 
 
-            let bufferSizeOffset = 0;
-            let sizeOffset = 0;
-            let dataLength = 0;
+        //     let bufferSizeOffset = 0;
+        //     let sizeOffset = 0;
+        //     let dataLength = 0;
 
-            Object.entries(buffer[1]).forEach(property => {
+        //     Object.entries(buffer[1]).forEach(property => {
 
-                let paramsIn = {};  // {name: 'position',  type: `f32`, data: [7.0, 0.1, 0.2]  }
-                paramsIn.name = property[0];
+        //         let paramsIn = {};  // {name: 'position',  type: `f32`, data: [7.0, 0.1, 0.2]  }
+        //         paramsIn.name = property[0];
 
-                //console.log(property[1])
+        //         //console.log(property[1])
 
-                let propertiesCount = 0;
+        //         let propertiesCount = 0;
 
-                Object.entries(property[1]).forEach(propertyValues=>{
-                    paramsIn[propertyValues[0]] = propertyValues[1];
-                });
+        //         Object.entries(property[1]).forEach(propertyValues=>{
+        //             paramsIn[propertyValues[0]] = propertyValues[1];
+        //         });
 
-                if (opt==0)
-                  this.#process.parts[buffer[0]][property[0]] = new Ebk.WEBGPU.Buffer.Property(paramsIn);
-                else if (opt==1)
-                   this.#process.parts[buffer[0]][property[0]]._update(paramsIn);
+        //         if (opt==0)
+        //           this.#process.parts[buffer[0]][property[0]] = new Ebk.WEBGPU.Buffer.Property(paramsIn);
+        //         else if (opt==1)
+        //            this.#process.parts[buffer[0]][property[0]]._update(paramsIn);
               
 
-                   this.#process.parts[buffer[0]][property[0]].bufferSizeOffset = bufferSizeOffset;
-                   this.#process.parts[buffer[0]][property[0]].sizeOffset = sizeOffset;
-                   this.#process.parts[buffer[0]][property[0]].name = this.#process.parts[buffer[0]][property[0]].getName();
-                   this.#process.parts[buffer[0]][property[0]].bufferSize = this.#process.parts[buffer[0]][property[0]].getBufferSize();
-                   this.#process.parts[buffer[0]][property[0]].typeDescription = this.#process.parts[buffer[0]][property[0]].getTypeDescription();
-                   this.#process.parts[buffer[0]][property[0]].size = this.#process.parts[buffer[0]][property[0]].getSize();
-                   this.#process.parts[buffer[0]][property[0]].byCount = this.#process.parts[buffer[0]][property[0]].getByteCount();
-                   this.#process.parts[buffer[0]][property[0]].bitCount = this.#process.parts[buffer[0]][property[0]].getBitCount();
-                   this.#process.parts[buffer[0]][property[0]].data = this.#process.parts[buffer[0]][property[0]].getData();
-                   this.#process.parts[buffer[0]][property[0]].flattenData = this.#process.parts[buffer[0]][property[0]].getflattenData();
-                   this.#process.parts[buffer[0]][property[0]].dataLength = this.#process.parts[buffer[0]][property[0]].getdataLength();
+        //            this.#process.parts[buffer[0]][property[0]].bufferSizeOffset = bufferSizeOffset;
+        //            this.#process.parts[buffer[0]][property[0]].sizeOffset = sizeOffset;
+        //            this.#process.parts[buffer[0]][property[0]].name = this.#process.parts[buffer[0]][property[0]].getName();
+        //            this.#process.parts[buffer[0]][property[0]].bufferSize = this.#process.parts[buffer[0]][property[0]].getBufferSize();
+        //            this.#process.parts[buffer[0]][property[0]].typeDescription = this.#process.parts[buffer[0]][property[0]].getTypeDescription();
+        //            this.#process.parts[buffer[0]][property[0]].size = this.#process.parts[buffer[0]][property[0]].getSize();
+        //            this.#process.parts[buffer[0]][property[0]].byCount = this.#process.parts[buffer[0]][property[0]].getByteCount();
+        //            this.#process.parts[buffer[0]][property[0]].bitCount = this.#process.parts[buffer[0]][property[0]].getBitCount();
+        //            this.#process.parts[buffer[0]][property[0]].data = this.#process.parts[buffer[0]][property[0]].getData();
+        //            this.#process.parts[buffer[0]][property[0]].flattenData = this.#process.parts[buffer[0]][property[0]].getflattenData();
+        //            this.#process.parts[buffer[0]][property[0]].dataLength = this.#process.parts[buffer[0]][property[0]].getdataLength();
                     
-                   this.#process.parts[buffer[0]][property[0]].wgsl_structProperty = this.#process.parts[buffer[0]][property[0]].getWGSL_StructProperty();
+        //            this.#process.parts[buffer[0]][property[0]].wgsl_structProperty = this.#process.parts[buffer[0]][property[0]].getWGSL_StructProperty();
 
-                     if (propertiesCount < Object.keys(property).length-1)
-                    this.#process.parts[buffer[0]].wgsl_structure+= `  ` + this.#process.parts[buffer[0]][property[0]].wgsl_structProperty+ `,`
-                      else this.#process.wgsl_structure+= `  ` +  this.#process.parts[buffer[0]][property[0]].wgsl_structProperty+ `};`
+        //              if (propertiesCount < Object.keys(property).length-1)
+        //             this.#process.parts[buffer[0]].wgsl_structure+= `  ` + this.#process.parts[buffer[0]][property[0]].wgsl_structProperty+ `,`
+        //               else this.#process.wgsl_structure+= `  ` +  this.#process.parts[buffer[0]][property[0]].wgsl_structProperty+ `};`
 
-                    bufferSizeOffset +=  this.#process.parts[buffer[0]][property[0]].getBufferSize();
-                    sizeOffset +=  this.#process.parts[buffer[0]][property[0]].getSize();
+        //             bufferSizeOffset +=  this.#process.parts[buffer[0]][property[0]].getBufferSize();
+        //             sizeOffset +=  this.#process.parts[buffer[0]][property[0]].getSize();
 
-                    dataLength +=  this.#process.parts[buffer[0]][property[0]].getdataLength();
+        //             dataLength +=  this.#process.parts[buffer[0]][property[0]].getdataLength();
 
-                     propertiesCount++;
+        //              propertiesCount++;
 
-                        console.log(this.#process.parts)
+        //                 console.log(this.#process.parts)
 
-                // Object.entries(property).forEach(key =>{
-                // paramsIn.name = key[0];
-                // Object.entries(key[1]).forEach((key1) =>{
-                //     paramsIn[key1[0]] = key1[1];
-                // });
+        //         // Object.entries(property).forEach(key =>{
+        //         // paramsIn.name = key[0];
+        //         // Object.entries(key[1]).forEach((key1) =>{
+        //         //     paramsIn[key1[0]] = key1[1];
+        //         // });
 
 
-                // if (opt==0)
-                //  this.#process.parts[buffer[0]][property[0]] = new Ebk.WEBGPU.Buffer.Property(paramsIn);
-                // else if (opt==1)
-                //   this.#process.parts[buffer[0]][property[0]]._update(paramsIn);
+        //         // if (opt==0)
+        //         //  this.#process.parts[buffer[0]][property[0]] = new Ebk.WEBGPU.Buffer.Property(paramsIn);
+        //         // else if (opt==1)
+        //         //   this.#process.parts[buffer[0]][property[0]]._update(paramsIn);
 
-            });
+        //     });
 
-        });
+        // });
         // let bufferSizeOffset = 0;
         // let sizeOffset = 0;
         // let dataLength = 0;
@@ -800,7 +878,8 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
 
     getPropertyInfo(params ={property: 'color'}){
 
-        return   /// this.#process.properties;
+       // this.#buildProperties(0);
+        //return   /// this.#process.properties;
    
     }
 
@@ -904,7 +983,7 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
 Ebk.WEBGPU.Buffer.PartsPropertiesTests = (paramsTestOptions =[
     
     {
-        creation:  { entries: [
+        creation:  { parts: [
 
                             {statics:[
                                 {color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
@@ -929,7 +1008,7 @@ Ebk.WEBGPU.Buffer.PartsPropertiesTests = (paramsTestOptions =[
             
             },   
 
-        update:  {  entries: [
+        update:  {  parts: [
 
                             {statics:[
                                 {color: { type: `vec4f`, data: [[0.1, 0.2, 0.3, 1.0]]}},
