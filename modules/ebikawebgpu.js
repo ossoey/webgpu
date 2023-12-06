@@ -678,7 +678,7 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
                   let dataLength = 0;
 
                  let structName = bufferProperty[0].charAt(0).toUpperCase() + bufferProperty[0].slice(1);
-                 this.#process.parts[bufferProperty[0]].wgsl_structure = `struct ${structName} { `
+                 this.#process.parts[bufferProperty[0]].wgsl_structure = `struct ${structName} { \n `
          
                   bufferProperty[1].forEach((property, property_ndx) =>{
 
@@ -719,9 +719,9 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
 
                         if (property_ndx <  (bufferProperty[1].length -1)) {
 
-                            this.#process.parts[bufferProperty[0]].wgsl_structure+= ` ` + this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].wgsl_structProperty+ `,`
+                            this.#process.parts[bufferProperty[0]].wgsl_structure+= ` ` + this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].wgsl_structProperty+ `, \n`
                       
-                        } else this.#process.parts[bufferProperty[0]].wgsl_structure+= ` ` +  this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].wgsl_structProperty+ `};`
+                        } else this.#process.parts[bufferProperty[0]].wgsl_structure+= ` ` +  this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].wgsl_structProperty+ `};\n`
     
                         bufferSizeOffset +=  this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getBufferSize();
                         sizeOffset +=  this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getSize();
