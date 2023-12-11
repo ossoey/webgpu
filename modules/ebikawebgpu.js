@@ -633,6 +633,7 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
         
         this.#params =  Object.assign({},  params );
 
+        this.device = params.device;
         this.#process.parts = {};
 
         this.#buildProperties(0);
@@ -661,6 +662,7 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
                     }) {
 
         this.#params =  Object.assign(this.#params,  params );
+        this.device = params.device;
         this.#buildProperties(1);
   
     }
@@ -727,7 +729,7 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
                         sizeOffset +=  this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getSize();
     
                         dataLength +=  this.#process.parts[bufferProperty[0]][propertyKeyValue[0]].getdataLength();
-                        console.log(this.#process.parts[bufferProperty[0]])
+                        // console.log(this.#process.parts[bufferProperty[0]])
 
                       
 
@@ -876,18 +878,72 @@ Ebk.WEBGPU.Buffer.PartsProperties = class WEBGPUBufferProperties {
 
     }
 
-    getPropertyInfo(params ={property: 'color'}){
+    getBufferNameInfo(params ={bufferName: 'dynamics'}){
 
-       // this.#buildProperties(0);
-        //return   /// this.#process.properties;
+        if (this.#process.parts.hasOwnProperty(params.bufferName )) {
+            return this.#process.parts[params.bufferName]
+          } else return null; 
+    
+
+    }
+
+    getPropertyInfo(params ={bufferName: 'dynamics', property: 'color'}){
+
+          if (this.getBufferNameInfo({bufferName: params.bufferName})) {
+            if (this.#process.parts[params.bufferName].hasOwnProperty(params.property )) {
+                return this.#process.parts[params.bufferName][params.property]
+              } else return null; 
+          }
    
     }
 
-    // getPropertyValue(params ={property: 'color', value: `data`}){
+    getPropertyValue(params ={bufferName: 'dynamics', property: 'color', value: `data`}){
 
-    //     return    this.#process.properties[params.property][params.value];
-   
-    // }
+        if (this.getPropertyInfo({bufferName: params.bufferName, property: params.property})) {
+          if (this.#process.parts[params.bufferName][params.property].hasOwnProperty(params.value )) {
+              return this.#process.parts[params.bufferName][params.property][params.value]
+            } else return null; 
+        }
+ 
+   }
+
+   createShader(){
+     
+    this.shader = this.device.createShaderModule({
+        label: this.params.shaderLabel,
+        code: `
+
+            struct OurStruct {
+              color: vec4f,
+              scale: vec2f,
+              offset: vec2f,
+            };
+                
+      
+            @group(0) @binding(0) var<uniform> ourStruct: OurStruct;
+      
+            @vertex fn vs(
+              @builtin(vertex_index) vertexIndex : u32
+            ) -> @builtin(position) vec4f {
+              let pos = array(
+                vec2f( 0.0,  0.5),  // top center
+                vec2f(-0.5, -0.5),  // bottom left
+                vec2f( 0.5, -0.5)   // bottom right
+              );
+      
+              return vec4f(
+                pos[vertexIndex] * ourStruct.scale + ourStruct.offset, 0.0, 1.0);
+            }
+      
+            @fragment fn fs() -> @location(0) vec4f {
+              return ourStruct.color;
+            }
+        `,
+      });
+  
+   }
+
+  
 
     // getPropertyValues(params ={property: 'color' }){
 
@@ -999,9 +1055,10 @@ Ebk.WEBGPU.Buffer.PartsPropertiesTests = (paramsTestOptions =[
                      ] , 
 
                     shaderLabel: `build triangle`,
-                    device: {},            
-                    property: `color`,
-                    value: `data`,
+                    device: {},  
+                    bufferName: 'dynamics',         
+                    property: `scale`,
+                    value: `bufferSize`,
                     exeptions: [`scale`],
                     data: [0.1, 0.2 ]
 
@@ -1024,7 +1081,8 @@ Ebk.WEBGPU.Buffer.PartsPropertiesTests = (paramsTestOptions =[
                     ] , 
 
                         shaderLabel: `build triangle`,
-                        device: {},            
+                        device: {}, 
+                        bufferName: 'statics',              
                         property: `color`,
                         value: `data`,
                         exeptions: [`scale`],
@@ -1038,7 +1096,8 @@ Ebk.WEBGPU.Buffer.PartsPropertiesTests = (paramsTestOptions =[
 
 
 
-    ] ,    exceptions = [`_update`, `createBuffer_UniformReadOnly` , `createData_Float32Array`, `createBindGroup`, `loadData`, `loadSpecData` ]   
+    ] ,    exceptions = [`_update`, `createBuffer_UniformReadOnly` , `createShader`,
+                        `createData_Float32Array`, `createBindGroup`, `loadData`, `loadSpecData` ]   
        
 )=>{
 
