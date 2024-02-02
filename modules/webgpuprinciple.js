@@ -138,7 +138,7 @@ let  createGroupedSelect = (params= {
   });
 
   // Return the created container div
-  return labelElement;
+  return {selectElement};
 }
 
 
@@ -171,28 +171,79 @@ let removeUIInputsContainer = () =>{
   
 }
 
+// let createUIFunctionList = () =>{
+
+
+//   let selectContainer = document.createElement(`div`);
+
+//   let list = document.createElement(`select`);
+
+//   selectContainer.appendChild(list);
+
+//   document.querySelector(`#menu`).append(selectContainer);
+
+//    createUIInputsContainer();
+
+//    functions_entries.forEach((elt,index)=>{
+
+//       let subElt = document.createElement(`option`);
+//       subElt.innerHTML = elt.entry().desc;
+//       subElt.functionId = index;
+//       list.appendChild(subElt);
+//   });
+
+//   list.addEventListener(`change`,(event)=>{
+//       removeUIInputsContainer();
+//       let select = event.target.options[event.target.selectedIndex];
+//       functions_entries[select.functionId].entry().func();           
+
+//   });
+
+//   functions_entries[0].entry().func();
+
+// }
+
+
+
 let createUIFunctionList = () =>{
 
 
   let selectContainer = document.createElement(`div`);
 
-  let list = document.createElement(`select`);
+  // let list = document.createElement(`select`);
 
-  selectContainer.appendChild(list);
+  // selectContainer.appendChild(list);
 
-  document.querySelector(`#menu`).append(selectContainer);
+  // document.querySelector(`#menu`).append(selectContainer);
 
    createUIInputsContainer();
 
+   let projectOptions =[];
+
    functions_entries.forEach((elt,index)=>{
 
-      let subElt = document.createElement(`option`);
-      subElt.innerHTML = elt.entry().desc;
-      subElt.functionId = index;
-      list.appendChild(subElt);
+      // let subElt = document.createElement(`option`);
+      // subElt.innerHTML = elt.entry().desc;
+      // subElt.functionId = index;
+      // list.appendChild(subElt);
+
+      projectOptions.push({  functionId: index,  textContent: elt.entry().desc }) 
+
+
   });
 
-  list.addEventListener(`change`,(event)=>{
+
+  let divvv =  createGroupedSelect (  {
+ 
+    options: projectOptions,
+      container: document.querySelector(`#menu`),
+     
+      labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Projects    ' },
+      selectProperties: { id: 'projectList', style: { width: '200px' } }
+  });
+  
+
+  divvv.selectElement.addEventListener(`change`,(event)=>{
       removeUIInputsContainer();
       let select = event.target.options[event.target.selectedIndex];
       functions_entries[select.functionId].entry().func();           
@@ -221,9 +272,7 @@ let functions_entries = [
 
         obj.uiLoad = ()=>{
 
-         
- 
-
+        
           createUIInputsContainer(); 
 
           reloadCanvas();   
@@ -241,7 +290,7 @@ let functions_entries = [
              ],
               container: container ,
              
-              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Select Label' },
+              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Triangle color    ' },
               selectProperties: { id: 'colorsList', style: { width: '100px' } }
           });
 
@@ -255,33 +304,12 @@ let functions_entries = [
              ],
               container: container ,
              
-              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Select Label' },
+              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'BackGroundColor   ' },
               selectProperties: { id: 'bgColorsList', style: { width: '100px' } }
-          })
-
-          // let elt = createAndAppendElement({container: container, elementType:"div", properties: {
-          //         textContent: 'This is a dynamically created element',
-          //         style: {
-          //           backgroundColor: '#965656',
-          //           padding: '10px',
-          //           margin: '10px'
-          //         }
-          // }});
+           })
 
 
-          
 
-  
-
-          // obj.uiLoadObjectsCount()
-
-          // obj.uiLoadColorButton(0,`Color Start`);
-          // obj.uiLoadColorButton(1,`Color End`);
-
-          // obj.uiLoadColorContainer(0,35,345);
-          // obj.uiLoadColorContainer(1,35,445);
-          // obj.uiLoadInstanceColorPickers(0,["#DD3698","#36109E","#E6DB65"]);
-          // obj.uiLoadInstanceColorPickers(1,["#DF3608","#36709E","#A6DB95"]);
 
         }
         
