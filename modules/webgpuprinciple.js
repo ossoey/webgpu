@@ -25,7 +25,13 @@ let  hexToRgbaNormal = ( hexColor )=> {
   return {r,g,b};
 }
 
-let ui_ = {};
+let ops = {};
+
+ops.ui   = {};
+ops.ui.elts = {};
+ops.cpu  = {};
+ops.gpu  = {};
+
 
 let createAndAppendElement = (params={container: {}, properties: {}, elementType: "div"  }    ) => {
   // Parameter checks
@@ -63,7 +69,6 @@ let createAndAppendElement = (params={container: {}, properties: {}, elementType
 
 
 
-// // Function to create a grouped <select> element with a container and properties
 // let  createGroupedSelect = (params= {
  
 //   options: [
@@ -104,7 +109,7 @@ let createAndAppendElement = (params={container: {}, properties: {}, elementType
 
 
 // Function to create a grouped <select> element with a container and properties
-let  createGroupedSelect = (params= {
+let  createElement_LabeledSelect = (params= {
  
   options: [
     { value: 'option1', textContent: 'Option 1' },
@@ -172,39 +177,6 @@ let removeUIInputsContainer = () =>{
   
 }
 
-// let createUIFunctionList = () =>{
-
-
-//   let selectContainer = document.createElement(`div`);
-
-//   let list = document.createElement(`select`);
-
-//   selectContainer.appendChild(list);
-
-//   document.querySelector(`#menu`).append(selectContainer);
-
-//    createUIInputsContainer();
-
-//    functions_entries.forEach((elt,index)=>{
-
-//       let subElt = document.createElement(`option`);
-//       subElt.innerHTML = elt.entry().desc;
-//       subElt.functionId = index;
-//       list.appendChild(subElt);
-//   });
-
-//   list.addEventListener(`change`,(event)=>{
-//       removeUIInputsContainer();
-//       let select = event.target.options[event.target.selectedIndex];
-//       functions_entries[select.functionId].entry().func();           
-
-//   });
-
-//   functions_entries[0].entry().func();
-
-// }
-
-
 
 let createUIFunctionList = () =>{
 
@@ -234,7 +206,7 @@ let createUIFunctionList = () =>{
   });
 
 
-    ui_.projectList =  createGroupedSelect (  {
+  ops.ui.elts.projectsList =  createElement_LabeledSelect (  {
  
     options: projectOptions,
       container: document.querySelector(`#menu`),
@@ -244,13 +216,14 @@ let createUIFunctionList = () =>{
   });
   
 
-  ui_.projectList.selectElement.addEventListener(`change`,(event)=>{
+  ops.ui.elts.projectsList.selectElement.addEventListener(`change`,(event)=>{
       removeUIInputsContainer();
       let select = event.target.options[event.target.selectedIndex];
       functions_entries[select.functionId].entry().func();           
-
+      
   });
 
+  removeUIInputsContainer(); 
   functions_entries[0].entry().func();
 
 }
@@ -281,7 +254,7 @@ let functions_entries = [
           let  container = document.querySelector(`#uiInputsContainer`);  
 
 
-          createGroupedSelect (  {
+          createElement_LabeledSelect (  {
  
             options: [
               { value: '1', textContent: 'Red' },
@@ -295,7 +268,7 @@ let functions_entries = [
               selectProperties: { id: 'colorsList', style: { width: '100px' } }
           });
 
-          createGroupedSelect (  {
+          createElement_LabeledSelect (  {
  
             options: [
               { value: '1', textContent: 'Red' },
@@ -309,9 +282,6 @@ let functions_entries = [
               selectProperties: { id: 'bgColorsList', style: { width: '100px' } }
            })
 
-
-
-
         }
         
  
@@ -320,15 +290,12 @@ let functions_entries = [
           // run uiload
           obj.uiLoad();
        
-
         }
-
 
         return {desc:obj.desc, func: obj.func};
     }
 
   } ,
-
 
 
   {
