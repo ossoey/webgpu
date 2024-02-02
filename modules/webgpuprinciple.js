@@ -26,6 +26,122 @@ let  hexToRgbaNormal = ( hexColor )=> {
 }
 
 
+let createAndAppendElement = (params={container: {}, properties: {}, elementType: "div"  }    ) => {
+  // Parameter checks
+  // if (!params || !params.container || !params.properties || typeof params.properties !== 'object' || typeof params.elementType !== 'string') {
+  //   console.error('Invalid parameters. Expected an object with container and properties.');
+  //   return null;
+  // }   
+
+  //= {container:{}, properties: {},  }
+  // Create a new element based on the specified type
+  let newElement = document.createElement(params.elementType);
+
+  // Set properties for the new element
+  for (var key in params.properties) {
+    if (params.properties.hasOwnProperty(key)) {
+      newElement[key] = params.properties[key];
+
+
+      if (params.properties.style) {
+        let styleString = Object.entries(params.properties.style)
+          .map(([key1, value1]) => `${key1}: ${value1}`)
+          .join(';');
+          newElement.setAttribute('style', styleString);
+      } 
+
+    }
+  }
+
+  // Append the new element to the specified container
+  params.container.appendChild(newElement);
+
+  // Return the created element
+  return newElement;
+};
+
+
+
+// // Function to create a grouped <select> element with a container and properties
+// let  createGroupedSelect = (params= {
+ 
+//   options: [
+//     { value: 'option1', textContent: 'Option 1' },
+//     { value: 'option2', textContent: 'Option 2' },
+//     { value: 'option3', textContent: 'Option 3' },
+//     { value: 'option4', textContent: 'Option 4' }
+//   ],
+//   container: {},
+//   divProperties: { id: 'myContainer', style: { border: '1px solid #ccc', padding: '10px' } },
+//   labelProperties: { style: { color: 'blue' }, text: 'Select Label' },
+//   selectProperties: { id: 'mySelect', style: { width: '150px' } }
+// }) =>{
+
+
+//   // Create a container div with specified properties
+//   let containerDiv = createAndAppendElement({container: params.container, properties : params.divProperties, elementType: "div" });
+
+//   // Create a <label> element with specified properties
+//   let labelElement= createAndAppendElement({container: containerDiv, properties : params.labelProperties, elementType: 'label'});
+//   labelElement.textContent = params.labelProperties.text || '';
+
+//   // Create a <select> element with specified properties
+
+//   let selectElement= createAndAppendElement({container: containerDiv, properties : params.selectProperties, elementType: 'select'});
+
+//   // Append the <select> element to the <label>
+//   labelElement.appendChild(selectElement);
+
+//   // Iterate over the options and create <option> elements
+//   params.options.forEach(function (option) {
+//     createAndAppendElement({container: selectElement, properties : option, elementType: 'option'});
+//   });
+
+//   // Return the created container div
+//   return containerDiv;
+// }
+
+
+// Function to create a grouped <select> element with a container and properties
+let  createGroupedSelect = (params= {
+ 
+  options: [
+    { value: 'option1', textContent: 'Option 1' },
+    { value: 'option2', textContent: 'Option 2' },
+    { value: 'option3', textContent: 'Option 3' },
+    { value: 'option4', textContent: 'Option 4' }
+  ],
+  container: {},
+  // divProperties: { id: 'myContainer', style: { border: '1px solid #ccc', padding: '10px' } },
+  labelProperties: { style: { color: 'blue' }, text: 'Select Label' },
+  selectProperties: { id: 'mySelect', style: { width: '150px' } }
+}) =>{
+
+
+  // Create a container div with specified properties
+  // let containerDiv = createAndAppendElement({container: params.container, properties : params.divProperties, elementType: "div" });
+
+  // Create a <label> element with specified properties
+  let labelElement= createAndAppendElement({container:  params.container, properties : params.labelProperties, elementType: 'label'});
+  labelElement.textContent = params.labelProperties.text || '';
+
+  // Create a <select> element with specified properties
+
+  let selectElement= createAndAppendElement({container: labelElement, properties : params.selectProperties, elementType: 'select'});
+
+  // Append the <select> element to the <label>
+  // labelElement.appendChild(selectElement);
+
+  // Iterate over the options and create <option> elements
+  params.options.forEach(function (option) {
+    createAndAppendElement({container: selectElement, properties : option, elementType: 'option'});
+  });
+
+  // Return the created container div
+  return labelElement;
+}
+
+
 let reloadCanvas = () =>{
     document.querySelector(`canvas`).remove();
     document.querySelector(`body`).append( document.createElement(`canvas`));
@@ -58,9 +174,6 @@ let removeUIInputsContainer = () =>{
 let createUIFunctionList = () =>{
 
 
-   
-
-
   let selectContainer = document.createElement(`div`);
 
   let list = document.createElement(`select`);
@@ -70,7 +183,6 @@ let createUIFunctionList = () =>{
   document.querySelector(`#menu`).append(selectContainer);
 
    createUIInputsContainer();
-
 
    functions_entries.forEach((elt,index)=>{
 
@@ -93,6 +205,101 @@ let createUIFunctionList = () =>{
 
 
 let functions_entries = [
+
+
+  {
+       
+    entry : ()=>{
+         
+        let gpuDevice = null;
+
+        let obj = {};
+        obj.desc = `test`
+        
+        obj.r = 0.3,  obj.g = 0.4, obj.b = 0.5
+
+
+        obj.uiLoad = ()=>{
+
+         
+ 
+
+          createUIInputsContainer(); 
+
+          reloadCanvas();   
+
+          let  container = document.querySelector(`#uiInputsContainer`);  
+
+
+          createGroupedSelect (  {
+ 
+            options: [
+              { value: '1', textContent: 'Red' },
+              { value: '2', textContent: 'Green' },
+              { value: '3', textContent: 'Blue' },
+              { value: '4', textContent: 'Grey' }
+             ],
+              container: container ,
+             
+              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Select Label' },
+              selectProperties: { id: 'colorsList', style: { width: '100px' } }
+          });
+
+          createGroupedSelect (  {
+ 
+            options: [
+              { value: '1', textContent: 'Red' },
+              { value: '2', textContent: 'Green' },
+              { value: '3', textContent: 'Blue' },
+              { value: '4', textContent: 'Grey' }
+             ],
+              container: container ,
+             
+              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Select Label' },
+              selectProperties: { id: 'bgColorsList', style: { width: '100px' } }
+          })
+
+          // let elt = createAndAppendElement({container: container, elementType:"div", properties: {
+          //         textContent: 'This is a dynamically created element',
+          //         style: {
+          //           backgroundColor: '#965656',
+          //           padding: '10px',
+          //           margin: '10px'
+          //         }
+          // }});
+
+
+          
+
+  
+
+          // obj.uiLoadObjectsCount()
+
+          // obj.uiLoadColorButton(0,`Color Start`);
+          // obj.uiLoadColorButton(1,`Color End`);
+
+          // obj.uiLoadColorContainer(0,35,345);
+          // obj.uiLoadColorContainer(1,35,445);
+          // obj.uiLoadInstanceColorPickers(0,["#DD3698","#36109E","#E6DB65"]);
+          // obj.uiLoadInstanceColorPickers(1,["#DF3608","#36709E","#A6DB95"]);
+
+        }
+        
+ 
+        obj.func = async () =>{
+
+          // run uiload
+          obj.uiLoad();
+       
+
+        }
+
+
+        return {desc:obj.desc, func: obj.func};
+    }
+
+  } ,
+
 
 
   {
