@@ -25,6 +25,7 @@ let  hexToRgbaNormal = ( hexColor )=> {
   return {r,g,b};
 }
 
+let ui_ = {};
 
 let createAndAppendElement = (params={container: {}, properties: {}, elementType: "div"  }    ) => {
   // Parameter checks
@@ -233,17 +234,17 @@ let createUIFunctionList = () =>{
   });
 
 
-  let divvv =  createGroupedSelect (  {
+    ui_.projectList =  createGroupedSelect (  {
  
     options: projectOptions,
       container: document.querySelector(`#menu`),
      
       labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Projects    ' },
-      selectProperties: { id: 'projectList', style: { width: '200px' } }
+      selectProperties: { id: 'projectList', style: { width: '200px', padding: '3px' } }
   });
   
 
-  divvv.selectElement.addEventListener(`change`,(event)=>{
+  ui_.projectList.selectElement.addEventListener(`change`,(event)=>{
       removeUIInputsContainer();
       let select = event.target.options[event.target.selectedIndex];
       functions_entries[select.functionId].entry().func();           
