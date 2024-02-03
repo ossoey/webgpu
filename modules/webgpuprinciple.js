@@ -320,9 +320,10 @@ projects.funcs.createUIFunctionList = () =>{
         ops.data = {};
 
         ops.data.shaderSource = `
-             @group(0) @binding(0) var<uniform> color : vec3f; 
 
-           
+            @group(0) @binding(0) var<uniform> color : vec3f; 
+            
+
             @vertex fn vs( @location(0) coords : vec2f ) -> @builtin(position) vec4f {
                return vec4f( coords, 0, 1 );
 
@@ -347,7 +348,7 @@ projects.funcs.createUIFunctionList = () =>{
           new Float32Array([0.0, 0.0, 1.0]), 
         ];
 
-        ops.data.colors  = [
+        ops.data.bgColors  = [
            [0.7, 0.0, 0.0], 
            [0.0, 0.7, 0.0], 
            [0.0, 0.0, 0.7], 
@@ -426,7 +427,7 @@ projects.funcs.createUIFunctionList = () =>{
             ops.data.context.configure({
               device: ops.data.device, 
               format: navigator.gpu.getPreferredCanvasFormat(), 
-              alphaMode: "premultiplied"
+              alphaMode: "premultiplied" 
             });
 
             ops.data.shaderModule = ops.data.device.createShaderModule({
@@ -441,13 +442,16 @@ projects.funcs.createUIFunctionList = () =>{
 
           let vertexBufferLayout = [
               {
-                attributes: {shaderLocation: 0, offset: 0, format: ops.data.vertexFormat }, 
+                attributes: [{shaderLocation: 0, offset: 0, format: "float32x2" }], 
                 stepMode: "vertex", 
                 arrayStride:8 //projects.gpu.vertexFormatValue( ops.data.vertexFormat ,"bytesize") 
               }
 
           ];
 
+
+
+  
           let uniformBindGroupLayout = ops.data.device.createBindGroupLayout({
             label: `uniformBindGoupLayout,   ${ops.desc}`,
             entries : [
@@ -459,9 +463,8 @@ projects.funcs.createUIFunctionList = () =>{
             ]
           });
 
-
-
-          ops.data.pipeline = ops.data.device.createRenderPipeline({
+          let pipelineDescriptor = {
+            
             label: `pipeline,   ${ops.desc}`,
 
             layout: ops.data.device.createPipelineLayout({
@@ -471,7 +474,7 @@ projects.funcs.createUIFunctionList = () =>{
             vertex: {
               module : ops.data.shaderModule, 
               entryPoint: "vs", 
-              buffer: vertexBufferLayout
+              buffers: vertexBufferLayout
             } , 
 
             fragment: {
@@ -486,7 +489,10 @@ projects.funcs.createUIFunctionList = () =>{
               topology: "triangle-list"
             }
 
-          });
+          }
+
+
+          ops.data.pipeline = ops.data.device.createRenderPipeline(pipelineDescriptor);
 
           ops.data.vertexBuffer = ops.data.device.createBuffer({
               label: `vertexBuffer,   ${ops.desc}`,
@@ -499,24 +505,27 @@ projects.funcs.createUIFunctionList = () =>{
           ops.data.uniformBuffer = ops.data.device.createBuffer({
               label: `uniformBuffer,   ${ops.desc}`,
               size: ops.data.colors[0].byteLength, 
-              usage: GPUBufferUsage.FRAGMENT | GPUBufferUsage.COPY_DST
+              usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
           }); 
 
           ops.data.device.queue.writeBuffer(ops.data.uniformBuffer, 0, ops.data.colors[0]);
  
           
-          ops.data.uniformBindGroup.createBindGroup({
+          ops.data.uniformBindGroup  =  ops.data.device.createBindGroup({
             label: `uniformBindGroup,   ${ops.desc}`,
             layout: uniformBindGroupLayout,
             
             entries : [
               {
                binding: 0, 
-               resource: {buffer: uniformBuffer, offset: 0, size: 3*4} 
+               resource: {buffer: ops.data.uniformBuffer, offset: 0, size: 3*4} 
               }
            ]
 
           }); 
+
+              
+
   
 
         }  
@@ -530,7 +539,7 @@ projects.funcs.createUIFunctionList = () =>{
 
 
         ops.funcs.draw = ()=>{
-          let bgColor = ops.data.colors[ Number(ops.ui.bgColors.value) ];
+          let bgColor = ops.data.bgColors[ Number(ops.ui.bgColors.value) ];
           let commandEncoder = ops.data.device.createCommandEncoder();
 
           let renderPassDescriptor = {
@@ -559,6 +568,19 @@ projects.funcs.createUIFunctionList = () =>{
 
         }  
 
+        ops.funcs.observer = new ResizeObserver(entries => {
+          for (const entry of entries) {
+            const canvas = entry.target;
+            const width = entry.contentBoxSize[0].inlineSize;
+            const height = entry.contentBoxSize[0].blockSize;
+            canvas.width = Math.max(1, Math.min(width, ops.data.device.limits.maxTextureDimension2D));
+            canvas.height = Math.max(1, Math.min(height, ops.data.device.limits.maxTextureDimension2D));
+            ops.funcs.draw();
+          }
+        });
+
+       
+
 
 
         ops.funcs.ini = async () =>{
@@ -568,20 +590,34 @@ projects.funcs.createUIFunctionList = () =>{
           try {
             await ops.funcs.iniWEBGPU();
              ops.funcs.doPipelineConfig();
+
+             
+
           }
           catch (e) {
-       
-             return;
-         }
+            alert( "<span style='color:#AA0000; font-size:110%'><b>Error: Could not initialize WebGPU: </b>" + 
+            e.message + "</span>")
+           
+            return;
+        }
 
 
-         ops.ui.colors.value = "0";
-         ops.ui.colors.onchange = ops.funcs.doColorChange;
-         ops.ui.bgColor.value = "2";
-         ops.ui.bgColor.onchange = draw;
+          ops.ui.colors.value = 0;
+          ops.ui.colors.onchange = ops.funcs.doColorChange;
+          ops.ui.bgColors.value = 2;
+          ops.ui.bgColors.onchange =  ops.funcs.draw;
 
-         ops.funcs.draw();
+          ops.funcs.observer.observe(ops.data.context.canvas)
+          //ops.funcs.draw();
 
+          
+          
+
+
+          
+
+
+  
         
         }
 
