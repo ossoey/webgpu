@@ -25,15 +25,13 @@ let  hexToRgbaNormal = ( hexColor )=> {
   return {r,g,b};
 }
 
-let ops = {};
-
-ops.ui   = {};
-ops.ui.elts = {};
-ops.cpu  = {};
-ops.gpu  = {};
 
 
-let createAndAppendElement = (params={container: {}, properties: {}, elementType: "div"  }    ) => {
+let projects = {};
+    projects.funcs = {};
+    
+
+  projects.funcs.createAndAppendElement = (params={container: {}, properties: {}, elementType: "div"  }    ) => {
   // Parameter checks
   // if (!params || !params.container || !params.properties || typeof params.properties !== 'object' || typeof params.elementType !== 'string') {
   //   console.error('Invalid parameters. Expected an object with container and properties.');
@@ -109,7 +107,7 @@ let createAndAppendElement = (params={container: {}, properties: {}, elementType
 
 
 // Function to create a grouped <select> element with a container and properties
-let  createElement_LabeledSelect = (params= {
+projects.funcs.createElement_LabeledSelect = (params= {
  
   options: [
     { value: 'option1', textContent: 'Option 1' },
@@ -128,25 +126,59 @@ let  createElement_LabeledSelect = (params= {
   // let containerDiv = createAndAppendElement({container: params.container, properties : params.divProperties, elementType: "div" });
 
   // Create a <label> element with specified properties
-  let labelElement= createAndAppendElement({container:  params.container, properties : params.labelProperties, elementType: 'label'});
+  let labelElement= projects.funcs.createAndAppendElement({container:  params.container, properties : params.labelProperties, elementType: 'label'});
   labelElement.textContent = params.labelProperties.text || '';
 
   // Create a <select> element with specified properties
 
-  let selectElement= createAndAppendElement({container: labelElement, properties : params.selectProperties, elementType: 'select'});
+  let selectElement= projects.funcs.createAndAppendElement({container: labelElement, properties : params.selectProperties, elementType: 'select'});
 
   // Append the <select> element to the <label>
   // labelElement.appendChild(selectElement);
 
   // Iterate over the options and create <option> elements
   params.options.forEach(function (option) {
-    createAndAppendElement({container: selectElement, properties : option, elementType: 'option'});
+    projects.funcs.createAndAppendElement({container: selectElement, properties : option, elementType: 'option'});
   });
 
   // Return the created container div
   return {selectElement};
 }
 
+
+
+projects.funcs.reloadCanvas = () =>{
+  document.querySelector(`canvas`).remove();
+  document.querySelector(`body`).append( document.createElement(`canvas`));
+}
+
+projects.funcs.createUIInputsContainer = () =>{
+
+  let uiInputsContainer = document.createElement(`div`);
+
+  uiInputsContainer.setAttribute(`id`,`uiInputsContainer`);
+  uiInputsContainer.style.display = "flex";
+  uiInputsContainer.style.flexDirection ="row";
+  uiInputsContainer.style.flexWrap = "nowrap";
+  uiInputsContainer.style.justifyContent = "flex-start";
+  uiInputsContainer.style.alignItems = "center";
+  
+  document.querySelector(`#menu`).appendChild(uiInputsContainer);
+}
+
+
+projects.funcs.removeUIInputsContainer = () =>{
+
+ let elt = document.querySelector(`#uiInputsContainer`);
+ if (elt) elt.remove();
+ 
+}
+
+
+
+
+
+///**Old  */
 
 let reloadCanvas = () =>{
     document.querySelector(`canvas`).remove();
@@ -174,31 +206,23 @@ let removeUIInputsContainer = () =>{
    let elt = document.querySelector(`#uiInputsContainer`);
    if (elt) elt.remove();
    
-  
 }
 
+///*End Old  */
 
-let createUIFunctionList = () =>{
+
+projects.funcs.createUIFunctionList = () =>{
 
 
   let selectContainer = document.createElement(`div`);
 
-  // let list = document.createElement(`select`);
 
-  // selectContainer.appendChild(list);
-
-  // document.querySelector(`#menu`).append(selectContainer);
-
-   createUIInputsContainer();
+  projects.funcs.createUIInputsContainer();
 
    let projectOptions =[];
 
-   functions_entries.forEach((elt,index)=>{
+     projects.entries.forEach((elt,index)=>{
 
-      // let subElt = document.createElement(`option`);
-      // subElt.innerHTML = elt.entry().desc;
-      // subElt.functionId = index;
-      // list.appendChild(subElt);
 
       projectOptions.push({  functionId: index,  textContent: elt.entry().desc }) 
 
@@ -206,7 +230,7 @@ let createUIFunctionList = () =>{
   });
 
 
-  ops.ui.elts.projectsList =  createElement_LabeledSelect (  {
+   let projectsList =  projects.funcs.createElement_LabeledSelect (  {
  
     options: projectOptions,
       container: document.querySelector(`#menu`),
@@ -216,20 +240,20 @@ let createUIFunctionList = () =>{
   });
   
 
-  ops.ui.elts.projectsList.selectElement.addEventListener(`change`,(event)=>{
-      removeUIInputsContainer();
+    projectsList.selectElement.addEventListener(`change`,(event)=>{
+      projects.funcs.removeUIInputsContainer();
       let select = event.target.options[event.target.selectedIndex];
-      functions_entries[select.functionId].entry().func();           
+      projects.entries[select.functionId].entry().func();           
       
   });
 
-  removeUIInputsContainer(); 
-  functions_entries[0].entry().func();
+  projects.funcs.removeUIInputsContainer(); 
+  projects.entries[0].entry().func();
 
 }
 
 
-let functions_entries = [
+ projects.entries = [
 
 
   {
@@ -247,14 +271,14 @@ let functions_entries = [
         obj.uiLoad = ()=>{
 
         
-          createUIInputsContainer(); 
+          projects.funcs.createUIInputsContainer(); 
 
-          reloadCanvas();   
+          projects.funcs.reloadCanvas();   
 
           let  container = document.querySelector(`#uiInputsContainer`);  
 
 
-          createElement_LabeledSelect (  {
+          projects.funcs.createElement_LabeledSelect (  {
  
             options: [
               { value: '1', textContent: 'Red' },
@@ -268,7 +292,7 @@ let functions_entries = [
               selectProperties: { id: 'colorsList', style: { width: '100px' } }
           });
 
-          createElement_LabeledSelect (  {
+          projects.funcs.createElement_LabeledSelect (  {
  
             options: [
               { value: '1', textContent: 'Red' },
@@ -6178,22 +6202,10 @@ let functions_entries = [
 
   } ,
 
- 
-
-
-
-
-  
-
- 
-
-
-
-
-
-
 
 ] ;
 
-export { functions_entries,createUIFunctionList};
-export default functions_entries; 
+let createUIFunctionList = projects.funcs.createUIFunctionList;
+
+export { projects,createUIFunctionList};
+export default projects; 
