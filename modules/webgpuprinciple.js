@@ -267,68 +267,61 @@ projects.funcs.createUIFunctionList = () =>{
         ops.desc = `--Colored Triangle and background`
         
         ops.ui = {};
-        ops.ui.funcs = {};
-        ops.ui.elts = {};
+        ops.funcs = {};
+        ops.data = {};
         
-        ops.cpu = {};
-        ops.cpu.funcs = {};
-        ops.cpu.data = {};
 
-        ops.gpu = {};
-        ops.gpu.data = {};
+        // ui section
+        ops.funcs.load = ()=>{
 
+            projects.funcs.createUIInputsContainer(); 
 
-        ops.uiLoad = ()=>{
+            projects.funcs.reloadCanvas();   
 
-        
-          projects.funcs.createUIInputsContainer(); 
-
-          projects.funcs.reloadCanvas();   
-
-          let  container = document.querySelector(`#uiInputsContainer`);  
+            let  container = document.querySelector(`#uiInputsContainer`);  
 
 
-          projects.funcs.createElement_LabeledSelect (  {
- 
-            options: [
-              { value: '1', textContent: 'Red' },
-              { value: '2', textContent: 'Green' },
-              { value: '3', textContent: 'Blue' },
-              { value: '4', textContent: 'Grey' }
-             ],
-              container: container ,
-             
-              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Triangle color    ' },
-              selectProperties: { id: 'colorsList', style: { width: '100px' } }
-          });
+            ops.ui.colors = projects.funcs.createElement_LabeledSelect (  {
+  
+              options: [
+                { value: '0', textContent: 'Red' },
+                { value: '1', textContent: 'Green' },
+                { value: '2', textContent: 'Blue' },
+                { value: '3', textContent: 'Grey' }
+              ],
+                container: container ,
+              
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Triangle color    ' },
+                selectProperties: { id: 'colorsList', style: { width: '100px' } }
+            }).selectElement;
 
-          projects.funcs.createElement_LabeledSelect (  {
- 
-            options: [
-              { value: '1', textContent: 'Red' },
-              { value: '2', textContent: 'Green' },
-              { value: '3', textContent: 'Blue' },
-              { value: '4', textContent: 'Grey' }
-             ],
-              container: container ,
-             
-              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'BackGroundColor   ' },
-              selectProperties: { id: 'bgColorsList', style: { width: '100px' } }
-           })
+            ops.ui.bgColors = projects.funcs.createElement_LabeledSelect (  {
+  
+              options: [
+                { value: '0', textContent: 'Red' },
+                { value: '1', textContent: 'Green' },
+                { value: '2', textContent: 'Blue' },
+                { value: '3', textContent: 'Grey' }
+              ],
+                container: container ,
+              
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'BackGroundColor   ' },
+                selectProperties: { id: 'bgColorsList', style: { width: '100px' } }
+            }).selectElement;
 
         }
         
  
-        ops.ini= async () =>{
+        ops.funcs.ini = async () =>{
 
-          // run uiload
-          ops.uiLoad();
-
+          ops.funcs.load(); 
+          
+          ops.ui.colors.value = 2;
 
        
         }
 
-        return {desc:ops.desc, func: ops.ini};
+        return {desc:ops.desc, func: ops.funcs.ini};
     }
 
   } ,
