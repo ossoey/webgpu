@@ -29,7 +29,9 @@ let  hexToRgbaNormal = ( hexColor )=> {
 
 let projects = {};
     projects.funcs = {};
-    
+    projects.ui = {};
+    projects.ui.elts = {};
+
 
   projects.funcs.createAndAppendElement = (params={container: {}, properties: {}, elementType: "div"  }    ) => {
   // Parameter checks
@@ -178,6 +180,7 @@ projects.funcs.removeUIInputsContainer = () =>{
 
 
 
+
 ///**Old  */
 
 let reloadCanvas = () =>{
@@ -230,17 +233,17 @@ projects.funcs.createUIFunctionList = () =>{
   });
 
 
-   let projectsList =  projects.funcs.createElement_LabeledSelect (  {
+  projects.ui.elts.list =  projects.funcs.createElement_LabeledSelect (  {
  
     options: projectOptions,
       container: document.querySelector(`#menu`),
      
       labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Projects    ' },
-      selectProperties: { id: 'projectList', style: { width: '200px', padding: '3px' } }
+      selectProperties: { id: 'projectList', style: { width: '250px', padding: '3px' } }
   });
   
 
-    projectsList.selectElement.addEventListener(`change`,(event)=>{
+  projects.ui.elts.list.selectElement.addEventListener(`change`,(event)=>{
       projects.funcs.removeUIInputsContainer();
       let select = event.target.options[event.target.selectedIndex];
       projects.entries[select.functionId].entry().func();           
@@ -260,15 +263,22 @@ projects.funcs.createUIFunctionList = () =>{
        
     entry : ()=>{
          
-        let gpuDevice = null;
-
-        let obj = {};
-        obj.desc = `test`
+        let ops = {};
+        ops.desc = `--Colored Triangle and background`
         
-        obj.r = 0.3,  obj.g = 0.4, obj.b = 0.5
+        ops.ui = {};
+        ops.ui.funcs = {};
+        ops.ui.elts = {};
+        
+        ops.cpu = {};
+        ops.cpu.funcs = {};
+        ops.cpu.data = {};
+
+        ops.gpu = {};
+        ops.gpu.data = {};
 
 
-        obj.uiLoad = ()=>{
+        ops.uiLoad = ()=>{
 
         
           projects.funcs.createUIInputsContainer(); 
@@ -309,14 +319,16 @@ projects.funcs.createUIFunctionList = () =>{
         }
         
  
-        obj.func = async () =>{
+        ops.ini= async () =>{
 
           // run uiload
-          obj.uiLoad();
+          ops.uiLoad();
+
+
        
         }
 
-        return {desc:obj.desc, func: obj.func};
+        return {desc:ops.desc, func: ops.ini};
     }
 
   } ,
