@@ -31,6 +31,55 @@ let projects = {};
     projects.funcs = {};
     projects.ui = {};
     projects.ui.elts = {};
+    projects.gpu = {};
+  
+  
+  projects.gpu.VERTEX_FORMAT = {
+
+    "uint8x2":{ format:"uint8x2"  , type:"unsigned int" ,components:	2, bytesize:	2, wgsltype:"vec2<u32>"},
+    "uint8x4":{format:"uint8x4"  ,  type:"unsigned int" ,components:	4, bytesize:	4	, wgsltype:"vec4<u32>"},
+    "sint8x2":{format:"sint8x2"  ,  type:"signed int" ,components:	2, bytesize:	2	, wgsltype:"vec2<i32>"},
+    "sint8x4":{format:"sint8x4"  ,  type:"signed int" ,components:	4, bytesize:	4	, wgsltype:"vec4<i32>"},
+    "unorm8x2":{format:"unorm8x2"  ,  type:"unsigned normalized" ,components:	2, bytesize:	2	, wgsltype:"vec2<f32>"},
+    "unorm8x4":{format:"unorm8x4"  ,  type:"unsigned normalized" ,components:	4, bytesize:	4	, wgsltype:"vec4<f32>"},
+    "snorm8x2":{format:"snorm8x2"  ,  type:"signed normalized" ,components:	2, bytesize:	2	, wgsltype:"vec2<f32>"},
+    "snorm8x4":{format:"snorm8x4"  ,  type:"signed normalized" ,components:	4, bytesize:	4	, wgsltype:"vec4<f32>"},
+    "uint16x2":{format:"uint16x2"  ,  type:"unsigned int" ,components:	2, bytesize:	4	, wgsltype:"vec2<u32>"},
+    "uint16x4":{format:"uint16x4"  ,  type:"unsigned int" ,components:	4, bytesize:	8	, wgsltype:"vec4<u32>"},
+    "sint16x2":{format:"sint16x2"  ,  type:"signed int" ,components:	2, bytesize:	4	, wgsltype:"vec2<i32>"},
+    "sint16x4":{format:"sint16x4"  ,  type:"signed int" ,components:	4	, bytesize:8	, wgsltype:"vec4<i32>"},
+    "unorm16x2":{format:"unorm16x2"  , type:"unsigned normalized" ,components:	2, bytesize:	4	, wgsltype:"vec2<f32>"},
+    "unorm16x4":{format:"unorm16x4"  ,  type:"unsigned normalized" ,components:	4, bytesize:	8	, wgsltype:"vec4<f32>"},
+    "snorm16x2":{format:"snorm16x2"  ,  type:"signed normalized" ,components:	2, bytesize:	4	, wgsltype:"vec2<f32>"},
+    "snorm16x4":{format:"snorm16x4"  ,  type:"signed normalized" ,components:	4, bytesize:	8	, wgsltype:"vec4<f32>"},
+    "float16x2":{format:"float16x2"  ,  type:"float" ,components:	2, bytesize:	4	, wgsltype:"vec2<f16>"},
+    "float16x4":{format:"float16x4"  ,  type:"float" ,components:	4, bytesize:	8	, wgsltype:"vec4<f16>"},
+    "float32":{format:"float32"  , 	 type:"float" ,components:	1, bytesize:	4	, wgsltype:"f32"},
+    "float32x2":{format:"float32x2"  , type:"float" ,components:	2, bytesize:	8	, wgsltype:"vec2<f32>"},
+    "float32x3":{format:"float32x3"  ,  type:"float" ,components:	3, bytesize:	12	, wgsltype:"vec3<f32>"},
+    "float32x4":{format:"float32x4"  ,  	type:"float" ,components:	4, bytesize:	16	, wgsltype:"vec4<f32>"},
+    "uint32":{format:"uint32"  ,  	type:"unsigned int" ,components:	1, bytesize:	4	, wgsltype:"u32"},
+    "uint32x2":{format:"uint32x2"  , type:"unsigned int" ,components:	2, bytesize:	8	, wgsltype:"vec2<u32>"},
+    "uint32x3":{format:"uint32x3"  ,  type:"unsigned int" ,components:	3, bytesize:	12	, wgsltype:"vec3<u32>"},
+    "uint32x4":{format:"uint32x4"  ,  type:"unsigned int" ,components:	4, bytesize:	16	, wgsltype:"vec4<u32>"},
+    "sint32":{format:"sint32"  ,  type:"signed int" ,components:	1, bytesize:	4	, wgsltype:"i32"},
+    "sint32x2":{format:"sint32x2"  , type:"signed int" ,components:	2, bytesize:	8	, wgsltype:"vec2<i32>"},
+    "sint32x3":{format:"sint32x3"  ,  type:"signed int" ,components:	3, bytesize:	12	, wgsltype:"vec3<i32>"},
+    "sint32x4":{format:"sint32x4"  ,  type:"signed int" ,components:	4, bytesize:	16	, wgsltype:"vec4<i32>"},
+    "unorm10-10-10-2":{format:"unorm10-10-10-2"  , type:"unsigned normalized" ,components:	4, bytesize:	4	, wgsltype:"vec4<f32>"}
+
+  }  
+
+
+  projects.gpu.vertexFormatValue = (format,attr) => {
+  
+    return projects.gpu.VERTEX_FORMAT[format][attr];
+
+  }
+
+
+
+ 
 
 
   projects.funcs.createAndAppendElement = (params={container: {}, properties: {}, elementType: "div"  }    ) => {
@@ -267,11 +316,56 @@ projects.funcs.createUIFunctionList = () =>{
         ops.desc = `--Colored Triangle and background`
         
         ops.ui = {};
-        ops.funcs = {};
+       
         ops.data = {};
-        
 
-        // ui section
+        ops.data.shaderSource = `
+             @group(0) @binding(0) var<uniform> color : vec3f; 
+
+           
+            @vertex fn vs( @location(0) coords : vec2f ) -> @builtin(position) vec4f {
+               return vec4f( coords, 0, 1 );
+
+            }
+            
+          
+             @fragment fn fs() -> @location(0) vec4f {
+               return vec4f( color, 1 ); 
+
+            }
+        
+        `;
+        
+        ops.data.triCoords  = new Float32Array([
+          -0.8, -0.6,  0.8, -0.6, 0.0, 0.6
+        ]);
+
+
+        ops.data.colors  = [
+          new Float32Array([1.0, 0.0, 0.0]), 
+          new Float32Array([0.0, 1.0, 0.0]), 
+          new Float32Array([0.0, 0.0, 1.0]), 
+        ];
+
+        ops.data.colors  = [
+           [0.7, 0.0, 0.0], 
+           [0.0, 0.7, 0.0], 
+           [0.0, 0.0, 0.7], 
+        ];
+
+        ops.data.device; 
+        ops.data.context;
+        ops.data.shaderModule;
+        ops.data.vertexFormat = "float32x2";
+        ops.data.pipeline; 
+        ops.data.vertexBuffer; 
+        ops.data.uniformBuffer; 
+        ops.data.uniformBindGroup; 
+
+
+        ops.funcs = {};  
+        
+        
         ops.funcs.load = ()=>{
 
             projects.funcs.createUIInputsContainer(); 
@@ -310,15 +404,185 @@ projects.funcs.createUIFunctionList = () =>{
             }).selectElement;
 
         }
+
+
+        ops.funcs.iniWEBGPU = async ()=>{
+
+            if (!navigator.gpu) {
+              throw  Error(`this navigator doest not support WEBGPU`);
+              
+            }
+
+            let adapter = await navigator.gpu.requestAdapter(); 
+
+            if (!adapter){
+              throw Error(`Navigator support WEBGPU but there no adapter found`);
+            }
+
+            ops.data.device = await adapter.requestDevice(); 
+
+            ops.data.context = document.querySelector(`canvas`).getContext("webgpu");
+
+            ops.data.context.configure({
+              device: ops.data.device, 
+              format: navigator.gpu.getPreferredCanvasFormat(), 
+              alphaMode: "premultiplied"
+            });
+
+            ops.data.shaderModule = ops.data.device.createShaderModule({
+              label: `shaderModule,   ${ops.desc}`,
+              code : ops.data.shaderSource
+            });
+
+        }
         
+
+        ops.funcs.doPipelineConfig = ()=>{
+
+          let vertexBufferLayout = [
+              {
+                attributes: {shaderLocation: 0, offset: 0, format: ops.data.vertexFormat }, 
+                stepMode: "vertex", 
+                arrayStride:8 //projects.gpu.vertexFormatValue( ops.data.vertexFormat ,"bytesize") 
+              }
+
+          ];
+
+          let uniformBindGroupLayout = ops.data.device.createBindGroupLayout({
+            label: `uniformBindGoupLayout,   ${ops.desc}`,
+            entries : [
+               {
+                binding: 0,
+                visibility: GPUShaderStage.FRAGMENT, 
+                buffer: {type: "uniform"}
+               }
+            ]
+          });
+
+
+
+          ops.data.pipeline = ops.data.device.createRenderPipeline({
+            label: `pipeline,   ${ops.desc}`,
+
+            layout: ops.data.device.createPipelineLayout({
+              bindGroupLayouts: [uniformBindGroupLayout]
+            }), 
+
+            vertex: {
+              module : ops.data.shaderModule, 
+              entryPoint: "vs", 
+              buffer: vertexBufferLayout
+            } , 
+
+            fragment: {
+              module: ops.data.shaderModule, 
+              entryPoint: "fs", 
+              targets: [{
+                format: navigator.gpu.getPreferredCanvasFormat()
+              }]
+            } , 
+
+            primitive: {
+              topology: "triangle-list"
+            }
+
+          });
+
+          ops.data.vertexBuffer = ops.data.device.createBuffer({
+              label: `vertexBuffer,   ${ops.desc}`,
+              size: ops.data.triCoords.byteLength, 
+              usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+          }); 
+
+          ops.data.device.queue.writeBuffer(ops.data.vertexBuffer, 0, ops.data.triCoords);
+
+          ops.data.uniformBuffer = ops.data.device.createBuffer({
+              label: `uniformBuffer,   ${ops.desc}`,
+              size: ops.data.colors[0].byteLength, 
+              usage: GPUBufferUsage.FRAGMENT | GPUBufferUsage.COPY_DST
+          }); 
+
+          ops.data.device.queue.writeBuffer(ops.data.uniformBuffer, 0, ops.data.colors[0]);
  
+          
+          ops.data.uniformBindGroup.createBindGroup({
+            label: `uniformBindGroup,   ${ops.desc}`,
+            layout: uniformBindGroupLayout,
+            
+            entries : [
+              {
+               binding: 0, 
+               resource: {buffer: uniformBuffer, offset: 0, size: 3*4} 
+              }
+           ]
+
+          }); 
+  
+
+        }  
+
+
+        ops.funcs.doColorChange = ()=> {
+          let colorNum = Number(ops.ui.colors.value);
+          ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  ops.data.colors[colorNum]);
+          ops.funcs.draw()
+       }
+
+
+        ops.funcs.draw = ()=>{
+          let bgColor = ops.data.colors[ Number(ops.ui.bgColors.value) ];
+          let commandEncoder = ops.data.device.createCommandEncoder();
+
+          let renderPassDescriptor = {
+             colorAttachments: [{
+
+                 clearValue: { r: bgColor[0], g: bgColor[1], b: bgColor[2], a: 1 },
+
+                 loadOp: "clear", 
+                 storeOp: "store",  
+                 view: ops.data.context.getCurrentTexture().createView() 
+
+             }]
+          };
+          let passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+   
+          passEncoder.setPipeline(ops.data.pipeline);  
+          passEncoder.setVertexBuffer(0,ops.data.vertexBuffer);
+
+          passEncoder.setBindGroup(0,ops.data.uniformBindGroup);
+
+          passEncoder.draw(3);
+          passEncoder.end();
+          let commandBuffer = commandEncoder.finish(); 
+          ops.data.device.queue.submit([commandBuffer]); 
+         
+
+        }  
+
+
+
         ops.funcs.ini = async () =>{
 
           ops.funcs.load(); 
-          
-          ops.ui.colors.value = 2;
 
+          try {
+            await ops.funcs.iniWEBGPU();
+             ops.funcs.doPipelineConfig();
+          }
+          catch (e) {
        
+             return;
+         }
+
+
+         ops.ui.colors.value = "0";
+         ops.ui.colors.onchange = ops.funcs.doColorChange;
+         ops.ui.bgColor.value = "2";
+         ops.ui.bgColor.onchange = draw;
+
+         ops.funcs.draw();
+
+        
         }
 
         return {desc:ops.desc, func: ops.funcs.ini};
