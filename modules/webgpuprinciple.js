@@ -307,13 +307,12 @@ projects.funcs.createUIFunctionList = () =>{
 
  projects.entries = [
 
-
   {
        
     entry : ()=>{
          
         let ops = {};
-        ops.desc = `--Colored Triangle and background`
+        ops.desc = `--Colored Triangle and background -1 practice `
         
         ops.ui = {};
        
@@ -321,20 +320,16 @@ projects.funcs.createUIFunctionList = () =>{
 
         ops.data.shaderSource = `
 
-            @group(0) @binding(0) var<uniform> color : vec3f; 
-            
+          @group(0) @binding(0) var<uniform> color: vec3f; 
 
-            @vertex fn vs( @location(0) coords : vec2f ) -> @builtin(position) vec4f {
-               return vec4f( coords, 0, 1 );
+          @vertex fn vs(@location(0) coords: vec2f)->@builtin(position) vec4f {
+            return vec4f(coords[0], coords[1], 0.0, 1.0);
+          }
 
-            }
-            
-          
-             @fragment fn fs() -> @location(0) vec4f {
-               return vec4f( color, 1 ); 
+          @fragment fn fs()->@location(0) vec4f {
+            return vec4f(color[0], color[1], color[2], 1.0);
+          }
 
-            }
-        
         `;
         
         ops.data.triCoords  = new Float32Array([
@@ -346,12 +341,14 @@ projects.funcs.createUIFunctionList = () =>{
           new Float32Array([1.0, 0.0, 0.0]), 
           new Float32Array([0.0, 1.0, 0.0]), 
           new Float32Array([0.0, 0.0, 1.0]), 
+          new Float32Array([0.1, 0.1, 0.1]), 
         ];
 
         ops.data.bgColors  = [
            [0.7, 0.0, 0.0], 
            [0.0, 0.7, 0.0], 
            [0.0, 0.0, 0.7], 
+           [0.3, 0.3, 0.3], 
         ];
 
         ops.data.device; 
@@ -409,30 +406,30 @@ projects.funcs.createUIFunctionList = () =>{
 
         ops.funcs.iniWEBGPU = async ()=>{
 
-            if (!navigator.gpu) {
-              throw  Error(`this navigator doest not support WEBGPU`);
-              
+            if(!navigator.gpu){
+              throw new error("This navigator does not support webgpu"); 
             }
 
             let adapter = await navigator.gpu.requestAdapter(); 
 
-            if (!adapter){
-              throw Error(`Navigator support WEBGPU but there no adapter found`);
+            if(!adapter) {
+              throw new error("The navigator support webgpu but there is no adapter found");
             }
 
             ops.data.device = await adapter.requestDevice(); 
 
-            ops.data.context = document.querySelector(`canvas`).getContext("webgpu");
+            ops.data.context = document.querySelector("canvas").getContext("webgpu"); 
 
             ops.data.context.configure({
-              device: ops.data.device, 
-              format: navigator.gpu.getPreferredCanvasFormat(), 
-              alphaMode: "premultiplied" 
+               device: ops.data.device, 
+               format: navigator.gpu.getPreferredCanvasFormat(), 
+               alphaMode: "premultiplied"
+
             });
 
             ops.data.shaderModule = ops.data.device.createShaderModule({
-              label: `shaderModule,   ${ops.desc}`,
-              code : ops.data.shaderSource
+              label: `Shader module ${ops.desc}`, 
+              code: ops.data.shaderSource, 
             });
 
         }
@@ -442,9 +439,9 @@ projects.funcs.createUIFunctionList = () =>{
 
           let vertexBufferLayout = [
               {
-                attributes: [{shaderLocation: 0, offset: 0, format: "float32x2" }], 
+                attributes: [{shaderLocation: 0, offset: 0, format: ops.data.vertexFormat }], 
                 stepMode: "vertex", 
-                arrayStride:8 //projects.gpu.vertexFormatValue( ops.data.vertexFormat ,"bytesize") 
+                arrayStride: projects.gpu.vertexFormatValue( ops.data.vertexFormat ,"bytesize") 
               }
 
           ];
@@ -614,11 +611,325 @@ projects.funcs.createUIFunctionList = () =>{
           
 
 
+  
+          
+        }
+
+        return {desc:ops.desc, func: ops.funcs.ini};
+    }
+
+  } ,
+
+  {
+       
+    entry : ()=>{
+         
+        let ops = {};
+        ops.desc = `--Colored Triangle and background `
+        
+        ops.ui = {};
+       
+        ops.data = {};
+
+        ops.data.shaderSource = `
+
+            @group(0) @binding(0) var<uniform> color : vec3f; 
+            
+
+            @vertex fn vs( @location(0) coords : vec2f ) -> @builtin(position) vec4f {
+               return vec4f( coords, 0, 1 );
+
+            }
+            
+          
+             @fragment fn fs() -> @location(0) vec4f {
+               return vec4f( color, 1 ); 
+
+            }
+        
+        `;
+        
+        ops.data.triCoords  = new Float32Array([
+          -0.8, -0.6,  0.0, -0.6, 0.0, 0.6
+        ]);
+
+
+        ops.data.colors  = [
+          new Float32Array([1.0, 0.0, 0.0]), 
+          new Float32Array([0.0, 1.0, 0.0]), 
+          new Float32Array([0.0, 0.0, 1.0]), 
+          new Float32Array([0.1, 0.1, 0.1]), 
+        ];
+
+        ops.data.bgColors  = [
+           [0.7, 0.0, 0.0], 
+           [0.0, 0.7, 0.0], 
+           [0.0, 0.0, 0.7], 
+           [0.3, 0.3, 0.3], 
+        ];
+
+        ops.data.device; 
+        ops.data.context;
+        ops.data.shaderModule;
+        ops.data.vertexFormat = "float32x2";
+        ops.data.pipeline; 
+        ops.data.vertexBuffer; 
+        ops.data.uniformBuffer; 
+        ops.data.uniformBindGroup; 
+
+
+        ops.funcs = {};  
+        
+        
+        ops.funcs.load = ()=>{
+
+            projects.funcs.createUIInputsContainer(); 
+
+            projects.funcs.reloadCanvas();   
+
+            let  container = document.querySelector(`#uiInputsContainer`);  
+
+
+            ops.ui.colors = projects.funcs.createElement_LabeledSelect (  {
+  
+              options: [
+                { value: '0', textContent: 'Red' },
+                { value: '1', textContent: 'Green' },
+                { value: '2', textContent: 'Blue' },
+                { value: '3', textContent: 'Grey' }
+              ],
+                container: container ,
+              
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Triangle color    ' },
+                selectProperties: { id: 'colorsList', style: { width: '100px' } }
+            }).selectElement;
+
+            ops.ui.bgColors = projects.funcs.createElement_LabeledSelect (  {
+  
+              options: [
+                { value: '0', textContent: 'Red' },
+                { value: '1', textContent: 'Green' },
+                { value: '2', textContent: 'Blue' },
+                { value: '3', textContent: 'Grey' }
+              ],
+                container: container ,
+              
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'BackGroundColor   ' },
+                selectProperties: { id: 'bgColorsList', style: { width: '100px' } }
+            }).selectElement;
+
+        }
+
+
+        ops.funcs.iniWEBGPU = async ()=>{
+
+            if (!navigator.gpu) {
+              throw  Error(`this navigator doest not support WEBGPU`);
+              
+            }
+
+            let adapter = await navigator.gpu.requestAdapter(); 
+
+            if (!adapter){
+              throw Error(`Navigator support WEBGPU but there no adapter found`);
+            }
+
+            ops.data.device = await adapter.requestDevice(); 
+
+            ops.data.context = document.querySelector(`canvas`).getContext("webgpu");
+
+            ops.data.context.configure({
+              device: ops.data.device, 
+              format: navigator.gpu.getPreferredCanvasFormat(), 
+              alphaMode: "premultiplied" 
+            });
+
+            ops.data.shaderModule = ops.data.device.createShaderModule({
+              label: `shaderModule,   ${ops.desc}`,
+              code : ops.data.shaderSource
+            });
+
+        }
+        
+
+        ops.funcs.doPipelineConfig = ()=>{
+
+          let vertexBufferLayout = [
+              {
+                attributes: [{shaderLocation: 0, offset: 0, format: ops.data.vertexFormat }], 
+                stepMode: "vertex", 
+                arrayStride: projects.gpu.vertexFormatValue( ops.data.vertexFormat ,"bytesize") 
+              }
+
+          ];
+
+
+
+  
+          let uniformBindGroupLayout = ops.data.device.createBindGroupLayout({
+            label: `uniformBindGoupLayout,   ${ops.desc}`,
+            entries : [
+               {
+                binding: 0,
+                visibility: GPUShaderStage.FRAGMENT, 
+                buffer: {type: "uniform"}
+               }
+            ]
+          });
+
+          let pipelineDescriptor = {
+            
+            label: `pipeline,   ${ops.desc}`,
+
+            layout: ops.data.device.createPipelineLayout({
+              bindGroupLayouts: [uniformBindGroupLayout]
+            }), 
+
+            vertex: {
+              module : ops.data.shaderModule, 
+              entryPoint: "vs", 
+              buffers: vertexBufferLayout
+            } , 
+
+            fragment: {
+              module: ops.data.shaderModule, 
+              entryPoint: "fs", 
+              targets: [{
+                format: navigator.gpu.getPreferredCanvasFormat()
+              }]
+            } , 
+
+            primitive: {
+              topology: "triangle-list"
+            }
+
+          }
+
+
+          ops.data.pipeline = ops.data.device.createRenderPipeline(pipelineDescriptor);
+
+          ops.data.vertexBuffer = ops.data.device.createBuffer({
+              label: `vertexBuffer,   ${ops.desc}`,
+              size: ops.data.triCoords.byteLength, 
+              usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+          }); 
+
+          ops.data.device.queue.writeBuffer(ops.data.vertexBuffer, 0, ops.data.triCoords);
+
+          ops.data.uniformBuffer = ops.data.device.createBuffer({
+              label: `uniformBuffer,   ${ops.desc}`,
+              size: ops.data.colors[0].byteLength, 
+              usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+          }); 
+
+          ops.data.device.queue.writeBuffer(ops.data.uniformBuffer, 0, ops.data.colors[0]);
+ 
+          
+          ops.data.uniformBindGroup  =  ops.data.device.createBindGroup({
+            label: `uniformBindGroup,   ${ops.desc}`,
+            layout: uniformBindGroupLayout,
+            
+            entries : [
+              {
+               binding: 0, 
+               resource: {buffer: ops.data.uniformBuffer, offset: 0, size: 3*4} 
+              }
+           ]
+
+          }); 
+
+              
+
+  
+
+        }  
+
+
+        ops.funcs.doColorChange = ()=> {
+          let colorNum = Number(ops.ui.colors.value);
+          ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  ops.data.colors[colorNum]);
+          ops.funcs.draw()
+       }
+
+
+        ops.funcs.draw = ()=>{
+          let bgColor = ops.data.bgColors[ Number(ops.ui.bgColors.value) ];
+          let commandEncoder = ops.data.device.createCommandEncoder();
+
+          let renderPassDescriptor = {
+             colorAttachments: [{
+
+                 clearValue: { r: bgColor[0], g: bgColor[1], b: bgColor[2], a: 1 },
+
+                 loadOp: "clear", 
+                 storeOp: "store",  
+                 view: ops.data.context.getCurrentTexture().createView() 
+
+             }]
+          };
+          let passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+   
+          passEncoder.setPipeline(ops.data.pipeline);  
+          passEncoder.setVertexBuffer(0,ops.data.vertexBuffer);
+
+          passEncoder.setBindGroup(0,ops.data.uniformBindGroup);
+
+          passEncoder.draw(3);
+          passEncoder.end();
+          let commandBuffer = commandEncoder.finish(); 
+          ops.data.device.queue.submit([commandBuffer]); 
+         
+
+        }  
+
+        ops.funcs.observer = new ResizeObserver(entries => {
+          for (const entry of entries) {
+            const canvas = entry.target;
+            const width = entry.contentBoxSize[0].inlineSize;
+            const height = entry.contentBoxSize[0].blockSize;
+            canvas.width = Math.max(1, Math.min(width, ops.data.device.limits.maxTextureDimension2D));
+            canvas.height = Math.max(1, Math.min(height, ops.data.device.limits.maxTextureDimension2D));
+            ops.funcs.draw();
+          }
+        });
+
+       
+
+
+
+        ops.funcs.ini = async () =>{
+
+          ops.funcs.load(); 
+
+          try {
+            await ops.funcs.iniWEBGPU();
+             ops.funcs.doPipelineConfig();
+
+             
+
+          }
+          catch (e) {
+            alert( "<span style='color:#AA0000; font-size:110%'><b>Error: Could not initialize WebGPU: </b>" + 
+            e.message + "</span>")
+           
+            return;
+        }
+
+
+          ops.ui.colors.value = 0;
+          ops.ui.colors.onchange = ops.funcs.doColorChange;
+          ops.ui.bgColors.value = 2;
+          ops.ui.bgColors.onchange =  ops.funcs.draw;
+
+          ops.funcs.observer.observe(ops.data.context.canvas)
+          //ops.funcs.draw();
+
+          
           
 
 
   
-        
+          
         }
 
         return {desc:ops.desc, func: ops.funcs.ini};
