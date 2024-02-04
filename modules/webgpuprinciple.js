@@ -26,7 +26,6 @@ let  hexToRgbaNormal = ( hexColor )=> {
 }
 
 
-
 let projects = {};
     projects.funcs = {};
     projects.ui = {};
@@ -79,8 +78,6 @@ let projects = {};
 
 
 
- 
-
 
   projects.funcs.createAndAppendElement = (params={container: {}, properties: {}, elementType: "div"  }    ) => {
   // Parameter checks
@@ -118,46 +115,35 @@ let projects = {};
 
 
 
-// let  createGroupedSelect = (params= {
+// Function to create a labeled <input> element with a container and properties
+projects.funcs.createElement_LabeledInput = (params= {
  
-//   options: [
-//     { value: 'option1', textContent: 'Option 1' },
-//     { value: 'option2', textContent: 'Option 2' },
-//     { value: 'option3', textContent: 'Option 3' },
-//     { value: 'option4', textContent: 'Option 4' }
-//   ],
-//   container: {},
-//   divProperties: { id: 'myContainer', style: { border: '1px solid #ccc', padding: '10px' } },
-//   labelProperties: { style: { color: 'blue' }, text: 'Select Label' },
-//   selectProperties: { id: 'mySelect', style: { width: '150px' } }
-// }) =>{
+  container: {},
+  // divProperties: { id: 'myContainer', style: { border: '1px solid #ccc', padding: '10px' } },
+  labelProperties: { style: { color: 'blue' }, text: 'Select Label' },
+  inputProperties: { id: 'mySelect', style: { width: '150px' } }
+}) =>{
 
 
-//   // Create a container div with specified properties
-//   let containerDiv = createAndAppendElement({container: params.container, properties : params.divProperties, elementType: "div" });
+  // Create a container div with specified properties
+  // let containerDiv = createAndAppendElement({container: params.container, properties : params.divProperties, elementType: "div" });
 
-//   // Create a <label> element with specified properties
-//   let labelElement= createAndAppendElement({container: containerDiv, properties : params.labelProperties, elementType: 'label'});
-//   labelElement.textContent = params.labelProperties.text || '';
+  // Create a <label> element with specified properties
+  let labelElement= projects.funcs.createAndAppendElement({container:  params.container, properties : params.labelProperties, elementType: 'label'});
+  labelElement.textContent = params.labelProperties.text || '';
 
-//   // Create a <select> element with specified properties
+  // Create a <select> element with specified properties
 
-//   let selectElement= createAndAppendElement({container: containerDiv, properties : params.selectProperties, elementType: 'select'});
-
-//   // Append the <select> element to the <label>
-//   labelElement.appendChild(selectElement);
-
-//   // Iterate over the options and create <option> elements
-//   params.options.forEach(function (option) {
-//     createAndAppendElement({container: selectElement, properties : option, elementType: 'option'});
-//   });
-
-//   // Return the created container div
-//   return containerDiv;
-// }
+  let inputElement= projects.funcs.createAndAppendElement({container: labelElement, properties : params.inputProperties, elementType: 'input'});
 
 
-// Function to create a grouped <select> element with a container and properties
+  // Return the created container div
+  return {inputElement, labelElement};
+}
+
+
+
+// Function to create a labeled <select> element with a container and properties
 projects.funcs.createElement_LabeledSelect = (params= {
  
   options: [
@@ -193,7 +179,7 @@ projects.funcs.createElement_LabeledSelect = (params= {
   });
 
   // Return the created container div
-  return {selectElement};
+  return {selectElement, labelElement};
 }
 
 
@@ -224,9 +210,6 @@ projects.funcs.removeUIInputsContainer = () =>{
  if (elt) elt.remove();
  
 }
-
-
-
 
 
 
@@ -312,7 +295,7 @@ projects.funcs.createUIFunctionList = () =>{
     entry : ()=>{
          
         let ops = {};
-        ops.desc = `--Colored Triangle and background -1 practice `
+        ops.desc = `--Colored Triangle and background with picker`
         
         ops.ui = {};
        
@@ -372,7 +355,19 @@ projects.funcs.createUIFunctionList = () =>{
 
             let  container = document.querySelector(`#uiInputsContainer`);  
 
+            ops.ui.dyniColor =  projects.funcs.createElement_LabeledInput( 
+              {   
+               container: container,   
+              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Triangle dyni color    ' },
+               inputProperties: { type:"color",  style: { width: '50px' } }
+            }).inputElement;
 
+            ops.ui.dyniBgColor =  projects.funcs.createElement_LabeledInput( 
+              {   
+               container: container,   
+              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Dyni backgroup color    ' },
+               inputProperties: { type:"color",  style: { width: '50px' } }
+            }).inputElement;
             ops.ui.colors = projects.funcs.createElement_LabeledSelect (  {
   
               options: [
@@ -448,7 +443,6 @@ projects.funcs.createUIFunctionList = () =>{
 
 
 
-  
           let uniformBindGroupLayout = ops.data.device.createBindGroupLayout({
             label: `uniformBindGoupLayout,   ${ops.desc}`,
             entries : [
@@ -522,10 +516,16 @@ projects.funcs.createUIFunctionList = () =>{
           }); 
 
               
-
-  
-
         }  
+
+
+        ops.funcs.dyniColorOnChange = ()=> {
+
+          let colorComp =   hexToRgba(ops.ui.dyniColor.value);
+          let colorArr = new Float32Array([colorComp.r/255, colorComp.g/255, colorComp.b/255]);
+          ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  colorArr);
+          ops.funcs.draw()
+       }
 
 
         ops.funcs.doColorChange = ()=> {
@@ -536,13 +536,15 @@ projects.funcs.createUIFunctionList = () =>{
 
 
         ops.funcs.draw = ()=>{
-          let bgColor = ops.data.bgColors[ Number(ops.ui.bgColors.value) ];
+
+          let bgColorComp =   hexToRgba(ops.ui.dyniBgColor.value);
+ 
           let commandEncoder = ops.data.device.createCommandEncoder();
 
           let renderPassDescriptor = {
              colorAttachments: [{
 
-                 clearValue: { r: bgColor[0], g: bgColor[1], b: bgColor[2], a: 1 },
+                 clearValue: { r: bgColorComp.r/255, g: bgColorComp.g/255, b: bgColorComp.b/255, a: 1 },
 
                  loadOp: "clear", 
                  storeOp: "store",  
@@ -577,9 +579,6 @@ projects.funcs.createUIFunctionList = () =>{
         });
 
        
-
-
-
         ops.funcs.ini = async () =>{
 
           ops.funcs.load(); 
@@ -604,14 +603,16 @@ projects.funcs.createUIFunctionList = () =>{
           ops.ui.bgColors.value = 2;
           ops.ui.bgColors.onchange =  ops.funcs.draw;
 
+          ops.ui.dyniBgColor.value = "#7EA96b"
+          ops.ui.dyniBgColor.oninput =  ops.funcs.draw;
+
+          ops.ui.dyniColor.value = "#e66465"
+          ops.ui.dyniColor.oninput =  ops.funcs.dyniColorOnChange
+
+          
           ops.funcs.observer.observe(ops.data.context.canvas)
           //ops.funcs.draw();
 
-          
-          
-
-
-  
           
         }
 
@@ -690,6 +691,8 @@ projects.funcs.createUIFunctionList = () =>{
             let  container = document.querySelector(`#uiInputsContainer`);  
 
 
+
+            
             ops.ui.colors = projects.funcs.createElement_LabeledSelect (  {
   
               options: [
