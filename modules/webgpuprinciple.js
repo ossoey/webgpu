@@ -26,6 +26,67 @@ let  hexToRgbaNormal = ( hexColor )=> {
 }
 
 
+
+
+
+let  rgbToHex = (red, green, blue) => {
+  // Ensure that the input values are within the valid range (0 to 255)
+  red = Math.min(255, Math.max(0, red));
+  green = Math.min(255, Math.max(0, green));
+  blue = Math.min(255, Math.max(0, blue));
+
+  // Convert each component to hexadecimal and concatenate
+  const hexRed = red.toString(16).padStart(2, '0');
+  const hexGreen = green.toString(16).padStart(2, '0');
+  const hexBlue = blue.toString(16).padStart(2, '0');
+
+  // Combine the components to form the hexadecimal color code
+  const hexColor = `#${hexRed}${hexGreen}${hexBlue}`;
+
+  return hexColor.toUpperCase(); // Convert to uppercase for consistency
+}
+
+
+let MIDISwitch = {
+
+   select: (params = { selection: {program: 176, key: 0  }, 
+                      flow: {program: 176, key: 0, value: value} , 
+                         operation: {function: () =>{ return }, params: {value: 4}} }) =>{
+
+          if   ((params.selection.program === params.flow.program) && (params.selection.key === params.flow.key)){
+            
+              params.operation.params.value =  params.flow.value; 
+              return params.operation.function(params.operation.params) 
+
+          } 
+
+         
+   } ,
+
+   AKAI_PROG1_K1: (params = {  
+                   flow: {program: 176, key: 0, value:value} , 
+                  operation: {function: () =>{ return }, params: {value: 4}} })  =>{
+
+                    params.selection = {program: 176, key: 8  };
+                 
+       return   MIDISwitch.select(params);
+    
+   },
+
+   AKAI_PROG1_K2: (params = {  
+    flow: {program: 176, key: 0, value:value} , 
+   operation: {function: () =>{ return }, params: {value: 4}} })  =>{
+
+     params.selection = {program: 176, key: 9  };
+  
+     return   MIDISwitch.select(params);
+
+}
+
+
+
+};
+
 let projects = {};
     projects.funcs = {};
     projects.ui = {};
@@ -399,6 +460,76 @@ projects.funcs.createUIFunctionList = () =>{
         }
 
 
+        ops.funcs.initMIDI = ()=> {
+          // Check if the Web MIDI API is supported
+          if (navigator.requestMIDIAccess) {
+            // Request access to MIDI devices
+            navigator.requestMIDIAccess()
+              .then(ops.funcs.onMIDISuccess, ops.funcs.onMIDIFailure);
+          } else {
+            console.error('Web MIDI API is not supported in this browser.');
+          }
+        }
+
+        ops.funcs.onMIDISuccess =(midiAccess)=> {
+          // Get the list of available MIDI inputs
+          const inputs = midiAccess.inputs.values();
+      
+          // Log each MIDI input device
+          for (let input of inputs) {
+            console.log('MIDI Input:', input.name);
+            
+            // Listen for MIDI messages
+            input.onmidimessage = ops.funcs.onMIDIMessage;
+          }
+        }
+      
+        ops.funcs.onMIDIFailure = (error)=> {
+          console.error('Failed to access MIDI devices:', error);
+        }
+      
+        ops.funcs.onMIDIMessage = (event) => {
+          // Extract MIDI data from the event
+          const [status, data1, data2] = event.data;
+      
+          // Log MIDI message details
+          // console.log('MIDI Message Received:');
+          // console.log('  Status:', status);
+          // console.log('  Data1:', data1);
+          // console.log('  Data2:', data2);
+
+
+          MIDISwitch.AKAI_PROG1_K1({  
+            flow: {program: status, key: data1, value: data2} , 
+           operation: {function: (funcParams) =>{ 
+          
+            console.log('AKAI_PROG1_K1');
+            // console.log('  Status:', status);
+            // console.log('  Data1:', data1);
+            console.log('  Data2:', funcParams.value);  
+          
+          }, params: {value: 676}} });
+
+
+          MIDISwitch.AKAI_PROG1_K2({  
+            flow: {program: status, key: data1, value: data2} , 
+           operation: {function: (funcParams) =>{ 
+          
+            console.log('AKAI_PROG1_K2');
+            // console.log('  Status:', status);
+            // console.log('  Data1:', data1);
+            console.log('  Data2:', funcParams.value);  
+          
+          }, params: {value: 676}} });
+        
+          
+
+          // Ebk.Conversion.intervalSourceToTarget  = (params={src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]}  })
+         // console.log( Math.floor(Ebk.Conversion.intervalSourceToTarget({src:{interval:[0,127], value:127},  dst:{interval:[0,255]}  })))
+          // Add your own logic to handle MIDI messages here
+        }
+      
+
         ops.funcs.iniWEBGPU = async ()=>{
 
             if(!navigator.gpu){
@@ -610,8 +741,10 @@ projects.funcs.createUIFunctionList = () =>{
           ops.ui.dyniColor.oninput =  ops.funcs.dyniColorOnChange
 
           
-          ops.funcs.observer.observe(ops.data.context.canvas)
-          //ops.funcs.draw();
+          ops.funcs.observer.observe(ops.data.context.canvas); //ops.funcs.draw();
+
+          ops.funcs.initMIDI();
+          
 
           
         }
