@@ -7,7 +7,7 @@ import { Ebk} from "./ebika.js";
 import { EbkCov} from "./ebikacovering.js";
 import { EbkGeo} from "./ebikageometry.js";
 import { EbkWebGPU} from "./ebikawebgpu.js";
-
+import { EbkMIDI} from "./ebikaMIDI.js";
 
 let  hexToRgba = (hexColor)=> {
   const hex = hexColor.substring(1); // Remove the leading '#'
@@ -471,7 +471,7 @@ projects.funcs.createUIFunctionList = () =>{
           }
         }
 
-        ops.funcs.onMIDISuccess =(midiAccess)=> {
+        ops.funcs.onMIDISuccess = (midiAccess)=> {
           // Get the list of available MIDI inputs
           const inputs = midiAccess.inputs.values();
       
@@ -512,7 +512,7 @@ projects.funcs.createUIFunctionList = () =>{
 
 
           MIDISwitch.AKAI_PROG1_K2({  
-            flow: {program: status, key: data1, value: data2} , 
+            flow: {program: status, key:  data1, value: data2} , 
            operation: {function: (funcParams) =>{ 
           
             console.log('AKAI_PROG1_K2');
@@ -743,7 +743,35 @@ projects.funcs.createUIFunctionList = () =>{
           
           ops.funcs.observer.observe(ops.data.context.canvas); //ops.funcs.draw();
 
-          ops.funcs.initMIDI();
+          
+          Ebk.MIDI.initMIDI({   onMIDIMessage : (event) => {
+            // Extract MIDI data from the event
+                 const [status, data1, data2] = event.data;
+                   //console.log(status, data1, data2);
+
+
+                
+                   Ebk.MIDI.ctrlAKAILPD8_PROG1_K1 ( {  
+
+                        flow: {chanel: status, key: data1, value: data2} , 
+                        operation: {function: (params) =>{ 
+                          console.log(params.chanel, params.key, params.value);
+                      
+                   }} });
+
+
+                   Ebk.MIDI.ctrlAKAILPD8_PROG1_K2 ( {  
+
+                    flow: {chanel: status, key: data1, value: data2} , 
+                    operation: {function: (params) =>{ 
+                      console.log(params.chanel, params.key, params.value);
+                  
+                  }} })
+
+
+
+              }
+          });
           
 
           
