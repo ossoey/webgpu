@@ -14,7 +14,7 @@ let  hexToRgba = (hexColor)=> {
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
-  return {r,g,b};
+  return {r,g,b}; 
 }
 
 let  hexToRgbaNormal = ( hexColor )=> {
@@ -356,7 +356,7 @@ projects.funcs.createUIFunctionList = () =>{
     entry : ()=>{
          
         let ops = {};
-        ops.desc = `--Colored Triangle and background with picker`
+        ops.desc = `--Colored Triangle and background with picker-MIDI`
         
         ops.ui = {};
        
@@ -429,6 +429,7 @@ projects.funcs.createUIFunctionList = () =>{
               labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Dyni backgroup color    ' },
                inputProperties: { type:"color",  style: { width: '50px' } }
             }).inputElement;
+
             ops.ui.colors = projects.funcs.createElement_LabeledSelect (  {
   
               options: [
@@ -439,8 +440,8 @@ projects.funcs.createUIFunctionList = () =>{
               ],
                 container: container ,
               
-                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Triangle color    ' },
-                selectProperties: { id: 'colorsList', style: { width: '100px' } }
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' , display: "none" }, text: 'Triangle color '  },
+                selectProperties: { id: 'colorsList', style: { width: '100px' , display: "none" } }
             }).selectElement;
 
             ops.ui.bgColors = projects.funcs.createElement_LabeledSelect (  {
@@ -453,82 +454,101 @@ projects.funcs.createUIFunctionList = () =>{
               ],
                 container: container ,
               
-                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'BackGroundColor   ' },
-                selectProperties: { id: 'bgColorsList', style: { width: '100px' } }
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' , display: "none" }, text: 'BackGroundColor   ' },
+                selectProperties: { id: 'bgColorsList', style: { width: '100px' , display: "none" } }
             }).selectElement;
 
         }
 
 
-        ops.funcs.initMIDI = ()=> {
-          // Check if the Web MIDI API is supported
-          if (navigator.requestMIDIAccess) {
-            // Request access to MIDI devices
-            navigator.requestMIDIAccess()
-              .then(ops.funcs.onMIDISuccess, ops.funcs.onMIDIFailure);
-          } else {
-            console.error('Web MIDI API is not supported in this browser.');
-          }
-        }
-
-        ops.funcs.onMIDISuccess = (midiAccess)=> {
-          // Get the list of available MIDI inputs
-          const inputs = midiAccess.inputs.values();
-      
-          // Log each MIDI input device
-          for (let input of inputs) {
-            console.log('MIDI Input:', input.name);
-            
-            // Listen for MIDI messages
-            input.onmidimessage = ops.funcs.onMIDIMessage;
-          }
-        }
-      
-        ops.funcs.onMIDIFailure = (error)=> {
-          console.error('Failed to access MIDI devices:', error);
-        }
-      
-        ops.funcs.onMIDIMessage = (event) => {
-          // Extract MIDI data from the event
-          const [status, data1, data2] = event.data;
-      
-          // Log MIDI message details
-          // console.log('MIDI Message Received:');
-          // console.log('  Status:', status);
-          // console.log('  Data1:', data1);
-          // console.log('  Data2:', data2);
+         ops.funcs.modulateDynyColor =(status, data1,data2)=>{
 
 
-          MIDISwitch.AKAI_PROG1_K1({  
-            flow: {program: status, key: data1, value: data2} , 
-           operation: {function: (funcParams) =>{ 
-          
-            console.log('AKAI_PROG1_K1');
-            // console.log('  Status:', status);
-            // console.log('  Data1:', data1);
-            console.log('  Data2:', funcParams.value);  
-          
-          }, params: {value: 676}} });
-
-
-          MIDISwitch.AKAI_PROG1_K2({  
-            flow: {program: status, key:  data1, value: data2} , 
-           operation: {function: (funcParams) =>{ 
-          
-            console.log('AKAI_PROG1_K2');
-            // console.log('  Status:', status);
-            // console.log('  Data1:', data1);
-            console.log('  Data2:', funcParams.value);  
-          
-          }, params: {value: 676}} });
-        
-          
-
-          // Ebk.Conversion.intervalSourceToTarget  = (params={src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]}  })
-         // console.log( Math.floor(Ebk.Conversion.intervalSourceToTarget({src:{interval:[0,127], value:127},  dst:{interval:[0,255]}  })))
-          // Add your own logic to handle MIDI messages here
-        }
-      
+          ops.ui.dyniColorComps =  hexToRgba(ops.ui.dyniColor.value); 
+                  
+    
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K1 ( {  
+  
+               flow: {chanel: status, key: data1, value: data2} , 
+               operation: {function: (params) =>{ 
+  
+                
+                 ops.ui.dyniColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                 ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+                
+          }} });
+  
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K2 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+  
+             ops.ui.dyniColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+         Ebk.MIDI.ctrlAKAILPD8_PROG1_K3 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+             ops.ui.dyniColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+  
+         }
+       
+  
+         ops.funcs.modulateDyniBgColor =(status, data1,data2)=>{
+  
+  
+          ops.ui.dyniBgColorComps =  hexToRgba(ops.ui.dyniBgColor.value); 
+                  
+    
+            Ebk.MIDI.ctrlAKAILPD8_PROG1_K5 ( {  
+  
+                flow: {chanel: status, key: data1, value: data2} , 
+                operation: {function: (params) =>{ 
+  
+                  
+                  ops.ui.dyniBgColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                  ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                  
+            }} });
+  
+            Ebk.MIDI.ctrlAKAILPD8_PROG1_K6 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+          }} });
+  
+  
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K7 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+            }} });
+  
+  
+  
+         }
+       
 
         ops.funcs.iniWEBGPU = async ()=>{
 
@@ -659,6 +679,24 @@ projects.funcs.createUIFunctionList = () =>{
        }
 
 
+       ops.funcs.dyniColorWriteNDraw = (uiDyniColor, uiDyniColorComps)=> {
+         uiDyniColor.value = rgbToHex(uiDyniColorComps.r, uiDyniColorComps.g, uiDyniColorComps.b) 
+                        
+        let colorArr = new Float32Array([uiDyniColorComps.r/255, uiDyniColorComps.g/255, uiDyniColorComps.b/255]);
+        ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  colorArr);
+        ops.funcs.draw()
+
+        }
+
+        ops.funcs.dyniBgColorWriteNDraw = (uiBgDyniColor, uiDyniBgColorComps)=> {
+          uiBgDyniColor.value = rgbToHex(uiDyniBgColorComps.r, uiDyniBgColorComps.g, uiDyniBgColorComps.b) 
+                         
+           ops.funcs.draw()
+ 
+         }
+
+
+
         ops.funcs.doColorChange = ()=> {
           let colorNum = Number(ops.ui.colors.value);
           ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  ops.data.colors[colorNum]);
@@ -709,7 +747,8 @@ projects.funcs.createUIFunctionList = () =>{
           }
         });
 
-       
+
+
         ops.funcs.ini = async () =>{
 
           ops.funcs.load(); 
@@ -734,11 +773,15 @@ projects.funcs.createUIFunctionList = () =>{
           ops.ui.bgColors.value = 2;
           ops.ui.bgColors.onchange =  ops.funcs.draw;
 
-          ops.ui.dyniBgColor.value = "#7EA96b"
+
+
+          ops.ui.dyniColor.value = "#e66465";
+          ops.ui.dyniColor.oninput =  ops.funcs.dyniColorOnChange;
+  
+
+          ops.ui.dyniBgColor.value = "#7EA96b";
           ops.ui.dyniBgColor.oninput =  ops.funcs.draw;
 
-          ops.ui.dyniColor.value = "#e66465"
-          ops.ui.dyniColor.oninput =  ops.funcs.dyniColorOnChange
 
           
           ops.funcs.observer.observe(ops.data.context.canvas); //ops.funcs.draw();
@@ -747,29 +790,11 @@ projects.funcs.createUIFunctionList = () =>{
           Ebk.MIDI.initMIDI({   onMIDIMessage : (event) => {
             // Extract MIDI data from the event
                  const [status, data1, data2] = event.data;
-                   //console.log(status, data1, data2);
 
-
-                
-                   Ebk.MIDI.ctrlAKAILPD8_PROG1_K1 ( {  
-
-                        flow: {chanel: status, key: data1, value: data2} , 
-                        operation: {function: (params) =>{ 
-                          console.log(params.chanel, params.key, params.value);
-                      
-                   }} });
-
-
-                   Ebk.MIDI.ctrlAKAILPD8_PROG1_K2 ( {  
-
-                    flow: {chanel: status, key: data1, value: data2} , 
-                    operation: {function: (params) =>{ 
-                      console.log(params.chanel, params.key, params.value);
-                  
-                  }} })
-
-
-
+                 ops.funcs.modulateDynyColor(status, data1,data2);
+                 ops.funcs.modulateDyniBgColor(status, data1,data2)
+           
+      
               }
           });
           
