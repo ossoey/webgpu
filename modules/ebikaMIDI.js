@@ -169,6 +169,96 @@ Ebk.MIDI =  {
 
 },
 
+
+
+ctrlAKAILPD8_CC_PAD1: (params = {  
+
+  flow: {chanel: 176, key: 0, value: value} , 
+  operation: {function: () =>{ return }} })  =>{
+  
+  params.selection = {chanel: 176, key: 0 };
+
+  return   Ebk.MIDI.controlSelect(params);
+
+},
+
+ctrlAKAILPD8_CC_PAD2: (params = {  
+
+  flow: {chanel: 176, key: 0, value: value} , 
+  operation: {function: () =>{ return }} })  =>{
+  
+  params.selection = {chanel: 176, key: 1 };
+
+  return   Ebk.MIDI.controlSelect(params);
+
+},
+
+
+ctrlAKAILPD8_CC_PAD3: (params = {  
+
+  flow: {chanel: 176, key: 0, value: value} , 
+  operation: {function: () =>{ return }} })  =>{
+  
+  params.selection = {chanel: 176, key: 2 };
+
+  return   Ebk.MIDI.controlSelect(params);
+
+},
+
+ctrlAKAILPD8_CC_PAD4: (params = {  
+
+  flow: {chanel: 176, key: 0, value: value} , 
+  operation: {function: () =>{ return }} })  =>{
+  
+  params.selection = {chanel: 176, key: 3 };
+
+  return   Ebk.MIDI.controlSelect(params);
+
+},
+
+ctrlAKAILPD8_CC_PAD5: (params = {  
+
+  flow: {chanel: 176, key: 0, value: value} , 
+  operation: {function: () =>{ return }} })  =>{
+  
+  params.selection = {chanel: 176, key: 4 };
+
+  return   Ebk.MIDI.controlSelect(params);
+
+},
+
+ctrlAKAILPD8_CC_PAD6: (params = {  
+
+  flow: {chanel: 176, key: 0, value: value} , 
+  operation: {function: () =>{ return }} })  =>{
+  
+  params.selection = {chanel: 176, key: 5 };
+
+  return   Ebk.MIDI.controlSelect(params);
+
+},
+
+ctrlAKAILPD8_CC_PAD7: (params = {  
+
+  flow: {chanel: 176, key: 0, value: value} , 
+  operation: {function: () =>{ return }} })  =>{
+  
+  params.selection = {chanel: 176, key: 6 };
+
+  return   Ebk.MIDI.controlSelect(params);
+
+},
+
+ctrlAKAILPD8_CC_PAD8: (params = {  
+
+  flow: {chanel: 176, key: 0, value: value} , 
+  operation: {function: () =>{ return }} })  =>{
+  
+  params.selection = {chanel: 176, key: 7 };
+
+  return   Ebk.MIDI.controlSelect(params);
+
+},
  
          
 }
