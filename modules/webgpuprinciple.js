@@ -14,7 +14,7 @@ let  hexToRgba = (hexColor)=> {
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
-  return {r,g,b};
+  return {r,g,b}; 
 }
 
 let  hexToRgbaNormal = ( hexColor )=> {
@@ -47,45 +47,6 @@ let  rgbToHex = (red, green, blue) => {
 }
 
 
-let MIDISwitch = {
-
-   select: (params = { selection: {program: 176, key: 0  }, 
-                      flow: {program: 176, key: 0, value: value} , 
-                         operation: {function: () =>{ return }, params: {value: 4}} }) =>{
-
-          if   ((params.selection.program === params.flow.program) && (params.selection.key === params.flow.key)){
-            
-              params.operation.params.value =  params.flow.value; 
-              return params.operation.function(params.operation.params) 
-
-          } 
-
-         
-   } ,
-
-   AKAI_PROG1_K1: (params = {  
-                   flow: {program: 176, key: 0, value:value} , 
-                  operation: {function: () =>{ return }, params: {value: 4}} })  =>{
-
-                    params.selection = {program: 176, key: 8  };
-                 
-       return   MIDISwitch.select(params);
-    
-   },
-
-   AKAI_PROG1_K2: (params = {  
-    flow: {program: 176, key: 0, value:value} , 
-   operation: {function: () =>{ return }, params: {value: 4}} })  =>{
-
-     params.selection = {program: 176, key: 9  };
-  
-     return   MIDISwitch.select(params);
-
-}
-
-
-
-};
 
 let projects = {};
     projects.funcs = {};
@@ -332,7 +293,7 @@ projects.funcs.createUIFunctionList = () =>{
       container: document.querySelector(`#menu`),
      
       labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Projects    ' },
-      selectProperties: { id: 'projectList', style: { width: '250px', padding: '3px' } }
+      selectProperties: { id: 'projectList', style: { width: '300px', padding: '3px' } }
   });
   
 
@@ -351,12 +312,13 @@ projects.funcs.createUIFunctionList = () =>{
 
  projects.entries = [
 
+
   {
        
     entry : ()=>{
          
         let ops = {};
-        ops.desc = `--Colored Triangle and background with picker`
+        ops.desc = `--Colored Triangle and background with picker-MIDI 1`
         
         ops.ui = {};
        
@@ -429,6 +391,7 @@ projects.funcs.createUIFunctionList = () =>{
               labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Dyni backgroup color    ' },
                inputProperties: { type:"color",  style: { width: '50px' } }
             }).inputElement;
+
             ops.ui.colors = projects.funcs.createElement_LabeledSelect (  {
   
               options: [
@@ -439,8 +402,8 @@ projects.funcs.createUIFunctionList = () =>{
               ],
                 container: container ,
               
-                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Triangle color    ' },
-                selectProperties: { id: 'colorsList', style: { width: '100px' } }
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' , display: "none" }, text: 'Triangle color '  },
+                selectProperties: { id: 'colorsList', style: { width: '100px' , display: "none" } }
             }).selectElement;
 
             ops.ui.bgColors = projects.funcs.createElement_LabeledSelect (  {
@@ -453,82 +416,192 @@ projects.funcs.createUIFunctionList = () =>{
               ],
                 container: container ,
               
-                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'BackGroundColor   ' },
-                selectProperties: { id: 'bgColorsList', style: { width: '100px' } }
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' , display: "none" }, text: 'BackGroundColor   ' },
+                selectProperties: { id: 'bgColorsList', style: { width: '100px' , display: "none" } }
             }).selectElement;
 
         }
 
 
-        ops.funcs.initMIDI = ()=> {
-          // Check if the Web MIDI API is supported
-          if (navigator.requestMIDIAccess) {
-            // Request access to MIDI devices
-            navigator.requestMIDIAccess()
-              .then(ops.funcs.onMIDISuccess, ops.funcs.onMIDIFailure);
-          } else {
-            console.error('Web MIDI API is not supported in this browser.');
-          }
-        }
-
-        ops.funcs.onMIDISuccess = (midiAccess)=> {
-          // Get the list of available MIDI inputs
-          const inputs = midiAccess.inputs.values();
-      
-          // Log each MIDI input device
-          for (let input of inputs) {
-            console.log('MIDI Input:', input.name);
-            
-            // Listen for MIDI messages
-            input.onmidimessage = ops.funcs.onMIDIMessage;
-          }
-        }
-      
-        ops.funcs.onMIDIFailure = (error)=> {
-          console.error('Failed to access MIDI devices:', error);
-        }
-      
-        ops.funcs.onMIDIMessage = (event) => {
-          // Extract MIDI data from the event
-          const [status, data1, data2] = event.data;
-      
-          // Log MIDI message details
-          // console.log('MIDI Message Received:');
-          // console.log('  Status:', status);
-          // console.log('  Data1:', data1);
-          // console.log('  Data2:', data2);
+         ops.funcs.modulateDyniColor =(status, data1,data2)=>{
 
 
-          MIDISwitch.AKAI_PROG1_K1({  
-            flow: {program: status, key: data1, value: data2} , 
-           operation: {function: (funcParams) =>{ 
-          
-            console.log('AKAI_PROG1_K1');
-            // console.log('  Status:', status);
-            // console.log('  Data1:', data1);
-            console.log('  Data2:', funcParams.value);  
-          
-          }, params: {value: 676}} });
+          ops.ui.dyniColorComps =  hexToRgba(ops.ui.dyniColor.value); 
+                  
+    
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K1 ( {  
+  
+               flow: {chanel: status, key: data1, value: data2} , 
+               operation: {function: (params) =>{ 
+  
+                
+                 ops.ui.dyniColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                 ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+                
+          }} });
+  
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K2 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+  
+             ops.ui.dyniColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+         Ebk.MIDI.ctrlAKAILPD8_PROG1_K3 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+             ops.ui.dyniColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+  
+         }
+       
+  
+         ops.funcs.modulateDyniBgColor =(status, data1,data2)=>{
+  
+  
+          ops.ui.dyniBgColorComps =  hexToRgba(ops.ui.dyniBgColor.value); 
+                  
+    
+            Ebk.MIDI.ctrlAKAILPD8_PROG1_K5 ( {  
+  
+                flow: {chanel: status, key: data1, value: data2} , 
+                operation: {function: (params) =>{ 
+  
+                  
+                  ops.ui.dyniBgColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                  ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                  
+            }} });
+  
+            Ebk.MIDI.ctrlAKAILPD8_PROG1_K6 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+          }} });
+  
+  
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K7 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+            }} });
+  
+  
+  
+         }
+       
 
 
-          MIDISwitch.AKAI_PROG1_K2({  
-            flow: {program: status, key:  data1, value: data2} , 
-           operation: {function: (funcParams) =>{ 
-          
-            console.log('AKAI_PROG1_K2');
-            // console.log('  Status:', status);
-            // console.log('  Data1:', data1);
-            console.log('  Data2:', funcParams.value);  
-          
-          }, params: {value: 676}} });
+         ops.funcs.modulateDyniColor_hit =(status, data1,data2)=>{
+
+
+          ops.ui.dyniColorComps =  hexToRgba(ops.ui.dyniColor.value); 
+                  
+    
+          Ebk.MIDI.ctrlAKAILPD8_CC_PAD5 ( {  
+  
+               flow: {chanel: status, key: data1, value: data2} , 
+               operation: {function: (params) =>{ 
+  
+                
+                 ops.ui.dyniColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                 ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+                
+          }} });
+  
+          Ebk.MIDI.ctrlAKAILPD8_CC_PAD6 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+  
+             ops.ui.dyniColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+         Ebk.MIDI.ctrlAKAILPD8_CC_PAD7 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+             ops.ui.dyniColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+  
+         }
+       
+
+         ops.funcs.modulateDyniBgColor_hit =(status, data1,data2)=>{
+  
+  
+          ops.ui.dyniBgColorComps =  hexToRgba(ops.ui.dyniBgColor.value); 
+                  
+    
+            Ebk.MIDI.ctrlAKAILPD8_CC_PAD1 ( {  
+  
+                flow: {chanel: status, key: data1, value: data2} , 
+                operation: {function: (params) =>{ 
+  
+                  
+                  ops.ui.dyniBgColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                  ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                  
+            }} });
+  
+            Ebk.MIDI.ctrlAKAILPD8_CC_PAD2 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+          }} });
+  
+  
+          Ebk.MIDI.ctrlAKAILPD8_CC_PAD3 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+            }} });
+  
+  
+  
+         }
         
-          
 
-          // Ebk.Conversion.intervalSourceToTarget  = (params={src:{interval:[1,12], value:3.18},  dst:{interval:[100,200]}  })
-         // console.log( Math.floor(Ebk.Conversion.intervalSourceToTarget({src:{interval:[0,127], value:127},  dst:{interval:[0,255]}  })))
-          // Add your own logic to handle MIDI messages here
-        }
-      
 
         ops.funcs.iniWEBGPU = async ()=>{
 
@@ -659,6 +732,24 @@ projects.funcs.createUIFunctionList = () =>{
        }
 
 
+       ops.funcs.dyniColorWriteNDraw = (uiDyniColor, uiDyniColorComps)=> {
+         uiDyniColor.value = rgbToHex(uiDyniColorComps.r, uiDyniColorComps.g, uiDyniColorComps.b) 
+                        
+        let colorArr = new Float32Array([uiDyniColorComps.r/255, uiDyniColorComps.g/255, uiDyniColorComps.b/255]);
+        ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  colorArr);
+        ops.funcs.draw()
+
+        }
+
+        ops.funcs.dyniBgColorWriteNDraw = (uiBgDyniColor, uiDyniBgColorComps)=> {
+          uiBgDyniColor.value = rgbToHex(uiDyniBgColorComps.r, uiDyniBgColorComps.g, uiDyniBgColorComps.b) 
+                         
+           ops.funcs.draw()
+ 
+         }
+
+
+
         ops.funcs.doColorChange = ()=> {
           let colorNum = Number(ops.ui.colors.value);
           ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  ops.data.colors[colorNum]);
@@ -709,7 +800,8 @@ projects.funcs.createUIFunctionList = () =>{
           }
         });
 
-       
+
+
         ops.funcs.ini = async () =>{
 
           ops.funcs.load(); 
@@ -734,11 +826,15 @@ projects.funcs.createUIFunctionList = () =>{
           ops.ui.bgColors.value = 2;
           ops.ui.bgColors.onchange =  ops.funcs.draw;
 
-          ops.ui.dyniBgColor.value = "#7EA96b"
+
+
+          ops.ui.dyniColor.value = "#e66465";
+          ops.ui.dyniColor.oninput =  ops.funcs.dyniColorOnChange;
+  
+
+          ops.ui.dyniBgColor.value = "#7EA96b";
           ops.ui.dyniBgColor.oninput =  ops.funcs.draw;
 
-          ops.ui.dyniColor.value = "#e66465"
-          ops.ui.dyniColor.oninput =  ops.funcs.dyniColorOnChange
 
           
           ops.funcs.observer.observe(ops.data.context.canvas); //ops.funcs.draw();
@@ -747,29 +843,473 @@ projects.funcs.createUIFunctionList = () =>{
           Ebk.MIDI.initMIDI({   onMIDIMessage : (event) => {
             // Extract MIDI data from the event
                  const [status, data1, data2] = event.data;
-                   //console.log(status, data1, data2);
+
+                 console.log(status, data1, data2)
+
+                 ops.funcs.modulateDyniColor(status, data1,data2);
+                 ops.funcs.modulateDyniBgColor(status, data1,data2);
+
+                 ops.funcs.modulateDyniColor_hit(status, data1,data2);
+                 ops.funcs.modulateDyniBgColor_hit(status, data1,data2);
+              
+           
+      
+              }
+          });
+          
+
+          
+        }
+
+        return {desc:ops.desc, func: ops.funcs.ini};
+    }
+
+  } ,
+
+  {
+       
+    entry : ()=>{
+         
+        let ops = {};
+        ops.desc = `--Colored Triangle and background with picker-MIDI`
+        
+        ops.ui = {};
+       
+        ops.data = {};
+
+        ops.data.shaderSource = `
+
+          @group(0) @binding(0) var<uniform> color: vec3f; 
+
+          @vertex fn vs(@location(0) coords: vec2f)->@builtin(position) vec4f {
+            return vec4f(coords[0], coords[1], 0.0, 1.0);
+          }
+
+          @fragment fn fs()->@location(0) vec4f {
+            return vec4f(color[0], color[1], color[2], 1.0);
+          }
+
+        `;
+        
+        ops.data.triCoords  = new Float32Array([
+          -0.8, -0.6,  0.8, -0.6, 0.0, 0.6
+        ]);
 
 
-                
-                   Ebk.MIDI.ctrlAKAILPD8_PROG1_K1 ( {  
+        ops.data.colors  = [
+          new Float32Array([1.0, 0.0, 0.0]), 
+          new Float32Array([0.0, 1.0, 0.0]), 
+          new Float32Array([0.0, 0.0, 1.0]), 
+          new Float32Array([0.1, 0.1, 0.1]), 
+        ];
 
-                        flow: {chanel: status, key: data1, value: data2} , 
-                        operation: {function: (params) =>{ 
-                          console.log(params.chanel, params.key, params.value);
-                      
-                   }} });
+        ops.data.bgColors  = [
+           [0.7, 0.0, 0.0], 
+           [0.0, 0.7, 0.0], 
+           [0.0, 0.0, 0.7], 
+           [0.3, 0.3, 0.3], 
+        ];
+
+        ops.data.device; 
+        ops.data.context;
+        ops.data.shaderModule;
+        ops.data.vertexFormat = "float32x2";
+        ops.data.pipeline; 
+        ops.data.vertexBuffer; 
+        ops.data.uniformBuffer; 
+        ops.data.uniformBindGroup; 
 
 
-                   Ebk.MIDI.ctrlAKAILPD8_PROG1_K2 ( {  
+        ops.funcs = {};  
+        
+        
+        ops.funcs.load = ()=>{
 
-                    flow: {chanel: status, key: data1, value: data2} , 
-                    operation: {function: (params) =>{ 
-                      console.log(params.chanel, params.key, params.value);
+            projects.funcs.createUIInputsContainer(); 
+
+            projects.funcs.reloadCanvas();   
+
+            let  container = document.querySelector(`#uiInputsContainer`);  
+
+            ops.ui.dyniColor =  projects.funcs.createElement_LabeledInput( 
+              {   
+               container: container,   
+              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Triangle dyni color    ' },
+               inputProperties: { type:"color",  style: { width: '50px' } }
+            }).inputElement;
+
+            ops.ui.dyniBgColor =  projects.funcs.createElement_LabeledInput( 
+              {   
+               container: container,   
+              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Dyni backgroup color    ' },
+               inputProperties: { type:"color",  style: { width: '50px' } }
+            }).inputElement;
+
+            ops.ui.colors = projects.funcs.createElement_LabeledSelect (  {
+  
+              options: [
+                { value: '0', textContent: 'Red' },
+                { value: '1', textContent: 'Green' },
+                { value: '2', textContent: 'Blue' },
+                { value: '3', textContent: 'Grey' }
+              ],
+                container: container ,
+              
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' , display: "none" }, text: 'Triangle color '  },
+                selectProperties: { id: 'colorsList', style: { width: '100px' , display: "none" } }
+            }).selectElement;
+
+            ops.ui.bgColors = projects.funcs.createElement_LabeledSelect (  {
+  
+              options: [
+                { value: '0', textContent: 'Red' },
+                { value: '1', textContent: 'Green' },
+                { value: '2', textContent: 'Blue' },
+                { value: '3', textContent: 'Grey' }
+              ],
+                container: container ,
+              
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' , display: "none" }, text: 'BackGroundColor   ' },
+                selectProperties: { id: 'bgColorsList', style: { width: '100px' , display: "none" } }
+            }).selectElement;
+
+        }
+
+
+         ops.funcs.modulateDynyColor =(status, data1,data2)=>{
+
+
+          ops.ui.dyniColorComps =  hexToRgba(ops.ui.dyniColor.value); 
                   
-                  }} })
+    
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K1 ( {  
+  
+               flow: {chanel: status, key: data1, value: data2} , 
+               operation: {function: (params) =>{ 
+  
+                
+                 ops.ui.dyniColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                 ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+                
+          }} });
+  
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K2 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+  
+             ops.ui.dyniColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+         Ebk.MIDI.ctrlAKAILPD8_PROG1_K3 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+             ops.ui.dyniColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+  
+         }
+       
+  
+         ops.funcs.modulateDyniBgColor =(status, data1,data2)=>{
+  
+  
+          ops.ui.dyniBgColorComps =  hexToRgba(ops.ui.dyniBgColor.value); 
+                  
+    
+            Ebk.MIDI.ctrlAKAILPD8_PROG1_K5 ( {  
+  
+                flow: {chanel: status, key: data1, value: data2} , 
+                operation: {function: (params) =>{ 
+  
+                  
+                  ops.ui.dyniBgColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                  ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                  
+            }} });
+  
+            Ebk.MIDI.ctrlAKAILPD8_PROG1_K6 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+          }} });
+  
+  
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K7 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+            }} });
+  
+  
+  
+         }
+       
+
+        ops.funcs.iniWEBGPU = async ()=>{
+
+            if(!navigator.gpu){
+              throw new error("This navigator does not support webgpu"); 
+            }
+
+            let adapter = await navigator.gpu.requestAdapter(); 
+
+            if(!adapter) {
+              throw new error("The navigator support webgpu but there is no adapter found");
+            }
+
+            ops.data.device = await adapter.requestDevice(); 
+
+            ops.data.context = document.querySelector("canvas").getContext("webgpu"); 
+
+            ops.data.context.configure({
+               device: ops.data.device, 
+               format: navigator.gpu.getPreferredCanvasFormat(), 
+               alphaMode: "premultiplied"
+
+            });
+
+            ops.data.shaderModule = ops.data.device.createShaderModule({
+              label: `Shader module ${ops.desc}`, 
+              code: ops.data.shaderSource, 
+            });
+
+        }
+        
+
+        ops.funcs.doPipelineConfig = ()=>{
+
+          let vertexBufferLayout = [
+              {
+                attributes: [{shaderLocation: 0, offset: 0, format: ops.data.vertexFormat }], 
+                stepMode: "vertex", 
+                arrayStride: projects.gpu.vertexFormatValue( ops.data.vertexFormat ,"bytesize") 
+              }
+
+          ];
 
 
 
+          let uniformBindGroupLayout = ops.data.device.createBindGroupLayout({
+            label: `uniformBindGoupLayout,   ${ops.desc}`,
+            entries : [
+               {
+                binding: 0,
+                visibility: GPUShaderStage.FRAGMENT, 
+                buffer: {type: "uniform"}
+               }
+            ]
+          });
+
+          let pipelineDescriptor = {
+            
+            label: `pipeline,   ${ops.desc}`,
+
+            layout: ops.data.device.createPipelineLayout({
+              bindGroupLayouts: [uniformBindGroupLayout]
+            }), 
+
+            vertex: {
+              module : ops.data.shaderModule, 
+              entryPoint: "vs", 
+              buffers: vertexBufferLayout
+            } , 
+
+            fragment: {
+              module: ops.data.shaderModule, 
+              entryPoint: "fs", 
+              targets: [{
+                format: navigator.gpu.getPreferredCanvasFormat()
+              }]
+            } , 
+
+            primitive: {
+              topology: "triangle-list"
+            }
+
+          }
+
+
+          ops.data.pipeline = ops.data.device.createRenderPipeline(pipelineDescriptor);
+
+          ops.data.vertexBuffer = ops.data.device.createBuffer({
+              label: `vertexBuffer,   ${ops.desc}`,
+              size: ops.data.triCoords.byteLength, 
+              usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+          }); 
+
+          ops.data.device.queue.writeBuffer(ops.data.vertexBuffer, 0, ops.data.triCoords);
+
+          ops.data.uniformBuffer = ops.data.device.createBuffer({
+              label: `uniformBuffer,   ${ops.desc}`,
+              size: ops.data.colors[0].byteLength, 
+              usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+          }); 
+
+          ops.data.device.queue.writeBuffer(ops.data.uniformBuffer, 0, ops.data.colors[0]);
+ 
+          
+          ops.data.uniformBindGroup  =  ops.data.device.createBindGroup({
+            label: `uniformBindGroup,   ${ops.desc}`,
+            layout: uniformBindGroupLayout,
+            
+            entries : [
+              {
+               binding: 0, 
+               resource: {buffer: ops.data.uniformBuffer, offset: 0, size: 3*4} 
+              }
+           ]
+
+          }); 
+
+              
+        }  
+
+
+        ops.funcs.dyniColorOnChange = ()=> {
+
+          let colorComp =   hexToRgba(ops.ui.dyniColor.value);
+          let colorArr = new Float32Array([colorComp.r/255, colorComp.g/255, colorComp.b/255]);
+          ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  colorArr);
+          ops.funcs.draw()
+       }
+
+
+       ops.funcs.dyniColorWriteNDraw = (uiDyniColor, uiDyniColorComps)=> {
+         uiDyniColor.value = rgbToHex(uiDyniColorComps.r, uiDyniColorComps.g, uiDyniColorComps.b) 
+                        
+        let colorArr = new Float32Array([uiDyniColorComps.r/255, uiDyniColorComps.g/255, uiDyniColorComps.b/255]);
+        ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  colorArr);
+        ops.funcs.draw()
+
+        }
+
+        ops.funcs.dyniBgColorWriteNDraw = (uiBgDyniColor, uiDyniBgColorComps)=> {
+          uiBgDyniColor.value = rgbToHex(uiDyniBgColorComps.r, uiDyniBgColorComps.g, uiDyniBgColorComps.b) 
+                         
+           ops.funcs.draw()
+ 
+         }
+
+
+
+        ops.funcs.doColorChange = ()=> {
+          let colorNum = Number(ops.ui.colors.value);
+          ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  ops.data.colors[colorNum]);
+          ops.funcs.draw()
+       }
+
+
+        ops.funcs.draw = ()=>{
+
+          let bgColorComp =   hexToRgba(ops.ui.dyniBgColor.value);
+ 
+          let commandEncoder = ops.data.device.createCommandEncoder();
+
+          let renderPassDescriptor = {
+             colorAttachments: [{
+
+                 clearValue: { r: bgColorComp.r/255, g: bgColorComp.g/255, b: bgColorComp.b/255, a: 1 },
+
+                 loadOp: "clear", 
+                 storeOp: "store",  
+                 view: ops.data.context.getCurrentTexture().createView() 
+
+             }]
+          };
+          let passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+   
+          passEncoder.setPipeline(ops.data.pipeline);  
+          passEncoder.setVertexBuffer(0,ops.data.vertexBuffer);
+
+          passEncoder.setBindGroup(0,ops.data.uniformBindGroup);
+
+          passEncoder.draw(3);
+          passEncoder.end();
+          let commandBuffer = commandEncoder.finish(); 
+          ops.data.device.queue.submit([commandBuffer]); 
+         
+
+        }  
+
+        ops.funcs.observer = new ResizeObserver(entries => {
+          for (const entry of entries) {
+            const canvas = entry.target;
+            const width = entry.contentBoxSize[0].inlineSize;
+            const height = entry.contentBoxSize[0].blockSize;
+            canvas.width = Math.max(1, Math.min(width, ops.data.device.limits.maxTextureDimension2D));
+            canvas.height = Math.max(1, Math.min(height, ops.data.device.limits.maxTextureDimension2D));
+            ops.funcs.draw();
+          }
+        });
+
+
+
+        ops.funcs.ini = async () =>{
+
+          ops.funcs.load(); 
+
+          try {
+            await ops.funcs.iniWEBGPU();
+             ops.funcs.doPipelineConfig();
+
+             
+
+          }
+          catch (e) {
+            alert( "<span style='color:#AA0000; font-size:110%'><b>Error: Could not initialize WebGPU: </b>" + 
+            e.message + "</span>")
+           
+            return;
+        }
+
+
+          ops.ui.colors.value = 0;
+          ops.ui.colors.onchange = ops.funcs.doColorChange;
+          ops.ui.bgColors.value = 2;
+          ops.ui.bgColors.onchange =  ops.funcs.draw;
+
+
+
+          ops.ui.dyniColor.value = "#e66465";
+          ops.ui.dyniColor.oninput =  ops.funcs.dyniColorOnChange;
+  
+
+          ops.ui.dyniBgColor.value = "#7EA96b";
+          ops.ui.dyniBgColor.oninput =  ops.funcs.draw;
+
+
+          
+          ops.funcs.observer.observe(ops.data.context.canvas); //ops.funcs.draw();
+
+          
+          Ebk.MIDI.initMIDI({   onMIDIMessage : (event) => {
+            // Extract MIDI data from the event
+                 const [status, data1, data2] = event.data;
+
+                 ops.funcs.modulateDynyColor(status, data1,data2);
+                 ops.funcs.modulateDyniBgColor(status, data1,data2)
+           
+      
               }
           });
           
