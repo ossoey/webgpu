@@ -330,15 +330,6 @@ projects.funcs.createUIFunctionList = () =>{
 
         ops.data.shaderSource = `
 
-          // @group(0) @binding(0) var<uniform> color: vec3f; 
-
-          // @vertex fn vs(@location(0) coords: vec2f)->@builtin(position) vec4f {
-          //   return vec4f(coords[0], coords[1], 0.0, 1.0);
-          // }
-
-          // @fragment fn fs()->@location(0) vec4f {
-          //   return vec4f(color[0], color[1], color[2], 1.0);
-          // }
 
           @group(0) @binding(0) var<uniform> color: vec3f; 
 
@@ -529,7 +520,6 @@ projects.funcs.createUIFunctionList = () =>{
   
          }
        
-
          ops.funcs.modulateDyniColor_hit =(status, data1,data2)=>{
 
 
@@ -654,35 +644,31 @@ projects.funcs.createUIFunctionList = () =>{
 
         ops.funcs.doPipelineConfig = ()=>{
 
-         
-            let vertexBufferLayout = [{
 
-              attributes : [{shaderLocation: 0, offset: 0, format: "float32x2"}], 
-              stepMode: "vertex", 
-              arrayStride: 8, 
-            }];
-
+            let vertexBufferLayout = [
+              {
+                attributes: [{shaderLocation: 0, offset: 0, format: "float32x2"}],
+                arrayStride: 8, 
+                stepMode: "vertex"
+              }
+            ];
 
             let bindGroupLayout = ops.data.device.createBindGroupLayout({
-               label: `BindGroupLayout, ${ops.desc}`, 
-               entries: [
-                  {
-      
-                    binding: 0,   
+                label: `BindGroupLayout, ${ops.desc}`, 
+                entries: [{
+                    binding: 0, 
                     visibility: GPUShaderStage.FRAGMENT, 
                     buffer: {type: "uniform"}
-                  
-                  }
-               ]
+                }]
             });
 
-            let  pipelineDesc = {
 
-                label: `Pipeline, ${ops.desc}`, 
+            let pipelineDesc = {
+
+                label: `pipeline, ${ops.desc}`, 
+
                 layout: ops.data.device.createPipelineLayout({
-
-                  bindGroupLayouts: [bindGroupLayout]
-                
+                    bindGroupLayouts: [bindGroupLayout]
                 }), 
 
                 vertex: {
@@ -690,7 +676,7 @@ projects.funcs.createUIFunctionList = () =>{
                   entryPoint: "vs", 
                   buffers: vertexBufferLayout
                 }, 
-
+                
                 fragment: {
                   module: ops.data.shaderModule, 
                   entryPoint: "fs", 
@@ -701,138 +687,130 @@ projects.funcs.createUIFunctionList = () =>{
                   topology: "triangle-list"
                 }
 
-
-            }
+            } 
 
             ops.data.pipeline = ops.data.device.createRenderPipeline(pipelineDesc);
-
-
-            ops.data.vertexBuffer  = ops.data.device.createBuffer({
-              label: `VertexBuffer, ${ops.desc}`, 
+            
+            ops.data.vertexBuffer = ops.data.device.createBuffer({
+              label: `VertexBuffer , ${ops.desc}`, 
               size: ops.data.triCoords.byteLength, 
               usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
             });
 
+            ops.data.device.queue.writeBuffer(ops.data.vertexBuffer, 0, ops.data.triCoords);
 
-            ops.data.device.queue.writeBuffer(ops.data.vertexBuffer, 0, ops.data.triCoords );
-
-
-            ops.data.uniformBuffer  = ops.data.device.createBuffer({
-              label: `uniformBuffer, ${ops.desc}`, 
+            ops.data.uniformBuffer = ops.data.device.createBuffer({
+              label: `UniformBuffer , ${ops.desc}`, 
               size: ops.data.colors[0].byteLength, 
               usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
             });
 
-
-            ops.data.device.queue.writeBuffer(ops.data.uniformBuffer, 0, ops.data.colors[0] );
-
+            ops.data.device.queue.writeBuffer(ops.data.uniformBuffer , 0, ops.data.colors[0]);
+            
 
             ops.data.uniformBindGroup = ops.data.device.createBindGroup({
-               label: `Uniform bind group , ${ops.desc}`, 
-               layout: bindGroupLayout, 
-               entries: [
+              label: `uniformBindGroup, ${ops.desc}`, 
+              layout : bindGroupLayout, 
+              entries: [
+                {
+                  binding: 0, 
+                  resource: { buffer: ops.data.uniformBuffer, offset: 0 , size: 4*3}
+                }
+              ]
+            })
 
-                  {
-                    binding: 0, 
-                    resource: { buffer: ops.data.uniformBuffer, offset: 0, size: 4*3}
 
-                  }
+         
+            // let vertexBufferLayout = [{
 
-               ]
-            }) 
+            //   attributes : [{shaderLocation: 0, offset: 0, format: "float32x2"}], 
+            //   stepMode: "vertex", 
+            //   arrayStride: 8, 
+            // }];
+
+
+            // let bindGroupLayout = ops.data.device.createBindGroupLayout({
+            //    label: `BindGroupLayout, ${ops.desc}`, 
+            //    entries: [
+            //       {
+      
+            //         binding: 0,   
+            //         visibility: GPUShaderStage.FRAGMENT, 
+            //         buffer: {type: "uniform"}
+                  
+            //       }
+            //    ]
+            // });
+
+            // let  pipelineDesc = {
+
+            //     label: `Pipeline, ${ops.desc}`, 
+            //     layout: ops.data.device.createPipelineLayout({
+
+            //       bindGroupLayouts: [bindGroupLayout]
+                
+            //     }), 
+
+            //     vertex: {
+            //       module: ops.data.shaderModule, 
+            //       entryPoint: "vs", 
+            //       buffers: vertexBufferLayout
+            //     }, 
+
+            //     fragment: {
+            //       module: ops.data.shaderModule, 
+            //       entryPoint: "fs", 
+            //       targets: [{format: navigator.gpu.getPreferredCanvasFormat()}]
+            //     } , 
+
+            //     primitive: {
+            //       topology: "triangle-list"
+            //     }
+
+
+            // }
+
+            // ops.data.pipeline = ops.data.device.createRenderPipeline(pipelineDesc);
+
+
+            // ops.data.vertexBuffer  = ops.data.device.createBuffer({
+            //   label: `VertexBuffer, ${ops.desc}`, 
+            //   size: ops.data.triCoords.byteLength, 
+            //   usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+            // });
+
+
+            // ops.data.device.queue.writeBuffer(ops.data.vertexBuffer, 0, ops.data.triCoords );
+
+
+            // ops.data.uniformBuffer  = ops.data.device.createBuffer({
+            //   label: `uniformBuffer, ${ops.desc}`, 
+            //   size: ops.data.colors[0].byteLength, 
+            //   usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+            // });
+
+
+            // ops.data.device.queue.writeBuffer(ops.data.uniformBuffer, 0, ops.data.colors[0] );
+
+
+            // ops.data.uniformBindGroup = ops.data.device.createBindGroup({
+            //    label: `Uniform bind group , ${ops.desc}`, 
+            //    layout: bindGroupLayout, 
+            //    entries: [
+
+            //       {
+            //         binding: 0, 
+            //         resource: { buffer: ops.data.uniformBuffer, offset: 0, size: 4*3}
+
+            //       }
+
+            //    ]
+            // }) 
           
 
 
 
-
-
-
-
-
-          // let vertexBufferLayout = [
-          //     {
-          //       attributes: [{shaderLocation: 0, offset: 0, format: ops.data.vertexFormat }], 
-          //       stepMode: "vertex", 
-          //       arrayStride: projects.gpu.vertexFormatValue( ops.data.vertexFormat , projects.gpu.vertexFormatCOL_BYTESIZE) 
-          //     }
-
-          // ];
-
-
-          // let uniformBindGroupLayout = ops.data.device.createBindGroupLayout({
-          //   label: `uniformBindGoupLayout,   ${ops.desc}`,
-          //   entries : [
-          //      {
-          //       binding: 0,
-          //       visibility: GPUShaderStage.FRAGMENT, 
-          //       buffer: {type: "uniform"}
-          //      }
-          //   ]
-          // });
-
-          // let pipelineDescriptor = {
-            
-          //   label: `pipeline,   ${ops.desc}`,
-
-          //   layout: ops.data.device.createPipelineLayout({
-          //     bindGroupLayouts: [uniformBindGroupLayout]
-          //   }), 
-
-          //   vertex: {
-          //     module : ops.data.shaderModule, 
-          //     entryPoint: "vs", 
-          //     buffers: vertexBufferLayout
-          //   } , 
-
-          //   fragment: {
-          //     module: ops.data.shaderModule, 
-          //     entryPoint: "fs", 
-          //     targets: [{
-          //       format: navigator.gpu.getPreferredCanvasFormat()
-          //     }]
-          //   } , 
-
-          //   primitive: {
-          //     topology: "triangle-list"
-          //   }
-
-          // }
-
-
-          // ops.data.pipeline = ops.data.device.createRenderPipeline(pipelineDescriptor);
-
-          // ops.data.vertexBuffer = ops.data.device.createBuffer({
-          //     label: `vertexBuffer,   ${ops.desc}`,
-          //     size: ops.data.triCoords.byteLength, 
-          //     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
-          // }); 
-
-          // ops.data.device.queue.writeBuffer(ops.data.vertexBuffer, 0, ops.data.triCoords);
-
-          // ops.data.uniformBuffer = ops.data.device.createBuffer({
-          //     label: `uniformBuffer,   ${ops.desc}`,
-          //     size: ops.data.colors[0].byteLength, 
-          //     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-          // }); 
-
-          // ops.data.device.queue.writeBuffer(ops.data.uniformBuffer, 0, ops.data.colors[0]);
- 
-          
-          // ops.data.uniformBindGroup  =  ops.data.device.createBindGroup({
-          //   label: `uniformBindGroup,   ${ops.desc}`,
-          //   layout: uniformBindGroupLayout,
-            
-          //   entries : [
-          //     {
-          //      binding: 0, 
-          //      resource: {buffer: ops.data.uniformBuffer, offset: 0, size: 3*4} 
-          //     }
-          //  ]
-
-          // }); 
-
-              
-
+    
 
         }  
 
