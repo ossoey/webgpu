@@ -349,12 +349,641 @@ projects.funcs.createUIFunctionList = () =>{
 
  projects.entries = [
 
+
   {
        
     entry : ()=>{
          
         let ops = {};
-        ops.desc = `--Colored Vertex Triangle and background with -MIDI A`
+        ops.desc = `--2-Colored Vertex Triangle and background with UI-MAX`
+        
+        ops.ui = {};
+       
+        ops.data = {};
+
+        ops.data.shaderSource = `
+
+
+          struct VertexTransfer {
+              @builtin(position) position: vec4f, 
+              @location(0) vertexColor : vec4f
+          }
+
+          @vertex fn vs(@location(0) coords: vec2f, 
+                        @location(1) color: vec3f
+                      
+          )-> VertexTransfer  {
+         
+
+            var vertexTransfer: VertexTransfer; 
+
+            vertexTransfer.position = vec4f(coords, 0.0, 1.0);
+            vertexTransfer.vertexColor = vec4f(color, 1.0);
+            
+            return vertexTransfer;
+           
+          }
+         
+          @fragment fn fs(@location(0) color: vec4f )-> @location(0) vec4f {
+            return color;
+          }
+         
+         
+        `;
+        
+
+        
+        ops.data.triCoords  = new Float32Array([
+          -0.8, -0.6, 1.0, 0.0, 0.0, 
+           0.8, -0.6,  0.0, 1.0, 0.0, 
+           0.0, 0.6, 0.0, 0.0, 1.0, 
+        ]);
+
+        ops.data.colorsO  =  new Float32Array( [
+             
+             
+             
+        ]);
+
+
+        ops.data.colors  = [
+          new Float32Array([1.0, 0.0, 0.0]), 
+          new Float32Array([0.0, 1.0, 0.0]), 
+          new Float32Array([0.0, 0.0, 1.0]), 
+          new Float32Array([0.1, 0.1, 0.1]), 
+        ];
+
+        ops.data.bgColors  = [
+           [0.7, 0.0, 0.0], 
+           [0.0, 0.7, 0.0], 
+           [0.0, 0.0, 0.7], 
+           [0.3, 0.3, 0.3], 
+        ];
+
+        ops.data.device; 
+        ops.data.context;
+        ops.data.shaderModule;
+        ops.data.vertexFormat = "float32x5";
+        ops.data.pipeline; 
+        ops.data.vertexBuffer; 
+        ops.data.uniformBuffer; 
+        ops.data.uniformBindGroup; 
+
+
+        ops.funcs = {};  
+        
+        
+        ops.funcs.load = ()=>{
+
+            projects.funcs.createUIInputsContainer(); 
+
+            projects.funcs.reloadCanvas();   
+
+            let  container = document.querySelector(`#uiInputsContainer`);  
+
+            ops.ui.dyniColor =  projects.funcs.createElement_LabeledInput( 
+              {   
+               container: container,   
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px', display: "none"  }, text: 'Triangle dyni color    ' },
+               inputProperties: { type:"color",  style: { width: '50px', display: "none" } }
+            }).inputElement;
+
+
+            
+             ops.ui.vertex1 = projects.funcs.createElement_LabeledVertexInputs({
+ 
+              container: container,
+              // divProperties: { id: 'myContainer', style: { border: '1px solid #ccc', padding: '10px' } },
+              labelProperties: { style: { color: 'blue', display: "grid" }, text: 'vertex 1' },
+              colorProperties:  { type:"color", style: { width: '50px' } },
+              inputsProperties: [{ type:"range", min:"-1", max:"1", value:"0", step:"0.01" , style: { width: '50px' } },
+                                 { type:"range", min:"-1", max:"1", value:"0", step:"0.01" , style: { width: '50px' } }
+                               ] 
+            });
+
+
+
+               projects.funcs.createAndAppendElement({container: container, properties: {innerHTML:"&nbsp;&nbsp;&nbsp " }, elementType: "div"  })
+                        
+              ops.ui.vertex2 = projects.funcs.createElement_LabeledVertexInputs({
+ 
+              container: container,
+ 
+              labelProperties: { style: { color: 'blue', display: "grid" }, text: 'vertex 2' },
+              colorProperties:  { type:"color", style: { width: '50px' } },
+              inputsProperties: [{ type:"range", min:"-1", max:"1", value:"0", step:"0.01" , style: { width: '50px'} },
+                                 { type:"range", min:"-1", max:"1", value:"0", step:"0.01" , style: { width: '50px' } }
+                               ] 
+              });
+      
+              projects.funcs.createAndAppendElement({container: container, properties: {innerHTML:"&nbsp;&nbsp;&nbsp " }, elementType: "div"  });
+
+              ops.ui.vertex3 = projects.funcs.createElement_LabeledVertexInputs({
+ 
+                container: container,
+       
+                labelProperties: { style: { color: 'blue', display: "grid" }, text: 'vertex 3' },
+                colorProperties:  { type:"color", style: { width: '50px' } },
+                inputsProperties: [{ type:"range", min:"-1", max:"1", value:"0", step:"0.01" , style: { width: '50px' } },
+                                   { type:"range", min:"-1", max:"1", value:"0", step:"0.01" , style: { width: '50px' } }
+                                 ] 
+                });
+        
+
+
+            ops.ui.dyniBgColor =  projects.funcs.createElement_LabeledInput( 
+              {   
+               container: container,   
+              labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'bgColor    ' },
+               inputProperties: { type:"color",  style: { width: '50px' } }
+            }).inputElement;
+
+        }
+
+
+
+         ops.funcs.modulateDyniColor =(status, data1,data2)=>{
+
+
+          ops.ui.dyniColorComps =  hexToRgba(ops.ui.dyniColor.value); 
+                  
+    
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K1 ( {  
+  
+               flow: {chanel: status, key: data1, value: data2} , 
+               operation: {function: (params) =>{ 
+  
+                
+                 ops.ui.dyniColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                 ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+                
+          }} });
+  
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K2 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+  
+             ops.ui.dyniColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+         Ebk.MIDI.ctrlAKAILPD8_PROG1_K3 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+             ops.ui.dyniColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+  
+         }
+       
+  
+         ops.funcs.modulateDyniBgColor =(status, data1,data2)=>{
+  
+  
+          ops.ui.dyniBgColorComps =  hexToRgba(ops.ui.dyniBgColor.value); 
+                  
+    
+            Ebk.MIDI.ctrlAKAILPD8_PROG1_K5 ( {  
+  
+                flow: {chanel: status, key: data1, value: data2} , 
+                operation: {function: (params) =>{ 
+  
+                  
+                  ops.ui.dyniBgColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                  ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                  
+            }} });
+  
+            Ebk.MIDI.ctrlAKAILPD8_PROG1_K6 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+          }} });
+  
+  
+          Ebk.MIDI.ctrlAKAILPD8_PROG1_K7 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+            }} });
+  
+
+         }
+       
+         ops.funcs.modulateDyniColor_hit =(status, data1,data2)=>{
+
+
+          ops.ui.dyniColorComps =  hexToRgba(ops.ui.dyniColor.value); 
+                  
+    
+          Ebk.MIDI.ctrlAKAILPD8_CC_PAD5 ( {  
+  
+               flow: {chanel: status, key: data1, value: data2} , 
+               operation: {function: (params) =>{ 
+  
+                
+                 ops.ui.dyniColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                 ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+                
+          }} });
+  
+          Ebk.MIDI.ctrlAKAILPD8_CC_PAD6 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+  
+             ops.ui.dyniColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+         Ebk.MIDI.ctrlAKAILPD8_CC_PAD7 ( {  
+  
+           flow: {chanel: status, key: data1, value: data2} , 
+           operation: {function: (params) =>{ 
+             ops.ui.dyniColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+             ops.funcs.dyniColorWriteNDraw(ops.ui.dyniColor, ops.ui.dyniColorComps);
+         
+         }} });
+  
+  
+         }
+       
+
+         ops.funcs.modulateDyniBgColor_hit =(status, data1,data2)=>{
+  
+  
+          ops.ui.dyniBgColorComps =  hexToRgba(ops.ui.dyniBgColor.value); 
+                  
+    
+            Ebk.MIDI.ctrlAKAILPD8_CC_PAD1 ( {  
+  
+                flow: {chanel: status, key: data1, value: data2} , 
+                operation: {function: (params) =>{ 
+  
+                  
+                  ops.ui.dyniBgColorComps.r = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                  ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                  
+            }} });
+  
+            Ebk.MIDI.ctrlAKAILPD8_CC_PAD2 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.g = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+          }} });
+  
+  
+          Ebk.MIDI.ctrlAKAILPD8_CC_PAD3 ( {  
+  
+              flow: {chanel: status, key: data1, value: data2} , 
+              operation: {function: (params) =>{ 
+  
+                
+                ops.ui.dyniBgColorComps.b = Ebk.MIDI.keyValueToRGBvalue(data2);
+  
+                ops.funcs.dyniBgColorWriteNDraw(ops.ui.dyniBgColor, ops.ui.dyniBgColorComps);
+                
+            }} });
+  
+  
+  
+         }
+        
+
+         ops.funcs.iniWEBGPU = async () =>{
+
+          if (!navigator.gpu) {
+              throw new Error("This navigator does't not support webGPU");
+                }
+        
+                let adapter = await navigator.gpu.requestAdapter(); 
+                 
+                if (!adapter) {
+                   throw new Errow("The navigator support WEBGPU, but there's no adapter");
+                }
+        
+                ops.data.device = await adapter.requestDevice();
+        
+                ops.data.context = document.querySelector("canvas").getContext("webgpu");
+        
+                ops.data.context.configure({
+                        device: ops.data.device, 
+                        format: navigator.gpu.getPreferredCanvasFormat(), 
+                        alphaMode: "premultiplied" 
+                });
+        
+                ops.data.shaderModule = ops.data.device.createShaderModule({
+        
+            label: "Shader module, ${ops.desc}", 
+            code: ops.data.shaderSource
+        
+                })        
+         
+        
+        }
+
+
+        ops.funcs.doPipelineConfig = ()=>{
+
+
+            let vertexBufferLayout = [
+                { attributes: [{shaderLocation: 0, offset: 0, format: "float32x2"},
+                               {shaderLocation: 1, offset: 8, format: "float32x3"}
+                              ], 
+                  stepMode: "vertex", 
+                  arrayStride: 20   
+                } 
+            ];
+
+
+
+            let pipelineDesc = {
+                 label: `pipeline, ${ops.desc}`, 
+                 layout: "auto", 
+                  
+                 vertex: {
+                    module: ops.data.shaderModule, 
+                    entryPoint: "vs", 
+                    buffers: vertexBufferLayout
+
+                 }, 
+
+                 fragment: {
+                    module: ops.data.shaderModule, 
+                    entryPoint: "fs", 
+                    targets: [{format: navigator.gpu.getPreferredCanvasFormat()}]
+
+                 }, 
+
+                 primitive: {
+                  topology: "triangle-list"
+                 }
+
+            };
+
+
+            ops.data.pipeline = ops.data.device.createRenderPipeline(pipelineDesc);
+
+            ops.data.vertexBuffer = ops.data.device.createBuffer(
+              {
+                label: `VertexBuffer , ${ops.desc}`, 
+                size: ops.data.triCoords.byteLength, 
+                usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+              }
+            );
+
+            ops.data.device.queue.writeBuffer(ops.data.vertexBuffer,0, ops.data.triCoords);
+
+
+      
+        }  
+
+
+
+
+        ops.funcs.dyniColorOnChange = ()=> {
+
+          let colorComp =   hexToRgba(ops.ui.dyniColor.value);
+          let colorArr = new Float32Array([colorComp.r/255, colorComp.g/255, colorComp.b/255]);
+          ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  colorArr);
+
+          ops.funcs.draw()
+       }
+
+
+       ops.funcs.dyniColorWriteNDraw = (uiDyniColor, uiDyniColorComps)=> {
+         uiDyniColor.value = rgbToHex(uiDyniColorComps.r, uiDyniColorComps.g, uiDyniColorComps.b) 
+                        
+        let colorArr = new Float32Array([uiDyniColorComps.r/255, uiDyniColorComps.g/255, uiDyniColorComps.b/255]);
+        ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  colorArr);
+        ops.funcs.draw()
+
+        }
+
+        ops.funcs.dyniBgColorWriteNDraw = (uiBgDyniColor, uiDyniBgColorComps)=> {
+          uiBgDyniColor.value = rgbToHex(uiDyniBgColorComps.r, uiDyniBgColorComps.g, uiDyniBgColorComps.b) 
+                         
+           ops.funcs.draw()
+ 
+         }
+
+
+
+        ops.funcs.doColorChange = ()=> {
+          let colorNum = Number(ops.ui.colors.value);
+          ops.data.device.queue.writeBuffer( ops.data.uniformBuffer, 0,  ops.data.colors[colorNum]);
+          ops.funcs.draw()
+       }
+
+       ops.funcs.coordsChanged = () =>{
+
+        let vxColor1 = hexToRgbaNormal(ops.ui.vertex1.color.value);
+        let vxColor2 = hexToRgbaNormal(ops.ui.vertex2.color.value);
+        let vxColor3 = hexToRgbaNormal(ops.ui.vertex3.color.value);
+
+        ops.data.triCoords  = new Float32Array([
+           ops.ui.vertex1.x.value, ops.ui.vertex1.y.value,   vxColor1.r,  vxColor1.g,  vxColor1.b, 
+           ops.ui.vertex2.x.value, ops.ui.vertex2.y.value,   vxColor2.r,  vxColor2.g,  vxColor2.b, 
+           ops.ui.vertex3.x.value, ops.ui.vertex3.y.value,   vxColor3.r,  vxColor3.g,  vxColor3.b,  
+        ]);
+
+        ops.data.device.queue.writeBuffer( ops.data.vertexBuffer, 0,  ops.data.triCoords);
+
+        ops.funcs.draw()
+
+       }
+
+
+      
+
+  
+
+        ops.funcs.draw = ()=>{
+
+   
+
+            let bgColorComp = hexToRgbaNormal(ops.ui.dyniBgColor.value);
+
+            let commandEncoder = ops.data.device.createCommandEncoder({
+              label: `CommandEncoder, ${ops.desc}`
+            });
+
+            let renderPassDesc = {
+                 colorAttachments: [
+                  {
+                    clearValue: [bgColorComp.r, bgColorComp.g, bgColorComp.b, 1.0], 
+                    loadOp: "clear", 
+                    storeOp: "store", 
+                    view: ops.data.context.getCurrentTexture().createView()
+                  }
+                ]
+            };
+
+
+            let passEncoder = commandEncoder.beginRenderPass(renderPassDesc);
+
+            passEncoder.setPipeline(ops.data.pipeline);
+            passEncoder.setVertexBuffer(0, ops.data.vertexBuffer);
+           
+            
+            passEncoder.draw(3);
+            passEncoder.end(); 
+
+            let commandBuffer = commandEncoder.finish();
+
+            ops.data.device.queue.submit([commandBuffer]);
+
+
+
+        }  
+
+        ops.funcs.observer = new ResizeObserver(entries => {
+          for (const entry of entries) {
+            const canvas = entry.target;
+            const width = entry.contentBoxSize[0].inlineSize;
+            const height = entry.contentBoxSize[0].blockSize;
+            canvas.width = Math.max(1, Math.min(width, ops.data.device.limits.maxTextureDimension2D));
+            canvas.height = Math.max(1, Math.min(height, ops.data.device.limits.maxTextureDimension2D));
+            ops.funcs.draw();
+          }
+        });
+
+
+
+        ops.funcs.ini = async () =>{
+
+          ops.funcs.load(); 
+
+          try {
+            await ops.funcs.iniWEBGPU();
+             ops.funcs.doPipelineConfig();
+          }
+
+          catch (e) {
+            alert( "<span style='color:#AA0000; font-size:110%'><b>Error: Could not initialize WebGPU: </b>" + 
+            e.message + "</span>")
+           
+            return;
+        }
+
+
+          // ops.ui.colors.value = 0;
+          // ops.ui.colors.onchange = ops.funcs.doColorChange;
+          // ops.ui.bgColors.value = 2;
+          // ops.ui.bgColors.onchange =  ops.funcs.draw;
+
+
+
+          // ops.ui.dyniColor.value = "#e66465";
+          // ops.ui.dyniColor.oninput =  ops.funcs.dyniColorOnChange;
+  
+
+          ops.ui.dyniBgColor.value = "#7EA96b";
+          ops.ui.dyniBgColor.oninput =  ops.funcs.draw;
+
+          // ops.ui.vertex1.x.oninput = () =>{
+
+          //   ops.data.triCoords  = new Float32Array([
+          //      ops.ui.vertex1.x.value, ops.ui.vertex1.y.value, 
+          //      0.8, -0.6,  
+          //      0.0, 0.6, 
+          //   ]);
+  
+          //   ops.data.device.queue.writeBuffer( ops.data.vertexBuffer, 0,  ops.data.triCoords);
+  
+          //   ops.funcs.draw()
+  
+          // }
+
+
+
+          ops.ui.vertex1.x.value =  -1;
+          ops.ui.vertex1.y.value =  -0.8;
+          ops.ui.vertex2.x.value =  1;
+          ops.ui.vertex2.y.value =  -0.8;
+          ops.ui.vertex3.x.value =  0;
+          ops.ui.vertex3.y.value =  0.5;
+
+          ops.ui.vertex1.color.value = "#7EA96b";
+          ops.ui.vertex2.color.value = "#e66465";
+          ops.ui.vertex3.color.value = "#7EA96b";
+
+          ops.ui.vertex1.x.oninput =  ops.funcs.coordsChanged
+          ops.ui.vertex1.y.oninput =  ops.funcs.coordsChanged
+          ops.ui.vertex2.x.oninput =  ops.funcs.coordsChanged
+          ops.ui.vertex2.y.oninput =  ops.funcs.coordsChanged
+          ops.ui.vertex3.x.oninput =  ops.funcs.coordsChanged
+          ops.ui.vertex3.y.oninput =  ops.funcs.coordsChanged
+
+
+          ops.ui.vertex1.color.oninput = ops.funcs.coordsChanged
+          ops.ui.vertex2.color.oninput = ops.funcs.coordsChanged
+          ops.ui.vertex3.color.oninput = ops.funcs.coordsChanged
+
+
+          
+          ops.funcs.observer.observe(ops.data.context.canvas); //ops.funcs.draw();
+
+          
+          Ebk.MIDI.initMIDI({   onMIDIMessage : (event) => {
+            // Extract MIDI data from the event
+                 const [status, data1, data2] = event.data;
+
+                 console.log(status, data1, data2)
+
+         
+
+                 ops.funcs.modulateDyniBgColor(status, data1,data2);
+                  ops.funcs.modulateDyniBgColor_hit(status, data1,data2);
+              
+           
+      
+              }
+          });
+          
+
+          
+        }
+
+        return {desc:ops.desc, func: ops.funcs.ini};
+    }
+
+  } ,
+
+  {
+       
+    entry : ()=>{
+         
+        let ops = {};
+        ops.desc = `--1-Colored Vertex Triangle and background with UI-MAX`
         
         ops.ui = {};
        
@@ -470,7 +1099,7 @@ projects.funcs.createUIFunctionList = () =>{
  
               labelProperties: { style: { color: 'blue', display: "grid" }, text: 'vertex 2' },
               colorProperties:  { type:"color", style: { width: '50px' } },
-              inputsProperties: [{ type:"range", min:"-1", max:"1", value:"0", step:"0.01" , style: { width: '50px' } },
+              inputsProperties: [{ type:"range", min:"-1", max:"1", value:"0", step:"0.01" , style: { width: '50px'} },
                                  { type:"range", min:"-1", max:"1", value:"0", step:"0.01" , style: { width: '50px' } }
                                ] 
               });
@@ -498,10 +1127,6 @@ projects.funcs.createUIFunctionList = () =>{
             }).inputElement;
 
 
-
-
-
-           
 
         }
 
@@ -1219,6 +1844,7 @@ projects.funcs.createUIFunctionList = () =>{
   
          }
        
+         
          ops.funcs.modulateDyniColor_hit =(status, data1,data2)=>{
 
 
@@ -1496,51 +2122,6 @@ projects.funcs.createUIFunctionList = () =>{
             ops.data.device.queue.submit([commandBuffer]);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-       
-          // let  bgColorComp = hexToRgbaNormal(ops.ui.dyniBgColor.value)
- 
-          // let commandEncoder = ops.data.device.createCommandEncoder();
-
-          // let renderPassDescriptor = {
-          //    colorAttachments: [{
-
-          //        clearValue: { r: bgColorComp.r, g: bgColorComp.g, b: bgColorComp.b, a: 1 },
-
-          //        loadOp: "clear", 
-          //        storeOp: "store",  
-          //        view: ops.data.context.getCurrentTexture().createView() 
-
-          //    }]
-          // };
-
-          // let passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-   
-          // passEncoder.setPipeline(ops.data.pipeline);  
-          // passEncoder.setVertexBuffer(0,ops.data.vertexBuffer);
-
-          // passEncoder.setBindGroup(0,ops.data.uniformBindGroup);
-
-          // passEncoder.draw(3);
-          // passEncoder.end();
-          // let commandBuffer = commandEncoder.finish(); 
-          // ops.data.device.queue.submit([commandBuffer]); 
          
 
         }  
