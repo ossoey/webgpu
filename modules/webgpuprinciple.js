@@ -355,6 +355,100 @@ projects.funcs.createUIFunctionList = () =>{
     entry : ()=>{
          
         let ops = {};
+        ops.desc = `--Multiple disks 1`
+        
+        ops.ui = {};
+        
+        ops.ui.context; 
+        ops.ui.actions = {};
+        
+
+        ops.cpu = {};
+
+        ops.cpu.actions = {};
+       
+
+        ops.gpu = {};
+
+        ops.gpu.shaderCode;
+        ops.gpu.shaderModule; 
+        ops.gpu.device;
+        ops.gpu.pipeline; 
+        ops.gpu.bindGroup;
+        ops.gpu.attr = {};
+        ops.gpu.unif = {};
+        ops.gpu.stor = {};
+        ops.gpu.actions = {};
+
+
+        ops.gpu.ini = async ()=>{
+
+            if (!navigator.gpu) {
+              throw new Error("Navigator does not support WEBGPU");
+            }
+            
+            let adapter = await navigator.gpu.requestAdapter();
+
+            if (!adapter) {
+              throw  new Error("Navigator support WEBFGP but there's no adapter found");
+            }
+
+            ops.gpu.device = await adapter.requestDevice();
+            
+            ops.ui.context = document.querySelector("canvas").getContext("webgpu");
+
+            ops.ui.context.configure({
+              
+              device: ops.gpu.device, 
+              format: navigator.gpu.getPreferredCanvasFormat(), 
+              alphaMode: "premultiplied"
+            });
+
+            ops.gpu.shaderCode = `
+
+                 struct VertexOut {
+                    @builtin(position)  coords: vec4f, 
+                    location(0)  color: vec4f
+                 }
+
+                 @vertex fn vs(@location(0) coords: vec2f, @location(1) color: vec3f, @location(2) offset: vec2f )-> VertexOut {
+                    var vertexOut: VertexOut; 
+                    vertexOut.coords = vec4f(coords + offset, 0.0, 1.0);
+                    vertexOut.color = vec4f(color, 1.0);
+                    return vertexOut; 
+                 }
+
+                 @fragment fn vs()-> @location(0) vec4f {
+                    
+                 }
+            
+            `
+
+
+        }
+
+        ops.cpu.actions.ini = async () =>{
+
+          try {
+              //ops.gpu.ini()
+          }
+          catch(e) {
+
+          }
+
+        }
+
+        return {desc:ops.desc, func: ops.cpu.actions.ini};
+    }
+
+  } ,
+
+
+  {
+       
+    entry : ()=>{
+         
+        let ops = {};
         ops.desc = `--2-Colored Vertex Triangle and background with UI-MAX`
         
         ops.ui = {};
