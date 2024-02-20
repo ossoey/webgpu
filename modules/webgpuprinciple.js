@@ -359,182 +359,48 @@ projects.funcs.createUIFunctionList = () =>{
         
         ops.ui = {};
         
-        ops.ui.context; 
-        
-
         ops.cpu = {};
 
  
-       
-
         ops.gpu = {};
-
-
-        ops.gpu.shaderCode = `
-
-        struct VertexOut {
-           @builtin(position)  coords: vec4f, 
-           @location(0)  color: vec4f
-        }
-
-        @vertex fn vs(@location(0) coords: vec2f, @location(1) offset: vec2f, @location(2) color: vec3f )-> VertexOut {
-           var vertexOut: VertexOut; 
-           vertexOut.coords = vec4f(coords + offset, 0.0, 1.0);
-           vertexOut.color = vec4f(color, 1.0);
-           return vertexOut; 
-        }
-
-        @fragment fn fs(@location(0) color: vec4f)-> @location(0) vec4f {
-           return color; 
-        }
-
-        `
-
         
-        ops.gpu.shaderModule; 
-        ops.gpu.device;
-        ops.gpu.pipeline; 
-        ops.gpu.bindGroup;
-        ops.gpu.VERTEX_COUNT = 32;
-        ops.gpu.INSTANCE_COUNT = 25;
-        
-        ops.gpu.attr = {};
-        ops.gpu.attr.vertexCoord = {};
-        ops.gpu.attr.vertexCoord.data = new Float32Array(2*ops.gpu.VERTEX_COUNT);
-        ops.gpu.attr.instanceColor = {};
-        ops.gpu.attr.instanceColor.data = new Float32Array(3*ops.gpu.INSTANCE_COUNT);
-        ops.gpu.attr.velocity = {};
-        ops.gpu.attr.velocity.data = new Float32Array(2*ops.gpu.INSTANCE_COUNT);
-        ops.gpu.attr.instanceOffset = {};
-        ops.gpu.attr.instanceOffset.data = new Float32Array(2*ops.gpu.INSTANCE_COUNT);
+
+        //  1-Preparer les variables globale
+             env.shderCode;
+             env.Shader;
+             env.context;
+             env.device;
+             env.pipeline;
+             
 
 
-        ops.gpu.unif = {};
-        ops.gpu.stor = {};
-     
-
-
-        ops.gpu.ini = async ()=>{
-
-            if (!navigator.gpu) {
-              throw new Error("Navigator does not support WEBGPU");
-            }
+             objs.count
+             objs.vertexCount
             
-            let adapter = await navigator.gpu.requestAdapter();
-
-            if (!adapter) {
-              throw  new Error("Navigator support WEBFGP but there's no adapter found");
-            }
-
-            ops.gpu.device = await adapter.requestDevice();
-            
-            ops.ui.context = document.querySelector("canvas").getContext("webgpu");
-
-            ops.ui.context.configure({
-              
-              device: ops.gpu.device, 
-              format: navigator.gpu.getPreferredCanvasFormat(), 
-              alphaMode: "premultiplied"
-            });
-
-            ops.gpu.shaderModule = ops.gpu.device.createShaderModule({
-              label: `ShaderModule, ${ops.desc}`, 
-              code: ops.gpu.shaderCode
-            });
-
-        }
-
-        ops.gpu.doPipelineConfig = () =>{
-
-           let vertexBufferLayout = [
-              {
-                attributes: [{shaderLocation: 0, offset: 0, format: "float32x2"}], 
-                stepMode: "vertex", 
-                arrayStride: 8
-              } , 
-
-              {
-                attributes: [{shaderLocation: 1, offset: 0, format: "float32x2"}], 
-                stepMode: "instance", 
-                arrayStride: 8
-              } , 
-              {
-                attributes: [{shaderLocation: 2, offset: 0, format: "float32x3"}], 
-                stepMode: "instance", 
-                arrayStride: 12
-              } , 
-
-           ];
+             objs.attr.buffers
+             objs.attr.vertex.data
+             objs.attr.vertex.buffer
+             objs.attr.offset.data
+             objs.attr.offset.buffer
+             objs.attr.color.data
+             objs.attr.color.buffer
 
 
-           let pipelineDesc = {
-               label: `Pipeline, ${ops.desc}`, 
-
-               layout : "auto", 
-
-               vertex : {
-                  entryPoint: "vs", 
-                  module: ops.gpu.shaderModule, 
-                  buffers: vertexBufferLayout, 
-               } , 
-
-               fragment: {
-                 entryPoint: "fs", 
-                 module: ops.gpu.shaderModule, 
-                 targets: [{format: navigator.gpu.getPreferredCanvasFormat()}]
-               } , 
-
-               primitive: {
-                  topology: "triangle-strip"
-               }
-           }; 
-
-            ops.gpu.pipeline = ops.gpu.device.createRenderPipeline(pipelineDesc);
-           
-
-           ops.gpu.attr.vertexCoord.buffer = ops.gpu.device.createBuffer({
-              label: `vertexCoord Buffer ${ops.desc}`, 
-              size:  ops.gpu.attr.vertexCoord.data.byteLength, 
-              usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
-           });
-
-           ops.gpu.device.queue.writeBuffer(ops.gpu.attr.vertexCoord.buffer, 0, ops.gpu.attr.vertexCoord.data);
-
-
-          ops.gpu.attr.instanceOffset.buffer = ops.gpu.device.createBuffer({
-            label: `instance offset Buffer ${ops.desc}`, 
-            size:  ops.gpu.attr.instanceOffset.data.byteLength, 
-            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
-          });
-
-          ops.gpu.device.queue.writeBuffer(ops.gpu.attr.instanceOffset.buffer, 0, ops.gpu.attr.instanceOffset.data);
-
-
-          ops.gpu.attr.instanceColor.buffer = ops.gpu.device.createBuffer({
-            label: `instance color Buffer ${ops.desc}`, 
-            size:  ops.gpu.attr.instanceColor.data.byteLength, 
-            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
-          });
-
-          ops.gpu.device.queue.writeBuffer(ops.gpu.attr.instanceColor.buffer, 0, ops.gpu.attr.instanceColor.data);
-
-
-
-        }
-
+        //  2-Initialiser les structures de données, les données et le code du shader
+        //  3-Initialiser le WEBGPU
+        //  4-Cree la configuration du pipeline
+        //  5-Dessiner
+        //  6-Modifier le frame
+        //  7-Déclencher l'animation
+        //  8-executer le programme
+//      
+// 
+// 
+// 
 
 
         ops.cpu.ini = async () =>{
 
-          try {
-              await ops.gpu.ini();
-              ops.gpu.doPipelineConfig();
-          }
-          catch(e) {
-
-            alert (e.message );
-
-          }
 
         }
 
