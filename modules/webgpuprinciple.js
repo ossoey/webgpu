@@ -363,27 +363,28 @@ projects.funcs.createUIFunctionList = () =>{
 
  
         ops.gpu = {};
-        
+        ops.env;
+        ops.objs;
 
         //  1-Preparer les variables globale
-             env.shderCode;
-             env.Shader;
-             env.context;
-             env.device;
-             env.pipeline;
+            //  env.shderCode;
+            //  env.Shader;
+            //  env.context;
+            //  env.device;
+            //  env.pipeline;
              
 
 
-             objs.count
-             objs.vertexCount
+            //  objs.count
+            //  objs.vertexCount
             
-             objs.attr.buffers
-             objs.attr.vertex.data
-             objs.attr.vertex.buffer
-             objs.attr.offset.data
-             objs.attr.offset.buffer
-             objs.attr.color.data
-             objs.attr.color.buffer
+            //  objs.attr.buffers
+            //  objs.attr.vertex.data
+            //  objs.attr.vertex.buffer
+            //  objs.attr.offset.data
+            //  objs.attr.offset.buffer
+            //  objs.attr.color.data
+            //  objs.attr.color.buffer
 
 
         //  2-Initialiser les structures de données, les données et le code du shader
