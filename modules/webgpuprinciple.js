@@ -355,57 +355,394 @@ projects.funcs.createUIFunctionList = () =>{
     entry : ()=>{
          
         let ops = {};
+
         ops.desc = `--Multiple disks 1`
-        
+         
+        // 1-Préparer les variables globales. 
         ops.ui = {};
+
+        ops.env = {};
+        ops.env.context;
+        ops.env.device; 
+        ops.env.shaderCode; 
+        ops.env.shader; 
+        ops.env.pipeline; 
+        ops.env.canvas = document.querySelector("canvas");
+
+        ops.objs = {};
         
-        ops.cpu = {};
+        ops.objs.count = 10; 
+        ops.objs.vertexCount = 16;
+        ops.objs.attr = {};
+        ops.objs.attr.buffers = {};
+        ops.objs.attr.coords = {};
+        ops.objs.attr.coords.data; 
+        ops.objs.attr.coords.buffer; 
 
- 
-        ops.gpu = {};
-        ops.env;
-        ops.objs;
+        ops.objs.attr.offsets = {};
+        ops.objs.attr.offsets.data; 
+        ops.objs.attr.offsets.buffer;
 
-        //  1-Preparer les variables globale
-            //  env.shderCode;
-            //  env.Shader;
-            //  env.context;
-            //  env.device;
-            //  env.pipeline;
-             
+        ops.objs.attr.velocities = {};
+        ops.objs.attr.velocities.data;
+
+        ops.objs.attr.colors = {};
+        ops.objs.attr.colors.data; 
+        ops.objs.attr.colors.buffer; 
 
 
-            //  objs.count
-            //  objs.vertexCount
+
+        ops.cams = {};
+        ops.lights = {};
+        ops.scene = {};
+        
+        // 2-Créer les composants de l'interface utilisateur. 
+        
+        ops.createUIComponents = () =>{
+
+          projects.funcs.createUIInputsContainer(); 
+
+          projects.funcs.reloadCanvas();   
+
+          let  container = document.querySelector(`#uiInputsContainer`); 
+
+          ops.ui.checkBox =  projects.funcs.createElement_LabeledInput( 
+              {   
+               container: container,   
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px'  }, text: 'Animation  ' },
+               inputProperties: { type:"checkbox",  style: { } }
+            }).inputElement;
+
+          ops.ui.colorStart =  projects.funcs.createElement_LabeledInput( 
+              {   
+               container: container,   
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Color start ' },
+               inputProperties: { type:"color",  style: { width: '50px'} }
+            }).inputElement;
+
+          ops.ui.colorEnd =  projects.funcs.createElement_LabeledInput( 
+              {   
+               container: container,   
+                labelProperties: { style: {  border: '1px solid #ccc', padding: '12px', margin: '12px' }, text: 'Color end ' },
+                inputProperties: { type:"color",  style: { width: '50px' } }
+            }).inputElement;
+
+           ops.ui.colorStart.value= "#a88d32"; 
+           ops.ui.colorEnd.value = "#7EA96b"; 
+
+        
+        }
+
+
+
+        // 3-Initialiser les structures de données, les données et le code de shader. 
+        
+        ops.iniDataStructures = () =>{
+
+            ops.objs.vertexCount = 16; 
+            ops.objs.count = 330; 
+            ops.objs.attr.coords.data = new Float32Array(2*ops.objs.vertexCount);
+            ops.objs.attr.offsets.data = new Float32Array(2*ops.objs.count);
+            ops.objs.attr.velocities.data = new Float32Array(2*ops.objs.count);
+            ops.objs.attr.colors.data = new Float32Array(3*ops.objs.count);
+
+            ops.env.shaderCode = `
+
+                  struct VertexOutPut {
+                     @location(0) color: vec4f, 
+                     @builtin(position) position : vec4f
+                  }
+
+                  @vertex fn vs(@location(0) coord: vec2f, 
+                                @location(1) offset: vec2f, 
+                                @location(2) color: vec3f
+                  ) -> VertexOutPut {
+
+                      var vertexOutput: VertexOutPut;
+                      vertexOutput.position = vec4f(coord + offset , 0.0, 1.0);
+                      vertexOutput.color = vec4f(color, 1.0);
+                      return  vertexOutput;   
+
+                  }
+
+
+                  @fragment fn fs(@location(0) color: vec4f) ->@location(0) vec4f {
+                     return color;
+                  }
             
-            //  objs.attr.buffers
-            //  objs.attr.vertex.data
-            //  objs.attr.vertex.buffer
-            //  objs.attr.offset.data
-            //  objs.attr.offset.buffer
-            //  objs.attr.color.data
-            //  objs.attr.color.buffer
+            `
+        }
 
+        ops.iniData = () =>{
 
-        //  2-Initialiser les structures de données, les données et le code du shader
-        //  3-Initialiser le WEBGPU
-        //  4-Cree la configuration du pipeline
-        //  5-Dessiner
-        //  6-Modifier le frame
-        //  7-Déclencher l'animation
-        //  8-executer le programme
-//      
-// 
-// 
-// 
+            //  Affecter les données des coordonnées de chaque vertex
+            const aspect =  ops.env.canvas.height/ops.env.canvas.width ;
 
+            // déterminer les coordonnées du premier point 
+              ops.objs.attr.coords.data[0] = 0.1*aspect; 
+              ops.objs.attr.coords.data[1] = 0; 
 
-        ops.cpu.ini = async () =>{
+            // par itération, déterminer les points symétriques à l'axe des abcisses
+            for(let vtxndx = 1; vtxndx<=ops.objs.vertexCount; vtxndx++){
 
+                let angle = (2*Math.PI/ops.objs.vertexCount)*vtxndx; 
+                ops.objs.attr.coords.data[4*(vtxndx-1)+2] = 0.1*aspect * Math.cos(angle); 
+                ops.objs.attr.coords.data[4*(vtxndx-1)+3] = -0.1 * Math.sin(angle); 
+                ops.objs.attr.coords.data[4*(vtxndx-1)+4] = 0.1*aspect * Math.cos(angle); 
+                ops.objs.attr.coords.data[4*(vtxndx-1)+5] = 0.1 * Math.sin(angle); 
+
+            }
+
+            // déterminer les coordonnées du dernier point 
+            ops.objs.attr.coords.data[2*ops.objs.vertexCount-2] = -0.1*aspect; 
+            ops.objs.attr.coords.data[2*ops.objs.vertexCount-1] = 0; 
+
+            // Pour toutes les données qui suivent procéder par itération
+            
+            for(let objndx = 0; objndx<ops.objs.count; objndx++){
+                // Affecter les données des vitesses de chaque disque
+                ops.objs.attr.velocities.data[2*objndx] = 0.06*Math.random();
+                ops.objs.attr.velocities.data[2*objndx+1]= 0.06*Math.random();
+
+                // assigner les données de  offsets
+                ops.objs.attr.offsets.data[2*objndx] = 2*Math.random() - 1;
+                ops.objs.attr.offsets.data[2*objndx+1]= 2*Math.random() -1 ;
+
+                // Affecter les données de couleur de chaque disque
+
+                ops.objs.attr.colors.data[3*objndx] =  Math.random();
+                ops.objs.attr.colors.data[3*objndx+1]=  Math.random();
+                ops.objs.attr.colors.data[3*objndx+2]=  Math.random();
+            }
 
         }
 
-        return {desc:ops.desc, func:  ops.cpu.ini };
+        // 4-Initialiser le WEBGPU de façon asynchrone. 
+
+        ops.iniWEBGPU = async () =>{
+
+             // Vérifier si le navigateur supporte WEBGPU
+            if(!navigator.gpu){
+              throw new Error("WEBGPU is not supported by this navigator");
+            }
+
+            // assigner avec attente l'adapter
+            let adapter = await navigator.gpu.requestAdapter() ;
+
+            // véfivier si l'adapter est existant
+            if (!adapter){
+              throw new Error("Navigator supported WEBGPU but no adapter found");
+            }
+
+            // assigner avec attente l'appareil
+            ops.env.device = await adapter.requestDevice();
+              
+            // assigner le context
+            ops.env.context = document.querySelector("canvas").getContext("webgpu");
+          
+            // configure le context
+
+            ops.env.context.configure({
+              device: ops.env.device, 
+              format: navigator.gpu.getPreferredCanvasFormat(),
+              alphaMode: "premultiplied"
+            });
+
+            // crée le shader
+            ops.env.device.pushErrorScope("validation");  
+            ops.env.shaderModule = ops.env.device.createShaderModule({
+               label: `Shader module, ${ops.desc}`, 
+               code: ops.env.shaderCode
+            });
+
+            let error = await ops.env.device.popErrorScope();
+            if (error) {
+               throw Error("Compilation error in shader; see Console for details.");
+            }  
+
+        
+
+        }
+
+        // 5-Créer la configuration du pipeline. 
+
+        ops.createPipilineConfig = () =>{
+
+            // Décrire la disposition du vertex buffer 
+
+            let vertexBufferLayout = [
+               {
+                attributes: [{shaderLocation:0, offset: 0, format: "float32x2"}], 
+                arrayStride: 8, 
+                stepMode:"vertex"
+               } , 
+               {
+                attributes: [{shaderLocation:1, offset: 0, format: "float32x2"}], 
+                arrayStride: 8, 
+                stepMode:"instance"
+               } , 
+               {
+                attributes: [{shaderLocation:2, offset: 0, format: "float32x3"}], 
+                arrayStride: 12, 
+                stepMode:"instance"
+               } , 
+            ];
+
+            // Décrire la description du pipeline 
+            let pipelineDesc = {
+                label: `pipeline, ${ops.desc}`,
+                layout: "auto", 
+                vertex: {
+                  module: ops.env.shaderModule, 
+                  entryPoint: "vs", 
+                  buffers: vertexBufferLayout
+                } , 
+                
+                fragment: {
+                  module: ops.env.shaderModule, 
+                  entryPoint: "fs", 
+                  targets: [{format: navigator.gpu.getPreferredCanvasFormat()}]
+
+                } , 
+
+                primitive: {
+                  topology: "triangle-strip"
+                }
+
+            }; 
+
+            ops.env.pipeline = ops.env.device.createRenderPipeline(pipelineDesc);
+
+            // créer le buffer des coordonnées de la geometrie
+
+            ops.objs.attr.coords.buffer = ops.env.device.createBuffer({
+               label: `coords.buffer, ${ops.desc}`, 
+               size: ops.objs.attr.coords.data.byteLength, 
+               usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+            });
+
+            // Écrire les données dans le buffer
+            ops.env.device.queue.writeBuffer(ops.objs.attr.coords.buffer, 0, ops.objs.attr.coords.data);
+            
+            
+
+            // créer le buffer des offsets de chaque instance 
+            
+            ops.objs.attr.offsets.buffer = ops.env.device.createBuffer({
+              label: `offsets.buffer, ${ops.desc}`, 
+              size: ops.objs.attr.offsets.data.byteLength, 
+              usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+           });
+
+           // Écrire les données dans le buffer
+           ops.env.device.queue.writeBuffer(ops.objs.attr.offsets.buffer, 0, ops.objs.attr.offsets.data);
+
+               
+            // créer le buffer des couleurs de chaque instance 
+
+           ops.objs.attr.colors.buffer = ops.env.device.createBuffer({
+            label: `colors.buffer, ${ops.desc}`, 
+            size: ops.objs.attr.colors.data.byteLength, 
+            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+           });
+
+          // Écrire les données dans le buffer
+           ops.env.device.queue.writeBuffer(ops.objs.attr.colors.buffer, 0, ops.objs.attr.colors.data);
+
+        }
+
+        // 6-Dessiner. 
+        
+        ops.draw = () => {
+
+            // crée l'encoder                   
+            let commandEncoder = ops.env.device.createCommandEncoder();
+            
+            // Décrire le renderPass 
+            let renderPassDesc = {
+              colorAttachments: [
+                {
+                  clearValue: [0.5, 0.4, 0.3, 1.0], 
+                  loadOp: "clear", 
+                  storeOp: "store",
+                  view: ops.env.context.getCurrentTexture().createView()
+                }
+              ]
+            };
+
+            // Démarrer la passe
+
+            let pass = commandEncoder.beginRenderPass(renderPassDesc);
+
+            // Affecter le pipeline dans la passe #
+            pass.setPipeline(ops.env.pipeline);
+
+            // Affecter coords Buffer dans la pas 
+            pass.setVertexBuffer(0, ops.objs.attr.coords.buffer);
+
+            // Affecter offsets Buffer dans la passe 
+            pass.setVertexBuffer(1, ops.objs.attr.offsets.buffer);
+
+            // Affecter offsets Buffer dans la passe 
+            pass.setVertexBuffer(2, ops.objs.attr.colors.buffer);
+          
+            // dessiner 
+
+            pass.draw(ops.objs.vertexCount, ops.objs.count);
+            
+            // Terminer la passe 
+            pass.end();
+
+            // Terminer la commande mémoire
+
+            let commandBuffer = commandEncoder.finish();
+
+            // Envoyer la command dans le GPU 
+            
+            ops.env.device.queue.submit([commandBuffer]);
+
+      
+        }
+
+        // réajuster le contenu du canvas 
+        const observer = new ResizeObserver(entries => {
+          for (const entry of entries) {
+            const canvas = entry.target;
+            const width = entry.contentBoxSize[0].inlineSize;
+            const height = entry.contentBoxSize[0].blockSize;
+            canvas.width = Math.max(1, Math.min(width, ops.env.device.limits.maxTextureDimension2D));
+            canvas.height = Math.max(1, Math.min(height, ops.env.device.limits.maxTextureDimension2D));
+          
+            ops.draw();
+          }
+        });
+        
+
+
+        // 7-Editer le frame. 
+        // 8-Declencher l'animation. 
+        // 9-Exécuter le programme. 
+
+        ops.run = async() =>{
+
+          try {
+            ops.createUIComponents();
+            ops.iniDataStructures();
+            ops.iniData();
+            await  ops.iniWEBGPU();
+            
+            ops.createPipilineConfig();
+          }
+          catch(e)  {
+
+          }
+
+
+          observer.observe(ops.env.context.canvas);
+
+        }
+ 
+        return {desc:ops.desc, func: ops.run };
     }
 
   } ,
@@ -883,10 +1220,7 @@ projects.funcs.createUIFunctionList = () =>{
        }
 
 
-      
-
-  
-
+    
         ops.funcs.draw = ()=>{
 
    
