@@ -651,9 +651,9 @@ projects.funcs.createUIFunctionList = () =>{
 
         }
 
-        // 6-Dessiner. 
+        // 6-Afficher. 
         
-        ops.draw = () => {
+        ops.render = () => {
 
             // crée l'encoder                   
             let commandEncoder = ops.env.device.createCommandEncoder();
@@ -707,22 +707,47 @@ projects.funcs.createUIFunctionList = () =>{
         // réajuster le contenu du canvas 
         const observer = new ResizeObserver(entries => {
           for (const entry of entries) {
-            const canvas = entry.target;
+            const target = entry.target;
             const width = entry.contentBoxSize[0].inlineSize;
             const height = entry.contentBoxSize[0].blockSize;
-            canvas.width = Math.max(1, Math.min(width, ops.env.device.limits.maxTextureDimension2D));
-            canvas.height = Math.max(1, Math.min(height, ops.env.device.limits.maxTextureDimension2D));
+            target.width = Math.max(1, Math.min(width, ops.env.device.limits.maxTextureDimension2D));
+            target.height = Math.max(1, Math.min(height, ops.env.device.limits.maxTextureDimension2D));
           
-            ops.draw();
+            ops.render();
           }
         });
         
+        
+        // créer un nouvel observateur
 
+        let observer1 = new  ResizeObserver(entries =>{
+
+          for(let entry of entries){
+
+            // assigner la cible 
+            let target = entry.target; 
+
+            // assigner la largeur encours qui est dans l'entrée
+            let width = entry.contentBoxSize[0].inlineSize; 
+
+            let height = entry.contentBoxSize[0].blockSize; 
+            
+            // assigner la nouvelle largeur
+
+            target.width = Math.max(1, Math.min(width, ops.env.device.limits.maxTextureDimension2D ));
+
+            target.height = Math.max(1, Math.min(height, ops.env.device.limits.maxTextureDimension2D ));
+          
+            ops.render()  ;
+          }
+
+        });
+        
 
         // 7-Editer le frame. 
-        // 8-Declencher l'animation. 
-        // 9-Exécuter le programme. 
+        // 8-Declencher l'animation.
 
+        // 9-Exécuter le programme. 
         ops.run = async() =>{
 
           try {
@@ -738,7 +763,7 @@ projects.funcs.createUIFunctionList = () =>{
           }
 
 
-          observer.observe(ops.env.context.canvas);
+          observer1.observe(ops.env.context.canvas);
 
         }
  
@@ -1270,6 +1295,9 @@ projects.funcs.createUIFunctionList = () =>{
             ops.funcs.draw();
           }
         });
+
+
+
 
 
 
