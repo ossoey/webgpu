@@ -244,9 +244,9 @@ projects.funcs.createElement_LabeledSelect = (params= {
 
 
 projects.funcs.reloadCanvas = () =>{
-  //  document.querySelector(`canvas`).remove();
+    document.querySelector(`canvas`).remove();
    
-  //  document.querySelector(`body`).append( document.createElement(`canvas`));
+    document.querySelector(`body`).append( document.createElement(`canvas`));
 
  
 }
@@ -528,28 +528,6 @@ projects.funcs.createUIFunctionList = () =>{
 
         // 4-Initialiser le WEBGPU de façon asynchrone. 
 
-        ops.reloadCanvas = () =>{
-
-
-          document.querySelector(`canvas`).remove();
-   
-          document.querySelector(`body`).append( document.createElement(`canvas`));
-
-          ops.env.context = document.querySelector("canvas").getContext("webgpu");
-          
-          // configure le context
-
-          ops.env.context.configure({
-            device: ops.env.device, 
-            format: navigator.gpu.getPreferredCanvasFormat(),
-            alphaMode: "premultiplied"
-          });
-
-
-
-        }
-
-
        ops.observer = new ResizeObserver(entries =>{
             for(let entry of entries){
               // Assigner la cible 
@@ -574,13 +552,6 @@ projects.funcs.createUIFunctionList = () =>{
 
 
         ops.iniWEBGPU = async () =>{
-
-
-          document.querySelector(`canvas`).remove();
-   
-          document.querySelector(`body`).append( document.createElement(`canvas`));
-
-          ops.observer.observe(document.querySelector(`canvas`))
            
 
              // Vérifier si le navigateur supporte WEBGPU
