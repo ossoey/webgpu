@@ -244,8 +244,11 @@ projects.funcs.createElement_LabeledSelect = (params= {
 
 
 projects.funcs.reloadCanvas = () =>{
-  document.querySelector(`canvas`).remove();
-  document.querySelector(`body`).append( document.createElement(`canvas`));
+  //  document.querySelector(`canvas`).remove();
+   
+  //  document.querySelector(`body`).append( document.createElement(`canvas`));
+
+ 
 }
 
 projects.funcs.createUIInputsContainer = () =>{
@@ -275,8 +278,9 @@ projects.funcs.removeUIInputsContainer = () =>{
 ///**Old  */
 
 let reloadCanvas = () =>{
+   
     document.querySelector(`canvas`).remove();
-    document.querySelector(`body`).append( document.createElement(`canvas`));
+     document.querySelector(`body`).append( document.createElement(`canvas`));
 }
 
 let createUIInputsContainer = () =>{
@@ -403,7 +407,7 @@ projects.funcs.createUIFunctionList = () =>{
 
           projects.funcs.createUIInputsContainer(); 
 
-          projects.funcs.reloadCanvas();   
+         projects.funcs.reloadCanvas();   
 
           let  container = document.querySelector(`#uiInputsContainer`); 
 
@@ -440,8 +444,8 @@ projects.funcs.createUIFunctionList = () =>{
         
         ops.iniDataStructures = () =>{
         
-            ops.objs.vertexCount = 14; 
-            ops.objs.count = 20; 
+            ops.objs.vertexCount = 32; 
+            ops.objs.count = 100; 
             ops.objs.attr.coords.data = new Float32Array(2*ops.objs.vertexCount);
             ops.objs.attr.offsets.data = new Float32Array(2*ops.objs.count);
             ops.objs.attr.velocities.data = new Float32Array(2*ops.objs.count);
@@ -462,7 +466,7 @@ projects.funcs.createUIFunctionList = () =>{
                   ) -> VertexOutPut {
 
                       var vertexOutput: VertexOutPut;
-                      vertexOutput.position = vec4f(offset + coord , 0.0, 1.0);
+                      vertexOutput.position = vec4f(offset + coord , 0.0, 1);
                       vertexOutput.color = vec4f(color, 1.0);
                       return  vertexOutput;   
 
@@ -506,8 +510,8 @@ projects.funcs.createUIFunctionList = () =>{
             
             for(let objndx = 0; objndx<ops.objs.count; objndx++){
                 // Affecter les données des vitesses de chaque disque
-                ops.objs.attr.velocities.data[2*objndx] = 0.8*Math.random();
-                ops.objs.attr.velocities.data[2*objndx+1]= 0.8*Math.random();
+                ops.objs.attr.velocities.data[2*objndx] = 0.2*Math.random();
+                ops.objs.attr.velocities.data[2*objndx+1]= 0.2*Math.random();
 
                 // assigner les données de  offsets
                 ops.objs.attr.offsets.data[2*objndx] = 1.8*Math.random() - 0.9;
@@ -524,7 +528,60 @@ projects.funcs.createUIFunctionList = () =>{
 
         // 4-Initialiser le WEBGPU de façon asynchrone. 
 
+        ops.reloadCanvas = () =>{
+
+
+          document.querySelector(`canvas`).remove();
+   
+          document.querySelector(`body`).append( document.createElement(`canvas`));
+
+          ops.env.context = document.querySelector("canvas").getContext("webgpu");
+          
+          // configure le context
+
+          ops.env.context.configure({
+            device: ops.env.device, 
+            format: navigator.gpu.getPreferredCanvasFormat(),
+            alphaMode: "premultiplied"
+          });
+
+
+
+        }
+
+
+       ops.observer = new ResizeObserver(entries =>{
+            for(let entry of entries){
+              // Assigner la cible 
+              let target = entry.target; 
+              // Assigner la largeur et la hauteur
+              // la largeur est égale à l'indice initiale de la taille du contenu de la boite associée à la taille en ligne 
+              
+              let width = entry.contentBoxSize[0].inlineSize; 
+              let height = entry.contentBoxSize[0].blockSize; 
+
+              // Définir la nouvelle largeur et hauteur de la cible
+
+              target.width = Math.max(1, Math.min(width, ops.env.device.limits.maxTextureDimension2D));
+              target.height = Math.max(1, Math.min(height, ops.env.device.limits.maxTextureDimension2D));
+              
+            }
+
+          
+
+        });
+
+
+
         ops.iniWEBGPU = async () =>{
+
+
+          document.querySelector(`canvas`).remove();
+   
+          document.querySelector(`body`).append( document.createElement(`canvas`));
+
+          ops.observer.observe(document.querySelector(`canvas`))
+           
 
              // Vérifier si le navigateur supporte WEBGPU
             if(!navigator.gpu){
@@ -550,7 +607,7 @@ projects.funcs.createUIFunctionList = () =>{
             ops.env.context.configure({
               device: ops.env.device, 
               format: navigator.gpu.getPreferredCanvasFormat(),
-              alphaMode: "opaque"
+              alphaMode: "premultiplied"
             });
 
             // crée le shader
@@ -711,29 +768,31 @@ projects.funcs.createUIFunctionList = () =>{
         }
 
         // créer un nouvel observateur avec la classe de réajustement de d'observateur
-       ops.observer = new ResizeObserver(entries =>{
-            for(let entry of entries){
-              // Assigner la cible 
-              let target = entry.target; 
-              // Assigner la largeur et la hauteur
-              // la largeur est égale à l'indice initiale de la taille du contenu de la boite associée à la taille en ligne 
+      //  ops.observer = new ResizeObserver(entries =>{
+      //       for(let entry of entries){
+      //         // Assigner la cible 
+      //         let target = entry.target; 
+      //         // Assigner la largeur et la hauteur
+      //         // la largeur est égale à l'indice initiale de la taille du contenu de la boite associée à la taille en ligne 
               
-              let width = entry.contentBoxSize[0].inlineSize; 
-              let height = entry.contentBoxSize[0].blockSize; 
+      //         let width = entry.contentBoxSize[0].inlineSize; 
+      //         let height = entry.contentBoxSize[0].blockSize; 
 
-              // Définir la nouvelle largeur et hauteur de la cible
+      //         // Définir la nouvelle largeur et hauteur de la cible
 
-              target.width = Math.max(1, Math.min(width, ops.env.device.limits.maxTextureDimension2D));
-              target.height = Math.max(1, Math.min(height, ops.env.device.limits.maxTextureDimension2D));
+      //         target.width = Math.max(1, Math.min(width, ops.env.device.limits.maxTextureDimension2D));
+      //         target.height = Math.max(1, Math.min(height, ops.env.device.limits.maxTextureDimension2D));
               
-            }
+      //       }
 
-            ops.render();
+      //       ops.render();
 
-        });
+      //   });
 
         // 7-Editer le frame. 
         ops.env.animating = false;
+        ops.env.previousTime;
+
         ops.editFrame = () =>{
           
           // verifier si l'animation est encours
@@ -762,26 +821,26 @@ projects.funcs.createUIFunctionList = () =>{
 
 
             // vérifier les exceptions aux déplacements
-             if (ops.objs.attr.offsets.data[x] > -0.9) {
+             if (ops.objs.attr.offsets.data[x] > 0.9) {
                  ops.objs.attr.velocities.data[x] = -ops.objs.attr.velocities.data[x];
-                 ops.objs.attr.offsets.data[x] = 1.8 - ops.objs.attr.offsets.data[x];
+                //  ops.objs.attr.offsets.data[x] = 1.8 - ops.objs.attr.offsets.data[x];
                   
   
              } 
              else if  (ops.objs.attr.offsets.data[x] < -0.9) {
               ops.objs.attr.velocities.data[x] = - ops.objs.attr.velocities.data[x];
                
-              ops.objs.attr.offsets.data[x] = -1.8 - ops.objs.attr.offsets.data[x];
+              // ops.objs.attr.offsets.data[x] = -1.8 - ops.objs.attr.offsets.data[x];
              } 
 
              if (ops.objs.attr.offsets.data[y] > 0.9) {
               ops.objs.attr.velocities.data[y] = - ops.objs.attr.velocities.data[y];
-              ops.objs.attr.offsets.data[y] = 1.8 - ops.objs.attr.offsets.data[y];
+              // ops.objs.attr.offsets.data[y] = 1.8 - ops.objs.attr.offsets.data[y];
 
              } 
               else if  (ops.objs.attr.offsets.data[y] < -0.9) {
               ops.objs.attr.velocities.data[y] = - ops.objs.attr.velocities.data[y];
-              ops.objs.attr.offsets.data[y] = -1.8 - ops.objs.attr.offsets.data[y];
+              // ops.objs.attr.offsets.data[y] = -1.8 - ops.objs.attr.offsets.data[y];
 
             } 
 
@@ -790,10 +849,7 @@ projects.funcs.createUIFunctionList = () =>{
           // transférer les données dans le buffer
           ops.env.device.queue.writeBuffer(ops.objs.attr.offsets.buffer, 0, ops.objs.attr.offsets.data)
 
-          // afficher le graphic
-          //ops.observer.observe(ops.env.context.canvas);
-
-          
+        
           ops.render()
    
           // invoquer l'animation du frame
@@ -813,12 +869,12 @@ projects.funcs.createUIFunctionList = () =>{
           ops.env.animating = animTrigger 
 
           if (ops.env.animating) {
+ 
 
             ops.env.previousTime = performance.now();
-           
+   
             requestAnimationFrame(ops.editFrame);
-          //  requestAnimationFrame(ops.editFrame);
-      
+   
           }
            
         }
@@ -839,14 +895,15 @@ projects.funcs.createUIFunctionList = () =>{
           }
 
          ops.render();
+     
          // ops.observer.observe(ops.env.context.canvas);
           ops.ui.checkboxAnimTrigger.checked = false; 
           ops.ui.checkboxAnimTrigger.onchange =  ops.triggerAnimation;
-          
+         
 
         }
  
-        return {desc:ops.desc, func: ops.run };
+        return {desc:ops.desc, func: ops.run, reloadCanvas: ops.reloadCanvas  };
     }
 
   } ,
